@@ -215,10 +215,10 @@ function App() {
         isOffline={isOffline}
       />
 
-      {/* Main Single-DOM Layout (Zero Double-Mount Collisions) */}
+      {/* Main Single-DOM Layout */}
       <main className="max-w-7xl mx-auto px-2.5 sm:px-6 w-full space-y-4 sm:space-y-5 my-3 sm:my-4 flex-1">
         
-        {/* Top 4 Telemetry Metric Capsules (Always on desktop; on mobile visible in Map tab) */}
+        {/* Top 4 Telemetry Metric Capsules */}
         <div className={activeMobileTab === 'map' ? 'block' : 'hidden lg:block'}>
           <Telemetry
             route={route}
@@ -231,7 +231,7 @@ function App() {
         {/* 2-Column Responsive Section */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
           
-          {/* 1. Interactive Dark Matter Marine Map */}
+          {/* 1. Interactive Dark Matter Marine Map with Floating Action HUD */}
           <div className={`lg:col-span-7 w-full ${activeMobileTab === 'map' ? 'block' : 'hidden lg:block'}`}>
             <MarineMap
               harbor={currentHarborObj}
@@ -240,20 +240,8 @@ function App() {
               onSelectHotspot={handleSelectHotspot}
               route={route}
               boundaries={boundaries}
+              onOpenChat={() => setActiveMobileTab('chat')}
             />
-            {/* Quick Action Drawer for Mobile */}
-            <div className="lg:hidden mt-3 glass-panel p-3 rounded-2xl flex items-center justify-between gap-2 shadow-xl">
-              <div className="text-xs">
-                <span className="text-slate-400 font-medium">Target: </span>
-                <span className="font-bold text-emerald-400">{selectedHotspot?.primary_species?.split('(')[0]?.trim()}</span>
-              </div>
-              <button
-                onClick={() => setActiveMobileTab('chat')}
-                className="flex items-center gap-1.5 text-xs bg-gradient-to-r from-emerald-400 to-cyan-500 text-slate-950 font-black px-3.5 py-1.5 rounded-xl shadow-lg shadow-emerald-500/20"
-              >
-                <span>Ask AI Co-Pilot 💬</span>
-              </button>
-            </div>
           </div>
 
           {/* 2. Collaborative Agentic Chat */}

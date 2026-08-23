@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { Compass, Waves, Anchor, Sparkles } from 'lucide-react';
+import { Compass, Waves, Anchor, Sparkles, MessageSquare, ChevronRight } from 'lucide-react';
 
 // Custom Map Centering Controller with smooth coordinate listener
 function MapViewController({ center, zoom }) {
@@ -53,49 +53,70 @@ const pfzStandardIcon = L.divIcon({
   popupAnchor: [0, -18]
 });
 
-export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectHotspot, route, boundaries }) {
+export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectHotspot, route, boundaries, onOpenChat }) {
   const center = [harbor?.lat || 13.125, harbor?.lng || 80.298];
 
   const imblLines = boundaries?.imbl_lines ? Object.values(boundaries.imbl_lines).map(b => b.points.map(p => [p.lat, p.lng])) : [];
   const aiRoutePoints = route?.ai_waypoints ? route.ai_waypoints.map(w => [w.lat, w.lng]) : [];
   const straightPoints = route?.straight_path ? route.straight_path.map(p => [p.lat, p.lng]) : [];
 
+  const rawSpecies = selectedHotspot?.primary_species || "Indian Mackerel";
+  const cleanSpecies = rawSpecies.split('(')[0].trim();
+
   return (
-    <div className="relative w-full h-[520px] lg:h-[600px] rounded-3xl overflow-hidden glass-panel shadow-2xl border border-white/10">
+    <div className="relative w-full h-[430px] sm:h-[480px] lg:h-[580px] rounded-3xl overflow-hidden glass-panel shadow-2xl border border-white/15">
       
       {/* Map Header Floating Pill */}
-      <div className="absolute top-4 left-4 z-[400] glass-panel px-4 py-2 rounded-2xl flex items-center gap-2.5 text-xs shadow-xl">
+      <div className="absolute top-3 left-3 z-[400] bg-slate-950/85 backdrop-blur-xl border border-white/20 px-3 py-1.5 rounded-2xl flex items-center gap-2 text-[11px] shadow-xl">
         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span className="font-bold text-white tracking-wide">{harbor?.name?.split('(')[0]?.trim() || 'Coast'}:</span>
+        <span className="font-bold text-white truncate max-w-[110px] sm:max-w-none">{harbor?.name?.split('(')[0]?.trim() || 'Coast'}:</span>
         <span className="text-emerald-400 font-mono font-bold">{harbor?.coast || 'Indian EEZ'}</span>
       </div>
 
-      {/* Modern Sleek Map Legend */}
-      <div className="absolute bottom-4 left-4 z-[400] glass-panel p-3.5 rounded-2xl text-[11px] text-slate-200 shadow-2xl space-y-2 hidden sm:block max-w-xs">
-        <div className="flex items-center gap-2 font-extrabold text-white border-b border-white/10 pb-1.5">
-          <Compass className="w-3.5 h-3.5 text-cyan-400" />
+      {/* Floating Tactical Legend (Desktop) */}
+      <div className="absolute top-3 right-3 z-[400] bg-slate-950/85 backdrop-blur-xl border border-white/20 p-2.5 rounded-2xl text-[10px] text-slate-200 shadow-2xl space-y-1.5 hidden md:block max-w-[210px]">
+        <div className="flex items-center gap-1.5 font-bold text-white border-b border-white/10 pb-1">
+          <Compass className="w-3 h-3 text-cyan-400" />
           <span>Tactical Marine Layers</span>
         </div>
-        <div className="flex items-center gap-2.5">
-          <span className="w-3 h-3 rounded-lg bg-emerald-400 border border-white shadow-[0_0_10px_rgba(0,245,160,0.8)]"></span>
-          <span>Potential Fishing Zone (PFZ Hotspot)</span>
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-md bg-emerald-400 border border-white"></span>
+          <span>PFZ Hotspot Zone</span>
         </div>
-        <div className="flex items-center gap-2.5">
-          <span className="w-4 h-1.5 bg-cyan-400 rounded-full shadow-[0_0_8px_#00d2ff]"></span>
-          <span>AI Current-Assisted Route ({route?.fuel_savings_percentage || 28}% Fuel Saved)</span>
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-1 bg-emerald-400 rounded-full"></span>
+          <span>AI Current Route (-{route?.fuel_savings_percentage || 28}%)</span>
         </div>
-        <div className="flex items-center gap-2.5">
-          <span className="w-4 h-0.5 border-t border-dashed border-slate-500"></span>
-          <span className="text-slate-400">Traditional Direct Path</span>
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-0.5 border-t border-dashed border-rose-500"></span>
+          <span className="text-rose-400">IMBL Border Line</span>
         </div>
-        <div className="flex items-center gap-2.5">
-          <span className="w-4 h-1.5 border-t-2 border-dashed border-rose-500"></span>
-          <span className="text-rose-400 font-medium">International Maritime Boundary (IMBL)</span>
+      </div>
+
+      {/* Floating Bottom Action HUD directly on the map (Zero scrolling required on phone!) */}
+      <div className="absolute bottom-3 left-3 right-3 z-[400] bg-slate-950/92 backdrop-blur-2xl border border-white/25 p-3 rounded-2xl flex items-center justify-between gap-2 shadow-[0_15px_35px_rgba(0,0,0,0.9)] animate-fadeIn">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 font-black text-sm shrink-0">
+            🐟
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] text-slate-400 font-medium truncate">Selected Target Shoal:</div>
+            <div className="text-xs font-black text-white truncate flex items-center gap-1.5">
+              <span className="text-emerald-400">{cleanSpecies}</span>
+              <span className="text-[10px] text-slate-300 font-mono font-normal">({selectedHotspot?.distance_nm || 20} NM)</span>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-2.5">
-          <span className="text-xs">🐢 / 🪸</span>
-          <span className="text-amber-300 font-medium">Marine Ecological Sanctuary</span>
-        </div>
+
+        {onOpenChat && (
+          <button
+            onClick={onOpenChat}
+            className="flex items-center gap-1.5 bg-gradient-to-r from-emerald-400 to-cyan-500 hover:opacity-90 active:scale-95 text-slate-950 font-black px-3.5 py-2 rounded-xl text-xs shadow-lg shadow-emerald-500/20 shrink-0 transition"
+          >
+            <MessageSquare className="w-3.5 h-3.5" />
+            <span>Ask AI Co-Pilot</span>
+          </button>
+        )}
       </div>
 
       <MapContainer
