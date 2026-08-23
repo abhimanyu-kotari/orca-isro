@@ -22,12 +22,12 @@ function App() {
   const [selectedHarbor, setSelectedHarbor] = useState('malpe');
   const [selectedLang, setSelectedLang] = useState('en');
   const [harbors, setHarbors] = useState(HARBORS);
-  const [hotspots, setHotspots] = useState([]);
-  const [selectedHotspot, setSelectedHotspot] = useState(null);
-  const [route, setRoute] = useState(null);
-  const [weather, setWeather] = useState(null);
+  const [hotspots, setHotspots] = useState(() => generateHotspots('malpe'));
+  const [selectedHotspot, setSelectedHotspot] = useState(() => generateHotspots('malpe')[0]);
+  const [route, setRoute] = useState(() => computeVoyageRoute(HARBORS.malpe, generateHotspots('malpe')[0]));
+  const [weather, setWeather] = useState(() => generateWeather(generateHotspots('malpe')[0].lat, generateHotspots('malpe')[0].lng));
   const [boundaries, setBoundaries] = useState(BOUNDARIES);
-  const [geofence, setGeofence] = useState(null);
+  const [geofence, setGeofence] = useState(() => checkGeofenceProximity(generateHotspots('malpe')[0].lat, generateHotspots('malpe')[0].lng));
   const [isOffline, setIsOffline] = useState(false);
 
   // Chat State
@@ -48,8 +48,9 @@ function App() {
 
   // Update harbor data on selection change
   const updateHarborData = async (harborKey) => {
-    const localHarbor = HARBORS[harborKey] || HARBORS.malpe;
-    const localHotspots = generateHotspots(harborKey);
+    const validHarborKey = HARBORS[harborKey] ? harborKey : 'malpe';
+    const localHarbor = HARBORS[validHarborKey];
+    const localHotspots = generateHotspots(validHarborKey);
     const topHotspot = localHotspots[0];
     const localRoute = computeVoyageRoute(localHarbor, topHotspot);
     const localGeofence = checkGeofenceProximity(topHotspot.lat, topHotspot.lng);
@@ -68,14 +69,17 @@ function App() {
         const hRes = await fetch(`${API_BASE_URL}/api/harbors`);
         if (hRes.ok) {
           const hData = await hRes.json();
-          setHarbors(hData.harbors);
+          if (hData && typeof hData === 'object' && !Array.isArray(hData)) {
+            setHarbors(hData.harbors || hData);
+          }
         }
-        const pfzRes = await fetch(`${API_BASE_URL}/api/pfz?harbor=${harborKey}`);
+        const pfzRes = await fetch(`${API_BASE_URL}/api/pfz-hotspots/${validHarborKey}`);
         if (pfzRes.ok) {
           const pfzData = await pfzRes.json();
-          if (pfzData.hotspots && pfzData.hotspots.length > 0) {
-            setHotspots(pfzData.hotspots);
-            setSelectedHotspot(pfzData.hotspots[0]);
+          const list = Array.isArray(pfzData) ? pfzData : (pfzData?.hotspots || []);
+          if (list.length > 0) {
+            setHotspots(list);
+            setSelectedHotspot(list[0]);
           }
         }
       } catch (err) {
@@ -91,8 +95,10 @@ function App() {
 
   // Handle Hotspot Click
   const handleSelectHotspot = async (spot) => {
+    if (!spot) return;
     setSelectedHotspot(spot);
-    const currentHarborObj = harbors[selectedHarbor] || HARBORS[selectedHarbor] || HARBORS.malpe;
+    const validHarborKey = harbors?.[selectedHarbor] ? selectedHarbor : 'malpe';
+    const currentHarborObj = harbors?.[validHarborKey] || HARBORS[validHarborKey] || HARBORS.malpe;
 
     // Instant local compute
     const localRoute = computeVoyageRoute(currentHarborObj, spot);
@@ -104,19 +110,18 @@ function App() {
 
     if (!isOffline) {
       try {
-        const routeRes = await fetch(`${API_BASE_URL}/api/route/optimize`, {
+        const routeRes = await fetch(`${API_BASE_URL}/api/analyze-voyage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            start_lat: currentHarborObj.lat,
-            start_lng: currentHarborObj.lng,
-            target_lat: spot.lat,
-            target_lng: spot.lng
+            harbor_id: validHarborKey,
+            target_hotspot_id: spot.id,
+            language: selectedLang
           })
         });
         if (routeRes.ok) {
           const routeData = await routeRes.json();
-          setRoute(routeData.route);
+          if (routeData?.route) setRoute(routeData.route);
         }
       } catch (err) {}
     }
@@ -128,7 +133,6 @@ function App() {
     setMessages(newMessages);
     setIsProcessing(true);
 
-    // If offline or on mobile without backend, process client-side instantly
     if (isOffline) {
       setTimeout(() => {
         const result = processClientChat(userText, selectedHarbor, selectedLang);
@@ -152,7 +156,7 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: userText,
-          harbor: selectedHarbor,
+          harbor_id: selectedHarbor,
           language: selectedLang
         })
       });
@@ -193,7 +197,8 @@ function App() {
     }
   };
 
-  const currentHarborObj = harbors[selectedHarbor] || HARBORS[selectedHarbor] || HARBORS.malpe;
+  const safeHarbors = (harbors && typeof harbors === 'object' && Object.keys(harbors).length > 0) ? harbors : HARBORS;
+  const currentHarborObj = safeHarbors[selectedHarbor] || safeHarbors.malpe || HARBORS.malpe;
 
   return (
     <div className="min-h-screen ocean-ambient-bg flex flex-col justify-between py-2 sm:py-3">
@@ -204,7 +209,7 @@ function App() {
         onHarborChange={(h) => setSelectedHarbor(h)}
         selectedLang={selectedLang}
         onLangChange={(l) => setSelectedLang(l)}
-        harbors={harbors}
+        harbors={safeHarbors}
         isOffline={isOffline}
       />
 
