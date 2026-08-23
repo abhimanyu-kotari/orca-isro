@@ -203,7 +203,7 @@ function App() {
   const currentHarborObj = safeHarbors[selectedHarbor] || safeHarbors.malpe || HARBORS.malpe;
 
   return (
-    <div className="min-h-screen ocean-ambient-bg flex flex-col justify-between pb-20 lg:pb-3 py-2 sm:py-3">
+    <div className="min-h-screen ocean-ambient-bg flex flex-col justify-between pb-24 lg:pb-4 py-2 sm:py-3">
       
       {/* Floating Modern Header */}
       <Navbar
@@ -215,37 +215,34 @@ function App() {
         isOffline={isOffline}
       />
 
-      {/* ========================================================================= */}
-      {/* MOBILE-FIRST APP EXPERIENCE (< lg screens) */}
-      {/* ========================================================================= */}
-      <div className="lg:hidden max-w-lg mx-auto px-3 w-full my-3 flex-1">
+      {/* Main Single-DOM Layout (Zero Double-Mount Collisions) */}
+      <main className="max-w-7xl mx-auto px-2.5 sm:px-6 w-full space-y-4 sm:space-y-5 my-3 sm:my-4 flex-1">
         
-        {/* TAB 1: MAP & ROUTE */}
-        {activeMobileTab === 'map' && (
-          <div className="space-y-3 animate-fadeIn">
-            
-            {/* Quick Metrics Bar */}
-            <Telemetry
+        {/* Top 4 Telemetry Metric Capsules (Always on desktop; on mobile visible in Map tab) */}
+        <div className={activeMobileTab === 'map' ? 'block' : 'hidden lg:block'}>
+          <Telemetry
+            route={route}
+            hotspot={selectedHotspot}
+            weather={weather}
+            geofence={geofence}
+          />
+        </div>
+
+        {/* 2-Column Responsive Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
+          
+          {/* 1. Interactive Dark Matter Marine Map */}
+          <div className={`lg:col-span-7 w-full ${activeMobileTab === 'map' ? 'block' : 'hidden lg:block'}`}>
+            <MarineMap
+              harbor={currentHarborObj}
+              hotspots={hotspots}
+              selectedHotspot={selectedHotspot}
+              onSelectHotspot={handleSelectHotspot}
               route={route}
-              hotspot={selectedHotspot}
-              weather={weather}
-              geofence={geofence}
+              boundaries={boundaries}
             />
-
-            {/* Interactive Marine Map */}
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10">
-              <MarineMap
-                harbor={currentHarborObj}
-                hotspots={hotspots}
-                selectedHotspot={selectedHotspot}
-                onSelectHotspot={handleSelectHotspot}
-                route={route}
-                boundaries={boundaries}
-              />
-            </div>
-
-            {/* Quick Action Drawer */}
-            <div className="glass-panel p-3 rounded-2xl flex items-center justify-between gap-2 shadow-xl">
+            {/* Quick Action Drawer for Mobile */}
+            <div className="lg:hidden mt-3 glass-panel p-3 rounded-2xl flex items-center justify-between gap-2 shadow-xl">
               <div className="text-xs">
                 <span className="text-slate-400 font-medium">Target: </span>
                 <span className="font-bold text-emerald-400">{selectedHotspot?.primary_species?.split('(')[0]?.trim()}</span>
@@ -257,93 +254,10 @@ function App() {
                 <span>Ask AI Co-Pilot 💬</span>
               </button>
             </div>
-
-          </div>
-        )}
-
-        {/* TAB 2: AI CO-PILOT CHAT */}
-        {activeMobileTab === 'chat' && (
-          <div className="animate-fadeIn">
-            <AgentChat
-              onSendMessage={handleSendMessage}
-              messages={messages}
-              isProcessing={isProcessing}
-              collaboratingAgents={collaboratingAgents}
-              activeVoiceScript={messages[messages.length - 1]?.voiceScript}
-              selectedLang={selectedLang}
-            />
-          </div>
-        )}
-
-        {/* TAB 3: OCEAN WEATHER & SWELL */}
-        {activeMobileTab === 'weather' && (
-          <div className="space-y-3.5 animate-fadeIn">
-            <WeatherCard
-              weather={weather}
-              hotspot={selectedHotspot}
-            />
-            <div className="glass-panel p-4 rounded-3xl space-y-2">
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                <span>🛰️</span> ISRO Ocean Sat Telemetry Feed
-              </h4>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Live oceanographic swell, sea-surface temperature (SST) thermal front contours, and surface current drift stream are synced in real-time.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* TAB 4: DEEP-SEA OFFLINE VOYAGE PASS */}
-        {activeMobileTab === 'pass' && (
-          <div className="space-y-3.5 animate-fadeIn">
-            <OfflineSync
-              harbor={currentHarborObj}
-              selectedHotspot={selectedHotspot}
-              route={route}
-              weather={weather}
-              isOffline={isOffline}
-              onToggleOffline={() => setIsOffline(!isOffline)}
-              selectedLang={selectedLang}
-            />
-            <div className="glass-panel p-4 rounded-3xl text-xs text-slate-300 space-y-1.5">
-              <p className="font-bold text-emerald-400">🌊 100% Zero-Internet Sea Autonomy</p>
-              <p>When sailing 15–40 km offshore, all waypoints, IMBL safety buffers, and fish shoals run offline from on-device cache.</p>
-            </div>
-          </div>
-        )}
-
-      </div>
-
-      {/* ========================================================================= */}
-      {/* DESKTOP COMMAND COCKPIT (lg: screens) */}
-      {/* ========================================================================= */}
-      <main className="hidden lg:block max-w-7xl mx-auto px-6 w-full space-y-5 my-4 flex-1">
-        
-        {/* Top 4 Telemetry Metric Capsules */}
-        <Telemetry
-          route={route}
-          hotspot={selectedHotspot}
-          weather={weather}
-          geofence={geofence}
-        />
-
-        {/* 2-Column Split: Map & Chat */}
-        <div className="grid grid-cols-12 gap-5 items-start">
-          
-          {/* Interactive Dark Matter Marine Map (7 Cols) */}
-          <div className="col-span-7 w-full">
-            <MarineMap
-              harbor={currentHarborObj}
-              hotspots={hotspots}
-              selectedHotspot={selectedHotspot}
-              onSelectHotspot={handleSelectHotspot}
-              route={route}
-              boundaries={boundaries}
-            />
           </div>
 
-          {/* Collaborative Agentic Chat (5 Cols) */}
-          <div className="col-span-5 w-full">
+          {/* 2. Collaborative Agentic Chat */}
+          <div className={`lg:col-span-5 w-full ${activeMobileTab === 'chat' ? 'block' : 'hidden lg:block'}`}>
             <AgentChat
               onSendMessage={handleSendMessage}
               messages={messages}
@@ -357,14 +271,18 @@ function App() {
         </div>
 
         {/* Bottom Section: Weather Telemetry & Deep-Sea Offline Sync */}
-        <div className="grid grid-cols-12 gap-5 items-stretch">
-          <div className="col-span-7">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-stretch">
+          
+          {/* Weather Card */}
+          <div className={`lg:col-span-7 ${activeMobileTab === 'weather' ? 'block' : 'hidden lg:block'}`}>
             <WeatherCard
               weather={weather}
               hotspot={selectedHotspot}
             />
           </div>
-          <div className="col-span-5 flex flex-col justify-center">
+
+          {/* Offline Sync Card */}
+          <div className={`lg:col-span-5 flex flex-col justify-center ${activeMobileTab === 'pass' ? 'block' : 'hidden lg:block'}`}>
             <OfflineSync
               harbor={currentHarborObj}
               selectedHotspot={selectedHotspot}
@@ -375,6 +293,7 @@ function App() {
               selectedLang={selectedLang}
             />
           </div>
+
         </div>
 
       </main>
