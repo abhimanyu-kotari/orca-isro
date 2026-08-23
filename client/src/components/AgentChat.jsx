@@ -6,24 +6,8 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [showAgentsTrace, setShowAgentsTrace] = useState(true);
-  const [voices, setVoices] = useState([]);
+  const [currentAudio, setCurrentAudio] = useState(null);
   const messagesEndRef = useRef(null);
-
-  // Load and cache browser speech synthesis voices
-  useEffect(() => {
-    const loadVoices = () => {
-      if ('speechSynthesis' in window) {
-        const available = window.speechSynthesis.getVoices();
-        if (available.length > 0) {
-          setVoices(available);
-        }
-      }
-    };
-    loadVoices();
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.onvoiceschanged = loadVoices;
-    }
-  }, []);
 
   // Suggested Prompts based on ISRO Problem Statement
   const suggestedQueries = [
@@ -39,55 +23,41 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isProcessing]);
 
-  // Robust Multilingual Web Speech Synthesis
-  const speakText = (text) => {
-    if (!('speechSynthesis' in window)) {
-      alert('Speech synthesis is not supported in this browser.');
-      return;
-    }
+  // Stop audio on unmount
+  useEffect(() => {
+    return () => {
+      if (currentAudio) {
+        currentAudio.pause();
+      }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [currentAudio]);
 
-    window.speechSynthesis.cancel();
-    if (isSpeaking) {
+  // Fallback Web Speech API
+  const fallbackWebSpeech = (cleanText) => {
+    if (!('speechSynthesis' in window)) {
       setIsSpeaking(false);
       return;
     }
-
-    // Clean markdown characters and emojis before speech
-    const cleanText = text
-      .replace(/\*\*/g, '')
-      .replace(/\*/g, '')
-      .replace(/#/g, '')
-      .replace(/•/g, '')
-      .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
-      .trim();
-
     const langMap = {
-      'ta': { code: 'ta-IN', prefix: 'ta', name: 'tamil' },
-      'kn': { code: 'kn-IN', prefix: 'kn', name: 'kannada' },
-      'tcy': { code: 'kn-IN', prefix: 'kn', name: 'kannada' }, // Tulu maps to Dravidian phonetic voice
-      'te': { code: 'te-IN', prefix: 'te', name: 'telugu' },
-      'hi': { code: 'hi-IN', prefix: 'hi', name: 'hindi' },
-      'ml': { code: 'ml-IN', prefix: 'ml', name: 'malayalam' },
-      'en': { code: 'en-IN', prefix: 'en', name: 'english' }
+      'ta': 'ta-IN',
+      'kn': 'kn-IN',
+      'tcy': 'kn-IN',
+      'te': 'te-IN',
+      'hi': 'hi-IN',
+      'ml': 'ml-IN',
+      'en': 'en-IN'
     };
-
-    const target = langMap[selectedLang] || langMap['en'];
+    const targetCode = langMap[selectedLang] || 'en-IN';
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = target.code;
+    utterance.lang = targetCode;
     utterance.rate = 0.92;
-    utterance.pitch = 1.0;
 
-    // Explicitly locate the regional language voice in the device
-    const availableVoices = window.speechSynthesis.getVoices();
-    const matchedVoice = availableVoices.find(v => 
-      v.lang === target.code || 
-      v.lang.toLowerCase().replace('_', '-').startsWith(target.prefix) ||
-      v.name.toLowerCase().includes(target.name)
-    );
-
-    if (matchedVoice) {
-      utterance.voice = matchedVoice;
-    }
+    const voices = window.speechSynthesis.getVoices();
+    const matched = voices.find(v => v.lang === targetCode || v.lang.startsWith(targetCode.slice(0, 2)));
+    if (matched) utterance.voice = matched;
 
     utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => setIsSpeaking(false);
@@ -96,7 +66,69 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
     window.speechSynthesis.speak(utterance);
   };
 
-  // Web Speech Recognition (Voice to Text in Regional Mother Tongue)
+  // High-Fidelity Dual-Engine Voice Synthesizer (Native Indian Voice Stream)
+  const speakText = (text) => {
+    // If currently speaking, toggle off immediately
+    if (isSpeaking) {
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+      }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      setIsSpeaking(false);
+      return;
+    }
+
+    // Clean text of markdown and emojis
+    const cleanText = text
+      .replace(/\*\*/g, '')
+      .replace(/\*/g, '')
+      .replace(/#/g, '')
+      .replace(/•/g, '')
+      .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
+      .trim();
+
+    const langCodeMap = {
+      'ta': 'ta',
+      'kn': 'kn',
+      'tcy': 'kn', // Tulu uses Dravidian phonetics
+      'te': 'te',
+      'hi': 'hi',
+      'ml': 'ml',
+      'en': 'en'
+    };
+
+    const targetLang = langCodeMap[selectedLang] || 'en';
+
+    // Truncate to reasonable phrase length for instant high-speed audio buffer
+    const spokenChunk = cleanText.length > 190 ? cleanText.substring(0, 185) + '...' : cleanText;
+    const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${targetLang}&q=${encodeURIComponent(spokenChunk)}`;
+
+    try {
+      const audio = new Audio(ttsUrl);
+      setCurrentAudio(audio);
+      setIsSpeaking(true);
+
+      audio.onended = () => {
+        setIsSpeaking(false);
+        setCurrentAudio(null);
+      };
+
+      audio.onerror = () => {
+        fallbackWebSpeech(cleanText);
+      };
+
+      audio.play().catch(() => {
+        fallbackWebSpeech(cleanText);
+      });
+    } catch (e) {
+      fallbackWebSpeech(cleanText);
+    }
+  };
+
+  // Web Speech Recognition (Voice to Text in Regional Language)
   const toggleListening = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -214,7 +246,11 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
                   </span>
                   <button
                     onClick={() => speakText(m.voiceScript || m.text)}
-                    className="flex items-center gap-1.5 text-emerald-300 hover:text-white bg-emerald-500/10 hover:bg-emerald-500/20 px-2.5 py-1 rounded-xl border border-emerald-500/25 transition font-semibold"
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-xl border transition font-bold shadow-md ${
+                      isSpeaking
+                        ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 animate-pulse'
+                        : 'bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 border-emerald-500/30 hover:text-white'
+                    }`}
                   >
                     {isSpeaking ? <VolumeX className="w-3.5 h-3.5 text-rose-400" /> : <Volume2 className="w-3.5 h-3.5" />}
                     <span>{isSpeaking ? 'Stop Audio' : 'Play Voice 🔊'}</span>
@@ -264,7 +300,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
               ? 'bg-rose-500/20 border-rose-500 text-rose-400 animate-pulse'
               : 'bg-white/[0.04] border-white/10 text-slate-300 hover:text-emerald-400 hover:border-emerald-400/40'
           }`}
-          title="Speak in Tamil (தமிழ்), Kannada (ಕನ್ನಡ), or your mother tongue"
+          title="Speak in Kannada, Tamil, Telugu, Hindi, or mother tongue"
         >
           {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
         </button>
@@ -273,7 +309,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={`Ask ORCA in Tamil, Kannada, Telugu, Hindi, or English...`}
+          placeholder={`Ask ORCA in Kannada, Tamil, Telugu, Hindi, or English...`}
           className="flex-1 bg-white/[0.04] border border-white/10 rounded-2xl px-4 py-3 text-xs text-white placeholder-slate-500 outline-none focus:border-emerald-400 font-medium transition shadow-inner"
         />
 
