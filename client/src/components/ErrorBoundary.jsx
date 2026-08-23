@@ -19,7 +19,13 @@ export class ErrorBoundary extends React.Component {
       return (
         <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 text-center text-white">
           <div className="glass-panel p-8 rounded-3xl max-w-md space-y-4 border border-emerald-500/30 shadow-2xl">
-            <div className="text-4xl animate-bounce">🐋</div>
+            <div className="flex justify-center">
+              <img 
+                src="/assets/orca_logo.png" 
+                alt="Project ORCA Emblem" 
+                className="w-16 h-16 rounded-full object-cover border-2 border-emerald-400 shadow-[0_0_25px_rgba(0,245,160,0.5)]"
+              />
+            </div>
             <h2 className="text-lg font-black text-emerald-400">ORCA System Reconnecting</h2>
             <p className="text-xs text-slate-400 leading-relaxed">
               {this.state.error?.message || "Click below to refresh the marine cockpit."}

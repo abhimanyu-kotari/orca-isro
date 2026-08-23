@@ -68,7 +68,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
       v.name.toLowerCase().includes(target.name)
     );
 
-    // 2. Locate Indian female voice (e.g. Heera, Swara, Kalpana, Google हिन्दी, Indian English)
+    // 2. Locate Indian female voice
     const indianFemaleVoice = availableVoices.find(v => 
       (v.name.toLowerCase().includes('heera') ||
        v.name.toLowerCase().includes('swara') ||
@@ -93,7 +93,6 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
       chosenVoice = nativeVoice;
       speechLang = target.code;
     } else {
-      // Use phonetic script with Indian accent voice
       textToSpeak = sanitizeText(msg.voiceScriptPhonetic || msg.voiceScript || msg.text);
       chosenVoice = indianFemaleVoice || generalFemaleVoice || availableVoices[0];
       speechLang = 'en-IN';
@@ -102,7 +101,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
     utterance.lang = speechLang;
     utterance.rate = 0.90;
-    utterance.pitch = 1.05; // Pleasant natural pitch
+    utterance.pitch = 1.05;
 
     if (chosenVoice) {
       utterance.voice = chosenVoice;
@@ -115,7 +114,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
     window.speechSynthesis.speak(utterance);
   };
 
-  // Web Speech Recognition (Voice to Text in Regional Language)
+  // Web Speech Recognition
   const toggleListening = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -169,9 +168,11 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
       {/* Header */}
       <div className="bg-white/[0.03] border-b border-white/[0.08] p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-slate-950 text-xl font-black shadow-[0_0_20px_rgba(0,245,160,0.35)]">
-            🐋
-          </div>
+          <img 
+            src="/assets/orca_logo.png" 
+            alt="Project ORCA Logo" 
+            className="w-10 h-10 rounded-full object-cover border border-emerald-400/50 shadow-[0_0_20px_rgba(0,245,160,0.4)]"
+          />
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-xs font-black text-white tracking-wider uppercase">ORCA Conversational Co-Pilot</h2>
@@ -213,9 +214,11 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
             className={`flex items-start gap-3 ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {m.sender === 'agent' && (
-              <div className="w-8 h-8 rounded-2xl bg-white/[0.06] border border-emerald-500/30 flex items-center justify-center text-lg shadow shrink-0 mt-0.5">
-                🐋
-              </div>
+              <img 
+                src="/assets/orca_logo.png" 
+                alt="ORCA Assistant" 
+                className="w-8 h-8 rounded-full object-cover border border-emerald-500/40 shadow shrink-0 mt-0.5"
+              />
             )}
             
             <div className={`max-w-[85%] rounded-3xl px-4 py-3 text-xs leading-relaxed shadow-lg ${

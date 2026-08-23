@@ -66,18 +66,20 @@ export default function Navbar({
         </div>
 
         {/* ========================================================================= */}
-        {/* 1. MOBILE ULTRA-COMPACT HEADER (< sm screens: 1 tight line + mini ticker) */}
+        {/* 1. MOBILE ULTRA-COMPACT HEADER (< sm screens) */}
         {/* ========================================================================= */}
         <div className="sm:hidden relative z-40 space-y-2">
           
           {/* Mobile Single Row */}
           <div className="flex items-center justify-between gap-1.5 w-full">
             
-            {/* Left: Brand */}
+            {/* Left: Official Emblem Logo & Brand */}
             <div className="flex items-center gap-2 shrink-0">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-slate-950 text-base font-black shadow-md">
-                🐋
-              </div>
+              <img 
+                src="/assets/orca_logo.png" 
+                alt="Project ORCA Logo" 
+                className="w-9 h-9 rounded-full object-cover border border-emerald-400/50 shadow-[0_0_15px_rgba(0,245,160,0.4)]"
+              />
               <div>
                 <div className="flex items-center gap-1.5">
                   <span className="text-xs font-black text-white tracking-tight">ORCA</span>
@@ -88,7 +90,7 @@ export default function Navbar({
               </div>
             </div>
 
-            {/* Right: 3 Single-Row Action Pills */}
+            {/* Right: 3 Action Pills */}
             <div className="flex items-center gap-1.5 shrink-0">
               
               {/* Vessel Pill */}
@@ -114,7 +116,6 @@ export default function Navbar({
                   <ChevronDown className="w-2.5 h-2.5 text-slate-400" />
                 </button>
 
-                {/* Mobile Harbor Popover */}
                 {isHarborOpen && (
                   <div className="absolute right-0 top-full mt-2 w-64 bg-[#020b17] border border-emerald-500/40 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-50 overflow-hidden animate-fadeIn ring-1 ring-emerald-500/20">
                     <div className="px-3 py-2 text-[9px] font-mono font-bold uppercase text-emerald-400 bg-[#01060e] border-b border-white/10 tracking-wider flex items-center gap-1">
@@ -156,7 +157,6 @@ export default function Navbar({
                   <ChevronDown className="w-2.5 h-2.5 text-slate-400" />
                 </button>
 
-                {/* Mobile Language Popover */}
                 {isLangOpen && (
                   <div className="absolute right-0 top-full mt-2 w-48 bg-[#020b17] border border-cyan-500/40 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-50 overflow-hidden animate-fadeIn ring-1 ring-cyan-500/20">
                     <div className="px-3 py-2 text-[9px] font-mono font-bold uppercase text-cyan-400 bg-[#01060e] border-b border-white/10 tracking-wider">
@@ -200,11 +200,13 @@ export default function Navbar({
           
           <div className="relative flex items-center justify-between gap-3 z-40 w-full">
             
-            {/* Brand & ISRO Badge */}
+            {/* Official Circular Emblem Logo & Brand */}
             <div className="flex items-center gap-3">
-              <div className="relative flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-500 shadow-[0_0_25px_rgba(0,245,160,0.45)] text-2xl font-black text-slate-950 shrink-0 transform transition hover:scale-105">
-                🐋
-              </div>
+              <img 
+                src="/assets/orca_logo.png" 
+                alt="Project ORCA Official Emblem" 
+                className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-emerald-400 shadow-[0_0_25px_rgba(0,245,160,0.5)] shrink-0 transform transition hover:scale-105"
+              />
               <div>
                 <div className="flex items-center gap-2">
                   <h1 className="text-base sm:text-xl font-black tracking-tight text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
@@ -216,7 +218,7 @@ export default function Navbar({
                 </div>
                 <p className="text-[11px] text-slate-200 font-medium flex items-center gap-1.5 mt-0.5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
                   <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                  <span>Marine EcoSystem & Sustainable Fisheries Co-Pilot</span>
+                  <span>Marine EcoSystem Reasoning with Collaborative Agents</span>
                 </p>
               </div>
             </div>

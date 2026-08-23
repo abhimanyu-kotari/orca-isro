@@ -12,9 +12,11 @@ export default function VesselModal({ isOpen, onClose, selectedVessel, onSelectV
         {/* Header */}
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-slate-950 text-xl font-black shadow-lg">
-              ⛵
-            </div>
+            <img 
+              src="/assets/orca_logo.png" 
+              alt="Project ORCA Emblem" 
+              className="w-11 h-11 rounded-full object-cover border border-emerald-400 shadow-lg shrink-0"
+            />
             <div>
               <h3 className="text-sm sm:text-base font-black text-white tracking-wide flex items-center gap-2">
                 Fisherman Vessel Profile Setup

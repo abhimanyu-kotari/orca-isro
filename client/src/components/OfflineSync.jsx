@@ -82,9 +82,11 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
       <div className="glass-panel rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
         
         <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-emerald-500/30 flex items-center justify-center text-xl shrink-0 shadow-lg">
-            🧭
-          </div>
+          <img 
+            src="/assets/orca_logo.png" 
+            alt="ORCA Emblem" 
+            className="w-11 h-11 rounded-full object-cover border border-emerald-400/50 shadow-lg shrink-0"
+          />
           <div>
             <div className="flex items-center gap-2.5">
               <h4 className="text-xs font-black text-white tracking-wide">Deep-Sea Pre-Trip Offline Pass</h4>
@@ -149,12 +151,14 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
             {/* Header: ISRO Co-Pilot Pass */}
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-slate-950 text-2xl font-black shadow-lg">
-                  🐋
-                </div>
+                <img 
+                  src="/assets/orca_logo.png" 
+                  alt="Official Emblem" 
+                  className="w-12 h-12 rounded-full object-cover border-2 border-emerald-400 shadow-[0_0_20px_rgba(0,245,160,0.5)]"
+                />
                 <div>
                   <h3 className="text-sm font-black tracking-wide text-white">FISHERMAN VOYAGE PASS</h3>
-                  <p className="text-[10px] text-emerald-400 font-mono">ISRO Marine Safe Co-Pilot</p>
+                  <p className="text-[10px] text-emerald-400 font-mono">ISRO Marine Safe Co-Pilot &bull; PS-26176</p>
                 </div>
               </div>
               <button
