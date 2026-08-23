@@ -5,6 +5,7 @@ import Telemetry from './components/Telemetry';
 import WeatherCard from './components/WeatherCard';
 import AgentChat from './components/AgentChat';
 import OfflineSync from './components/OfflineSync';
+
 import {
   HARBORS,
   BOUNDARIES,
@@ -15,198 +16,202 @@ import {
   processClientChat
 } from './services/marineEngine';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE_URL = 'http://localhost:8000';
 
-export default function App() {
-  const [selectedHarbor, setSelectedHarbor] = useState('chennai');
+function App() {
+  const [selectedHarbor, setSelectedHarbor] = useState('malpe');
   const [selectedLang, setSelectedLang] = useState('en');
-  const [isOffline, setIsOffline] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  // Core Marine State initialized with client-side engine
-  const [harborData, setHarborData] = useState(HARBORS.chennai);
-  const [harborsList, setHarborsList] = useState(HARBORS);
+  const [harbors, setHarbors] = useState(HARBORS);
+  const [hotspots, setHotspots] = useState([]);
+  const [selectedHotspot, setSelectedHotspot] = useState(null);
+  const [route, setRoute] = useState(null);
+  const [weather, setWeather] = useState(null);
   const [boundaries, setBoundaries] = useState(BOUNDARIES);
+  const [geofence, setGeofence] = useState(null);
+  const [isOffline, setIsOffline] = useState(false);
 
-  const initialHotspots = generateHotspots('chennai');
-  const [hotspots, setHotspots] = useState(initialHotspots);
-  const [selectedHotspot, setSelectedHotspot] = useState(initialHotspots[0]);
-  const [route, setRoute] = useState(computeVoyageRoute(HARBORS.chennai, initialHotspots[0]));
-  const [weather, setWeather] = useState(generateWeather(initialHotspots[0].lat, initialHotspots[0].lng));
-  const [geofence, setGeofence] = useState(checkGeofenceProximity(initialHotspots[0].lat, initialHotspots[0].lng));
-
-  // Multi-Agent Chat Messages
+  // Chat State
   const [messages, setMessages] = useState([
     {
       sender: 'agent',
-      text: '🛰️ **Welcome to ORCA Marine Co-Pilot (ISRO PS-26176)**!\n\nI am your collaborative Agentic AI assistant. I continuously reason over satellite Earth Observation data (SST, Chlorophyll-a, ocean currents, and weather forecasts).\n\nAsk me anything in English or your mother tongue (தமிழ், తెలుగు, हिन्दी, മലയാളം):',
-      voiceScript: 'Welcome to Project ORCA. I am your AI marine navigation and safety co-pilot.'
+      text: '🐋 **Welcome to ORCA Marine Intelligence Co-Pilot (ISRO PS-26176)**!\n\nI am your collaborative Agentic AI assistant. I reason over real-time satellite Earth Observation data (SST, Chlorophyll-a, ocean currents, and weather forecasts) to deliver evidence-backed fishing hotspots and fuel-optimal routing.\n\nAsk me anything in English or your mother tongue (ಕನ್ನಡ, ತುಳು, தமிழ், తెలుగు, हिन्दी, മലയാളം)!',
+      voiceScript: 'Welcome to Project ORCA. Your collaborative Marine Intelligence Co-Pilot is online and ready for voyage guidance.'
     }
   ]);
-
+  const [isProcessing, setIsProcessing] = useState(false);
   const [collaboratingAgents, setCollaboratingAgents] = useState([
-    { name: 'Ocean Analytics Agent', status: 'Ready', summary: 'SST & Chlorophyll mapping' },
-    { name: 'Weather Intelligence Agent', status: 'Ready', summary: 'Live wave & current vectors' },
-    { name: 'Routing Optimization Agent', status: 'Ready', summary: 'A* fuel-optimal pathfinder' },
-    { name: 'Geofencing & Safety Agent', status: 'Ready', summary: 'IMBL boundary monitoring' }
+    { name: 'Matsya Drishti Agent', status: 'Active', summary: 'SST & Chlorophyll mapping' },
+    { name: 'Sagara Vayu Agent', status: 'Active', summary: 'Live wave & current vectors' },
+    { name: 'Nava Setu Agent', status: 'Active', summary: 'A* fuel-optimal pathfinding' },
+    { name: 'Samudra Raksha Agent', status: 'Active', summary: 'IMBL boundary monitoring' }
   ]);
 
-  // Harbor Switch Handler
+  // Update harbor data on selection change
+  const updateHarborData = async (harborKey) => {
+    const localHarbor = HARBORS[harborKey] || HARBORS.malpe;
+    const localHotspots = generateHotspots(harborKey);
+    const topHotspot = localHotspots[0];
+    const localRoute = computeVoyageRoute(localHarbor, topHotspot);
+    const localGeofence = checkGeofenceProximity(topHotspot.lat, topHotspot.lng);
+    const localWeather = generateWeather(topHotspot.lat, topHotspot.lng);
+
+    // Immediate zero-latency local update
+    setHotspots(localHotspots);
+    setSelectedHotspot(topHotspot);
+    setRoute(localRoute);
+    setGeofence(localGeofence);
+    setWeather(localWeather);
+
+    // Try backend sync if running locally
+    if (!isOffline) {
+      try {
+        const hRes = await fetch(`${API_BASE_URL}/api/harbors`);
+        if (hRes.ok) {
+          const hData = await hRes.json();
+          setHarbors(hData.harbors);
+        }
+        const pfzRes = await fetch(`${API_BASE_URL}/api/pfz?harbor=${harborKey}`);
+        if (pfzRes.ok) {
+          const pfzData = await pfzRes.json();
+          if (pfzData.hotspots && pfzData.hotspots.length > 0) {
+            setHotspots(pfzData.hotspots);
+            setSelectedHotspot(pfzData.hotspots[0]);
+          }
+        }
+      } catch (err) {
+        // Standalone engine handles everything gracefully
+      }
+    }
+  };
+
+  // Initial Load
   useEffect(() => {
     updateHarborData(selectedHarbor);
   }, [selectedHarbor]);
 
-  const updateHarborData = async (harborKey) => {
-    // 1. Immediately apply client-side data (Instant responsiveness on Mobile/Vercel)
-    const currentHarbor = HARBORS[harborKey] || HARBORS.chennai;
-    setHarborData(currentHarbor);
+  // Handle Hotspot Click
+  const handleSelectHotspot = async (spot) => {
+    setSelectedHotspot(spot);
+    const currentHarborObj = harbors[selectedHarbor] || HARBORS[selectedHarbor] || HARBORS.malpe;
 
-    const newHotspots = generateHotspots(harborKey);
-    setHotspots(newHotspots);
-    const topHotspot = newHotspots[0];
-    setSelectedHotspot(topHotspot);
+    // Instant local compute
+    const localRoute = computeVoyageRoute(currentHarborObj, spot);
+    const localGeofence = checkGeofenceProximity(spot.lat, spot.lng);
+    const localWeather = generateWeather(spot.lat, spot.lng);
+    setRoute(localRoute);
+    setGeofence(localGeofence);
+    setWeather(localWeather);
 
-    const newRoute = computeVoyageRoute(currentHarbor, topHotspot);
-    setRoute(newRoute);
-
-    const newWeather = generateWeather(topHotspot.lat, topHotspot.lng);
-    setWeather(newWeather);
-
-    const newGeofence = checkGeofenceProximity(topHotspot.lat, topHotspot.lng);
-    setGeofence(newGeofence);
-
-    // 2. Try fetching from live FastAPI backend if available
-    try {
-      const vRes = await fetch(`${API_BASE}/api/analyze-voyage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ harbor_id: harborKey })
-      });
-      if (vRes.ok) {
-        const vData = await vRes.json();
-        setHarborData(vData.harbor);
-        setHotspots(vData.all_hotspots);
-        setSelectedHotspot(vData.selected_hotspot);
-        setRoute(vData.route);
-        setWeather(vData.weather);
-        setGeofence(vData.geofence);
-      }
-    } catch (e) {
-      // Backend not running on this device (e.g. mobile/cloud); client-side engine is active.
+    if (!isOffline) {
+      try {
+        const routeRes = await fetch(`${API_BASE_URL}/api/route/optimize`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            start_lat: currentHarborObj.lat,
+            start_lng: currentHarborObj.lng,
+            target_lat: spot.lat,
+            target_lng: spot.lng
+          })
+        });
+        if (routeRes.ok) {
+          const routeData = await routeRes.json();
+          setRoute(routeData.route);
+        }
+      } catch (err) {}
     }
   };
 
-  // Hotspot Click Handler
-  const handleSelectHotspot = async (hotspot) => {
-    setSelectedHotspot(hotspot);
-
-    // Local calculation
-    const newRoute = computeVoyageRoute(harborData, hotspot);
-    setRoute(newRoute);
-    const newWeather = generateWeather(hotspot.lat, hotspot.lng);
-    setWeather(newWeather);
-    const newGeofence = checkGeofenceProximity(hotspot.lat, hotspot.lng);
-    setGeofence(newGeofence);
-
-    // Backend attempt
-    try {
-      const res = await fetch(`${API_BASE}/api/analyze-voyage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          harbor_id: selectedHarbor,
-          target_hotspot_id: hotspot.id
-        })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setRoute(data.route);
-        setWeather(data.weather);
-        setGeofence(data.geofence);
-      }
-    } catch (err) {}
-  };
-
-  // Chat Message Submission Handler
+  // Handle Multi-Agent Chat Query
   const handleSendMessage = async (userText) => {
-    const userMsg = { sender: 'user', text: userText };
-    setMessages((prev) => [...prev, userMsg]);
+    const newMessages = [...messages, { sender: 'user', text: userText }];
+    setMessages(newMessages);
     setIsProcessing(true);
 
+    // If offline or on mobile without backend, process client-side instantly
+    if (isOffline) {
+      setTimeout(() => {
+        const result = processClientChat(userText, selectedHarbor, selectedLang);
+        setMessages([
+          ...newMessages,
+          {
+            sender: 'agent',
+            text: result.response_text,
+            voiceScript: result.voice_script
+          }
+        ]);
+        setCollaboratingAgents(result.collaborating_agents);
+        setIsProcessing(false);
+      }, 500);
+      return;
+    }
+
     try {
-      const res = await fetch(`${API_BASE}/api/chat`, {
+      const response = await fetch(`${API_BASE_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: userText,
-          harbor_id: selectedHarbor,
+          harbor: selectedHarbor,
           language: selectedLang
         })
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        const agentMsg = {
+      if (!response.ok) throw new Error('API unreachable');
+
+      const data = await response.json();
+      setMessages([
+        ...newMessages,
+        {
           sender: 'agent',
           text: data.response_text,
           voiceScript: data.voice_script
-        };
-        setMessages((prev) => [...prev, agentMsg]);
-        setCollaboratingAgents(data.collaborating_agents);
-
-        if (data.evidence) {
-          setHarborData(data.harbor);
-          setSelectedHotspot(data.evidence.top_pfz);
-          setHotspots(data.evidence.all_pfz_hotspots);
-          setRoute(data.evidence.route);
-          setWeather(data.evidence.weather);
-          setGeofence(data.evidence.geofence);
         }
-        return;
+      ]);
+      if (data.collaborating_agents) {
+        setCollaboratingAgents(data.collaborating_agents);
       }
-    } catch (err) {
-      // Backend unavailable; process via client-side multi-agent engine
-    }
-
-    // Client-side agent execution
-    setTimeout(() => {
-      const clientRes = processClientChat(userText, selectedHarbor, selectedLang);
-      const agentMsg = {
-        sender: 'agent',
-        text: clientRes.response_text,
-        voiceScript: clientRes.voice_script
-      };
-      setMessages((prev) => [...prev, agentMsg]);
-      setCollaboratingAgents(clientRes.collaborating_agents);
-
-      if (clientRes.evidence) {
-        setSelectedHotspot(clientRes.evidence.top_pfz);
-        setHotspots(clientRes.evidence.all_pfz_hotspots);
-        setRoute(clientRes.evidence.route);
-        setWeather(clientRes.evidence.weather);
-        setGeofence(clientRes.evidence.geofence);
+      if (data.evidence) {
+        if (data.evidence.route) setRoute(data.evidence.route);
+        if (data.evidence.weather) setWeather(data.evidence.weather);
+        if (data.evidence.geofence) setGeofence(data.evidence.geofence);
       }
+    } catch (error) {
+      // Graceful fallback to client engine
+      const result = processClientChat(userText, selectedHarbor, selectedLang);
+      setMessages([
+        ...newMessages,
+        {
+          sender: 'agent',
+          text: result.response_text,
+          voiceScript: result.voice_script
+        }
+      ]);
+      setCollaboratingAgents(result.collaborating_agents);
+    } finally {
       setIsProcessing(false);
-    }, 400);
+    }
   };
 
+  const currentHarborObj = harbors[selectedHarbor] || HARBORS[selectedHarbor] || HARBORS.malpe;
+
   return (
-    <div className="min-h-screen bg-ocean-950 text-slate-100 flex flex-col selection:bg-cyan-500 selection:text-black">
+    <div className="min-h-screen ocean-ambient-bg flex flex-col justify-between py-2 sm:py-3">
       
-      {/* Top Navigation Bar */}
+      {/* Floating Modern Header */}
       <Navbar
         selectedHarbor={selectedHarbor}
-        onHarborChange={setSelectedHarbor}
+        onHarborChange={(h) => setSelectedHarbor(h)}
         selectedLang={selectedLang}
-        onLangChange={setSelectedLang}
-        harbors={harborsList}
+        onLangChange={(l) => setSelectedLang(l)}
+        harbors={harbors}
         isOffline={isOffline}
       />
 
-      {/* Main Tactical Cockpit */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-3.5 lg:p-6 space-y-4">
+      {/* Main Content Area */}
+      <main className="max-w-7xl mx-auto px-2.5 sm:px-6 w-full space-y-3.5 sm:space-y-5 my-3 sm:my-4 flex-1">
         
-        {/* Real-time Telemetry Row */}
+        {/* Top 4 Telemetry Metric Capsules */}
         <Telemetry
           route={route}
           hotspot={selectedHotspot}
@@ -214,45 +219,54 @@ export default function App() {
           geofence={geofence}
         />
 
-        {/* Core Layout: Map & Multi-Agent Conversational Panel */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* 2-Column Split: Map & Chat */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-start">
           
-          {/* Left Column: Interactive Satellite Map (7 Cols) */}
-          <div className="lg:col-span-7 space-y-4">
+          {/* Interactive Dark Matter Marine Map (7 Cols) */}
+          <div className="lg:col-span-7 w-full">
             <MarineMap
-              harbor={harborData}
+              harbor={currentHarborObj}
               hotspots={hotspots}
               selectedHotspot={selectedHotspot}
               onSelectHotspot={handleSelectHotspot}
               route={route}
               boundaries={boundaries}
             />
+          </div>
 
-            {/* Live Weather & Sea State Card */}
+          {/* Collaborative Agentic Chat (5 Cols) */}
+          <div className="lg:col-span-5 w-full">
+            <AgentChat
+              onSendMessage={handleSendMessage}
+              messages={messages}
+              isProcessing={isProcessing}
+              collaboratingAgents={collaboratingAgents}
+              activeVoiceScript={messages[messages.length - 1]?.voiceScript}
+              selectedLang={selectedLang}
+            />
+          </div>
+
+        </div>
+
+        {/* Bottom Section: Weather Telemetry & Deep-Sea Offline Sync */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-stretch">
+          
+          <div className="lg:col-span-7">
             <WeatherCard
               weather={weather}
               hotspot={selectedHotspot}
             />
           </div>
 
-          {/* Right Column: Multi-Agent Conversational Interface (5 Cols) */}
-          <div className="lg:col-span-5 space-y-4">
-            <AgentChat
-              onSendMessage={handleSendMessage}
-              messages={messages}
-              isProcessing={isProcessing}
-              collaboratingAgents={collaboratingAgents}
-              selectedLang={selectedLang}
-            />
-
-            {/* Deep-Sea Offline Cache Downloader */}
+          <div className="lg:col-span-5 flex flex-col justify-center">
             <OfflineSync
-              harbor={harborData}
+              harbor={currentHarborObj}
               selectedHotspot={selectedHotspot}
               route={route}
               weather={weather}
               isOffline={isOffline}
               onToggleOffline={() => setIsOffline(!isOffline)}
+              selectedLang={selectedLang}
             />
           </div>
 
@@ -261,10 +275,12 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-ocean-800/80 bg-ocean-950/90 py-3 text-center text-xs text-slate-500 font-mono">
-        <p>Project ORCA &bull; Built for Smart India Hackathon (SIH 2026) &bull; Sponsoring Ministry: ISRO (Dept of Space)</p>
+      <footer className="max-w-7xl mx-auto px-4 py-3 text-center text-slate-500 text-[11px] font-mono w-full border-t border-white/[0.05] mt-2">
+        <p>Project ORCA &bull; Built for Smart India Hackathon (SIH 2026) &bull; Sponsoring Ministry: ISRO (Dept. of Space)</p>
       </footer>
 
     </div>
   );
 }
+
+export default App;

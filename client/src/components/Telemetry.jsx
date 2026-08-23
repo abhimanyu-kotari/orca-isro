@@ -1,5 +1,5 @@
 import React from 'react';
-import { Fuel, Clock, Leaf, Shield, Compass, Navigation, Fish, CheckCircle2, AlertTriangle, Waves, Anchor, Sparkles } from 'lucide-react';
+import { Fuel, Clock, Shield, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 export default function Telemetry({ route, hotspot, weather, geofence }) {
   const fuelSaved = route?.cost_saved_inr || 2400;
@@ -10,79 +10,88 @@ export default function Telemetry({ route, hotspot, weather, geofence }) {
   const imblDist = geofence?.nearest_imbl_distance_km || 18.4;
   const imblStatus = geofence?.status || 'SAFE';
 
+  // Format species name cleanly for mobile screens
+  const rawSpecies = hotspot?.primary_species || "Indian Mackerel (ಬಾಂಗ್ಡೆ)";
+  const cleanSpecies = rawSpecies.includes('/') 
+    ? rawSpecies.split('/')[0].trim() + ')'
+    : rawSpecies;
+
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       
       {/* 1. Target Fish Shoal Capsule */}
-      <div className="glass-panel-interactive rounded-3xl p-4.5 relative overflow-hidden group">
-        <div className="flex items-center justify-between text-xs text-slate-400 font-semibold">
-          <span className="flex items-center gap-1.5 text-slate-300">
-            <span className="text-sm">🐟</span> Marine Shoal
+      <div className="glass-panel-interactive rounded-3xl p-3.5 sm:p-5 flex flex-col justify-between min-h-[120px] sm:min-h-[135px]">
+        <div className="flex items-center justify-between gap-1">
+          <span className="text-[11px] sm:text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+            <span>🐟</span> <span className="truncate">Fish Shoal</span>
           </span>
-          <span className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-extrabold shadow-sm">
-            {hotspot?.confidence_score || 94}% Match
+          <span className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono font-bold shrink-0">
+            {hotspot?.confidence_score || 94}%
           </span>
         </div>
-        <div className="mt-3">
-          <div className="text-sm sm:text-base font-black text-white truncate tracking-tight">
-            {hotspot?.primary_species || "Indian Mackerel (ಬಾಂಗ್ಡೆ)"}
+        <div className="my-1.5">
+          <div className="text-xs sm:text-sm font-black text-white line-clamp-2 leading-tight">
+            {cleanSpecies}
           </div>
-          <p className="text-[11px] text-slate-400 mt-1 font-mono flex items-center gap-2">
-            <span className="text-cyan-400 font-semibold">{hotspot?.distance_nm || 20} NM offshore</span>
-            <span>&bull;</span>
-            <span className="text-emerald-400">{hotspot?.sst_celsius || 27.8}°C</span>
-          </p>
+        </div>
+        <div className="text-[10px] sm:text-[11px] text-slate-400 font-mono flex items-center justify-between border-t border-white/[0.06] pt-1.5 mt-auto">
+          <span className="text-cyan-400 font-semibold">{hotspot?.distance_nm || 20} NM</span>
+          <span className="text-emerald-400 font-semibold">{hotspot?.sst_celsius || 27.8}°C</span>
         </div>
       </div>
 
       {/* 2. Fuel Savings Capsule */}
-      <div className="glass-panel-interactive rounded-3xl p-4.5 relative overflow-hidden group">
-        <div className="flex items-center justify-between text-xs text-slate-400 font-semibold">
-          <span className="flex items-center gap-1.5 text-slate-300">
-            <Fuel className="w-3.5 h-3.5 text-cyan-400" /> Diesel Saved
+      <div className="glass-panel-interactive rounded-3xl p-3.5 sm:p-5 flex flex-col justify-between min-h-[120px] sm:min-h-[135px]">
+        <div className="flex items-center justify-between gap-1">
+          <span className="text-[11px] sm:text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+            <Fuel className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+            <span className="truncate">Fuel Saved</span>
           </span>
-          <span className="bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-extrabold shadow-sm">
-            -{savingsPct}% Burn
+          <span className="bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono font-bold shrink-0">
+            -{savingsPct}%
           </span>
         </div>
-        <div className="mt-2.5">
-          <div className="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">
+        <div className="my-1">
+          <div className="text-lg sm:text-2xl font-black text-white font-mono tracking-tight">
             ₹{fuelSaved.toLocaleString()}
           </div>
-          <p className="text-[11px] text-slate-400 mt-1 font-mono flex items-center gap-1.5">
-            <span className="text-emerald-400 font-semibold">+{weather?.ocean_current_knots || 1.3} kts Current Assist</span>
-            <span>({litresSaved} L)</span>
-          </p>
+        </div>
+        <div className="text-[10px] sm:text-[11px] text-slate-400 font-mono flex items-center justify-between border-t border-white/[0.06] pt-1.5 mt-auto">
+          <span className="text-emerald-400 truncate">+{weather?.ocean_current_knots || 1.3} kts assist</span>
+          <span className="text-slate-300 font-semibold shrink-0">{litresSaved} L</span>
         </div>
       </div>
 
-      {/* 3. Voyage Time & Carbon Offset */}
-      <div className="glass-panel-interactive rounded-3xl p-4.5 relative overflow-hidden group">
-        <div className="flex items-center justify-between text-xs text-slate-400 font-semibold">
-          <span className="flex items-center gap-1.5 text-slate-300">
-            <Clock className="w-3.5 h-3.5 text-emerald-400" /> Time Saved
+      {/* 3. Voyage Time Capsule */}
+      <div className="glass-panel-interactive rounded-3xl p-3.5 sm:p-5 flex flex-col justify-between min-h-[120px] sm:min-h-[135px]">
+        <div className="flex items-center justify-between gap-1">
+          <span className="text-[11px] sm:text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <span className="truncate">Time Saved</span>
           </span>
-          <span className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-extrabold shadow-sm">
-            🌿 {co2Reduction} kg CO₂
+          <span className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono font-bold shrink-0">
+            🌿 {co2Reduction}kg
           </span>
         </div>
-        <div className="mt-2.5">
-          <div className="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight">
+        <div className="my-1">
+          <div className="text-lg sm:text-2xl font-black text-white font-mono tracking-tight">
             {timeSaved} mins
           </div>
-          <p className="text-[11px] text-slate-400 mt-1 font-mono">
-            Eff. Speed: <strong className="text-slate-200">{route?.effective_speed_knots || 10.4} kts</strong>
-          </p>
+        </div>
+        <div className="text-[10px] sm:text-[11px] text-slate-400 font-mono flex items-center justify-between border-t border-white/[0.06] pt-1.5 mt-auto">
+          <span className="text-slate-300">Cruising Speed:</span>
+          <span className="text-emerald-400 font-bold">{route?.effective_speed_knots || 10.4} kts</span>
         </div>
       </div>
 
-      {/* 4. IMBL Border Clearance */}
-      <div className="glass-panel-interactive rounded-3xl p-4.5 relative overflow-hidden group">
-        <div className="flex items-center justify-between text-xs text-slate-400 font-semibold">
-          <span className="flex items-center gap-1.5 text-slate-300">
-            <Shield className="w-3.5 h-3.5 text-emerald-400" /> IMBL Border
+      {/* 4. IMBL Border Capsule */}
+      <div className="glass-panel-interactive rounded-3xl p-3.5 sm:p-5 flex flex-col justify-between min-h-[120px] sm:min-h-[135px]">
+        <div className="flex items-center justify-between gap-1">
+          <span className="text-[11px] sm:text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+            <Shield className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <span className="truncate">IMBL Border</span>
           </span>
-          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono font-extrabold shadow-sm border ${
+          <span className={`px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono font-bold border shrink-0 ${
             imblDist > 15 
               ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' 
               : 'bg-amber-500/15 text-amber-300 border-amber-500/30'
@@ -90,14 +99,14 @@ export default function Telemetry({ route, hotspot, weather, geofence }) {
             {imblStatus}
           </span>
         </div>
-        <div className="mt-2.5">
-          <div className="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight">
+        <div className="my-1">
+          <div className="text-lg sm:text-2xl font-black text-white font-mono tracking-tight">
             {imblDist} km
           </div>
-          <p className="text-[11px] text-slate-400 mt-1 font-medium flex items-center gap-1.5">
-            {imblDist > 15 ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />}
-            <span>Clear of international waters</span>
-          </p>
+        </div>
+        <div className="text-[10px] sm:text-[11px] text-slate-400 font-medium flex items-center gap-1 border-t border-white/[0.06] pt-1.5 mt-auto">
+          {imblDist > 15 ? <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" /> : <AlertTriangle className="w-3 h-3 text-amber-400 shrink-0" />}
+          <span className="truncate text-slate-300">Safe territorial zone</span>
         </div>
       </div>
 
