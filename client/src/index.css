@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #07162c;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1b4f93;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00f0ff;
+}
+
+/* Leaflet Dark Customizations */
+.leaflet-container {
+  background: #030b17 !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #07162c !important;
+  color: #f8fafc !important;
+  border: 1px solid #1e3a8a !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 240, 255, 0.15) !important;
+}
+
+.leaflet-popup-tip {
+  background: #07162c !important;
+}
+
+/* Pulse radar glowing markers */
+@keyframes radar-ping {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+.radar-pulse-ring {
+  position: absolute;
+  border-radius: 50%;
+  animation: radar-ping 2s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
