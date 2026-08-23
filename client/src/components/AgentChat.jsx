@@ -34,7 +34,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
       .trim();
   };
 
-  // High-Reliability Multilingual Speech Engine
+  // High-Reliability Multilingual Speech Synthesizer with Indian Voice Prioritization
   const handlePlayVoice = (msg) => {
     if (!('speechSynthesis' in window)) {
       alert('Speech synthesis is not supported on this device.');
@@ -50,49 +50,62 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
     const availableVoices = window.speechSynthesis.getVoices();
     
     const langMap = {
-      'ta': { code: 'ta-IN', prefix: 'ta' },
-      'kn': { code: 'kn-IN', prefix: 'kn' },
-      'tcy': { code: 'kn-IN', prefix: 'kn' },
-      'te': { code: 'te-IN', prefix: 'te' },
-      'hi': { code: 'hi-IN', prefix: 'hi' },
-      'ml': { code: 'ml-IN', prefix: 'ml' },
-      'en': { code: 'en-IN', prefix: 'en' }
+      'ta': { code: 'ta-IN', prefix: 'ta', name: 'tamil' },
+      'kn': { code: 'kn-IN', prefix: 'kn', name: 'kannada' },
+      'tcy': { code: 'kn-IN', prefix: 'kn', name: 'kannada' },
+      'te': { code: 'te-IN', prefix: 'te', name: 'telugu' },
+      'hi': { code: 'hi-IN', prefix: 'hi', name: 'hindi' },
+      'ml': { code: 'ml-IN', prefix: 'ml', name: 'malayalam' },
+      'en': { code: 'en-IN', prefix: 'en', name: 'english' }
     };
 
     const target = langMap[selectedLang] || langMap['en'];
 
-    // Check if device has native voice for this Indian language
-    const hasNativeVoice = availableVoices.some(v => 
+    // 1. Check if device has native voice for target language
+    const nativeVoice = availableVoices.find(v => 
       v.lang === target.code || 
-      v.lang.toLowerCase().replace('_', '-').startsWith(target.prefix)
+      v.lang.toLowerCase().replace('_', '-').startsWith(target.prefix) ||
+      v.name.toLowerCase().includes(target.name)
+    );
+
+    // 2. Locate Indian female voice (e.g. Heera, Swara, Kalpana, Google हिन्दी, Indian English)
+    const indianFemaleVoice = availableVoices.find(v => 
+      (v.name.toLowerCase().includes('heera') ||
+       v.name.toLowerCase().includes('swara') ||
+       v.name.toLowerCase().includes('kalpana') ||
+       v.name.toLowerCase().includes('neerja') ||
+       (v.lang.includes('IN') && (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('google'))))
+    );
+
+    // 3. Fallback female voice
+    const generalFemaleVoice = availableVoices.find(v => 
+      v.name.toLowerCase().includes('zira') || 
+      v.name.toLowerCase().includes('female') ||
+      v.name.toLowerCase().includes('natural')
     );
 
     let textToSpeak = '';
+    let chosenVoice = null;
     let speechLang = target.code;
 
-    if (hasNativeVoice || selectedLang === 'en' || selectedLang === 'hi') {
+    if (nativeVoice) {
       textToSpeak = sanitizeText(msg.voiceScript || msg.text);
+      chosenVoice = nativeVoice;
       speechLang = target.code;
     } else {
-      // If Windows/device lacks native Kannada/Tamil voice pack, use phonetic script with Indian English phonetics
+      // Use phonetic script with Indian accent voice
       textToSpeak = sanitizeText(msg.voiceScriptPhonetic || msg.voiceScript || msg.text);
+      chosenVoice = indianFemaleVoice || generalFemaleVoice || availableVoices[0];
       speechLang = 'en-IN';
     }
 
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
     utterance.lang = speechLang;
     utterance.rate = 0.90;
-    utterance.pitch = 1.0;
+    utterance.pitch = 1.05; // Pleasant natural pitch
 
-    // Pick best matching voice
-    const matchedVoice = availableVoices.find(v => 
-      v.lang === speechLang || 
-      v.lang.toLowerCase().startsWith(speechLang.slice(0, 2)) ||
-      v.lang.includes('IN')
-    );
-
-    if (matchedVoice) {
-      utterance.voice = matchedVoice;
+    if (chosenVoice) {
+      utterance.voice = chosenVoice;
     }
 
     utterance.onstart = () => setIsSpeaking(true);
