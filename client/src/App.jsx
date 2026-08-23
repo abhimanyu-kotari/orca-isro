@@ -18,6 +18,7 @@ import {
 } from './services/marineEngine';
 
 const API_BASE_URL = 'http://localhost:8000';
+const isLocalEnv = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
 function App() {
   const [selectedHarbor, setSelectedHarbor] = useState('malpe');
@@ -65,8 +66,8 @@ function App() {
     setGeofence(localGeofence);
     setWeather(localWeather);
 
-    // Try backend sync if running locally
-    if (!isOffline) {
+    // Only attempt localhost fetch if explicitly running in a local developer environment
+    if (isLocalEnv && !isOffline) {
       try {
         const hRes = await fetch(`${API_BASE_URL}/api/harbors`);
         if (hRes.ok) {
@@ -107,7 +108,7 @@ function App() {
     setGeofence(localGeofence);
     setWeather(localWeather);
 
-    if (!isOffline) {
+    if (isLocalEnv && !isOffline) {
       try {
         const routeRes = await fetch(`${API_BASE_URL}/api/analyze-voyage`, {
           method: 'POST',
@@ -132,7 +133,7 @@ function App() {
     setMessages(newMessages);
     setIsProcessing(true);
 
-    if (isOffline) {
+    if (isOffline || !isLocalEnv) {
       setTimeout(() => {
         const result = processClientChat(userText, selectedHarbor, selectedLang);
         setMessages([
@@ -182,7 +183,6 @@ function App() {
         if (data.evidence.geofence) setGeofence(data.evidence.geofence);
       }
     } catch (error) {
-      // Instant graceful fallback to client engine
       const result = processClientChat(userText, selectedHarbor, selectedLang);
       setMessages([
         ...newMessages,
