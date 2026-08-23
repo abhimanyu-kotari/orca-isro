@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Anchor, Globe2, ChevronDown, Check, Sparkles, Navigation, Waves, ShieldCheck } from 'lucide-react';
+import { Anchor, Globe2, ChevronDown, Check, Sparkles } from 'lucide-react';
 
 export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, onLangChange, harbors, isOffline }) {
   const [isHarborOpen, setIsHarborOpen] = useState(false);
@@ -39,18 +39,21 @@ export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, o
 
   return (
     <header className="sticky top-2 sm:top-3 z-50 px-2 sm:px-6">
-      <div 
-        className="max-w-7xl mx-auto rounded-3xl p-4 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.8)] border border-white/20 relative overflow-hidden flex flex-col justify-between min-h-[120px] sm:min-h-[140px]"
-        style={{
-          backgroundImage: "linear-gradient(90deg, rgba(2, 7, 18, 0.96) 0%, rgba(2, 7, 18, 0.82) 42%, rgba(2, 7, 18, 0.35) 75%, rgba(2, 7, 18, 0.15) 100%), url('/assets/marine_hero.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center 48%",
-          backgroundRepeat: "no-repeat"
-        }}
-      >
+      <div className="max-w-7xl mx-auto rounded-3xl p-4 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.8)] border border-white/20 relative min-h-[120px] sm:min-h-[140px] flex flex-col justify-between">
         
-        {/* Ambient Sunrise Glow Reflection */}
-        <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-amber-500/10 via-transparent to-transparent pointer-events-none"></div>
+        {/* Dedicated Background Layer (Clips image corners without clipping dropdowns!) */}
+        <div 
+          className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none z-0"
+          style={{
+            backgroundImage: "linear-gradient(90deg, rgba(2, 7, 18, 0.96) 0%, rgba(2, 7, 18, 0.82) 42%, rgba(2, 7, 18, 0.35) 75%, rgba(2, 7, 18, 0.15) 100%), url('/assets/marine_hero.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center 48%",
+            backgroundRepeat: "no-repeat"
+          }}
+        >
+          {/* Ambient Sunrise Glow Reflection */}
+          <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-amber-500/10 via-transparent to-transparent pointer-events-none"></div>
+        </div>
 
         {/* Top Row: Brand & Controls */}
         <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-3 z-10 w-full">
@@ -65,7 +68,7 @@ export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, o
                 <h1 className="text-lg sm:text-2xl font-black tracking-tight text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
                   PROJECT ORCA
                 </h1>
-                <span className="px-2.5 py-0.5 text-[10px] font-extrabold tracking-wider uppercase rounded-full bg-emerald-500/25 text-emerald-300 border border-emerald-400/50 shadow-md backdrop-blur-md">
+                <span className="px-2.5 py-0.5 text-[9px] sm:text-[10px] font-extrabold tracking-wider uppercase rounded-full bg-emerald-500/25 text-emerald-300 border border-emerald-400/50 shadow-md backdrop-blur-md">
                   ISRO PS-26176
                 </span>
               </div>
@@ -86,7 +89,7 @@ export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, o
                   setIsHarborOpen(!isHarborOpen);
                   setIsLangOpen(false);
                 }}
-                className="w-full flex items-center justify-between gap-2 bg-slate-950/80 hover:bg-slate-950 backdrop-blur-xl border border-white/20 active:scale-95 rounded-2xl px-3.5 py-2.5 text-xs text-slate-100 transition shadow-xl"
+                className="w-full flex items-center justify-between gap-2 bg-slate-950/85 hover:bg-slate-950 backdrop-blur-2xl border border-white/20 active:scale-95 rounded-2xl px-3.5 py-2.5 text-xs text-slate-100 transition shadow-2xl"
               >
                 <div className="flex items-center gap-2 truncate">
                   <Anchor className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
@@ -97,11 +100,11 @@ export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, o
                 <ChevronDown className={`w-3.5 h-3.5 text-slate-300 transition-transform duration-200 shrink-0 ${isHarborOpen ? 'rotate-180' : ''}`} />
               </button>
 
-              {/* Harbor Menu Popover */}
+              {/* Harbor Menu Popover (Full unclipped height!) */}
               {isHarborOpen && (
-                <div className="absolute left-0 sm:left-auto sm:right-0 mt-2 w-64 sm:w-72 bg-slate-950/95 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.9)] z-[100] py-1.5 max-h-80 overflow-y-auto animate-fadeIn">
-                  <div className="px-3.5 py-2 text-[10px] font-mono uppercase text-emerald-400 border-b border-white/10 tracking-wider flex items-center gap-1.5">
-                    <Anchor className="w-3 h-3" /> Select Coastal Harbor
+                <div className="absolute left-0 sm:left-auto sm:right-0 top-full mt-2 w-72 sm:w-80 bg-slate-950/98 backdrop-blur-3xl border border-white/25 rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] z-[999] py-2 max-h-80 overflow-y-auto animate-fadeIn">
+                  <div className="px-4 py-2 text-[10px] font-mono uppercase text-emerald-400 border-b border-white/10 tracking-wider flex items-center gap-1.5">
+                    <Anchor className="w-3.5 h-3.5" /> Select Coastal Harbor
                   </div>
                   {Object.entries(harbors).map(([key, h]) => {
                     const isSelected = selectedHarbor === key;
@@ -112,16 +115,16 @@ export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, o
                           onHarborChange(key);
                           setIsHarborOpen(false);
                         }}
-                        className={`w-full text-left px-3.5 py-2.5 text-xs flex items-center justify-between transition ${
+                        className={`w-full text-left px-4 py-2.5 text-xs flex items-center justify-between transition ${
                           isSelected 
-                            ? 'bg-emerald-500/20 text-emerald-300 font-bold border-l-2 border-emerald-400' 
+                            ? 'bg-emerald-500/20 text-emerald-300 font-bold border-l-4 border-emerald-400' 
                             : 'text-slate-200 hover:bg-white/[0.08]'
                         }`}
                       >
                         <div>
                           <div className="flex items-center gap-1.5">
                             <span>⚓</span>
-                            <span>{h.name.split('(')[0].trim()}</span>
+                            <span className="text-white font-medium">{h.name.split('(')[0].trim()}</span>
                           </div>
                           <div className="text-[10px] text-slate-400 font-mono pl-4 mt-0.5">
                             {h.state} &bull; {h.coast}
@@ -142,7 +145,7 @@ export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, o
                   setIsLangOpen(!isLangOpen);
                   setIsHarborOpen(false);
                 }}
-                className="flex items-center justify-between gap-2 bg-slate-950/80 hover:bg-slate-950 backdrop-blur-xl border border-white/20 active:scale-95 rounded-2xl px-3.5 py-2.5 text-xs text-slate-100 transition shadow-xl"
+                className="flex items-center justify-between gap-2 bg-slate-950/85 hover:bg-slate-950 backdrop-blur-2xl border border-white/20 active:scale-95 rounded-2xl px-3.5 py-2.5 text-xs text-slate-100 transition shadow-2xl"
               >
                 <div className="flex items-center gap-1.5">
                   <Globe2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
@@ -151,11 +154,11 @@ export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, o
                 <ChevronDown className={`w-3.5 h-3.5 text-slate-300 transition-transform duration-200 shrink-0 ${isLangOpen ? 'rotate-180' : ''}`} />
               </button>
 
-              {/* Language Menu Popover */}
+              {/* Language Menu Popover (Full unclipped height!) */}
               {isLangOpen && (
-                <div className="absolute right-0 mt-2 w-48 sm:w-56 bg-slate-950/95 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.9)] z-[100] py-1.5 max-h-80 overflow-y-auto animate-fadeIn">
-                  <div className="px-3.5 py-2 text-[10px] font-mono uppercase text-cyan-400 border-b border-white/10 tracking-wider flex items-center gap-1.5">
-                    <Globe2 className="w-3 h-3" /> Regional Language
+                <div className="absolute right-0 top-full mt-2 w-52 sm:w-60 bg-slate-950/98 backdrop-blur-3xl border border-white/25 rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] z-[999] py-2 max-h-80 overflow-y-auto animate-fadeIn">
+                  <div className="px-4 py-2 text-[10px] font-mono uppercase text-cyan-400 border-b border-white/10 tracking-wider flex items-center gap-1.5">
+                    <Globe2 className="w-3.5 h-3.5" /> Regional Language
                   </div>
                   {languages.map((l) => {
                     const isSelected = selectedLang === l.code;
@@ -166,13 +169,13 @@ export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, o
                           onLangChange(l.code);
                           setIsLangOpen(false);
                         }}
-                        className={`w-full text-left px-3.5 py-2 text-xs flex items-center justify-between transition ${
+                        className={`w-full text-left px-4 py-2.5 text-xs flex items-center justify-between transition ${
                           isSelected 
-                            ? 'bg-cyan-500/20 text-cyan-300 font-bold border-l-2 border-cyan-400' 
+                            ? 'bg-cyan-500/20 text-cyan-300 font-bold border-l-4 border-cyan-400' 
                             : 'text-slate-200 hover:bg-white/[0.08]'
                         }`}
                       >
-                        <span>{l.label}</span>
+                        <span className="text-white font-medium">{l.label}</span>
                         {isSelected && <Check className="w-4 h-4 text-cyan-400 shrink-0" />}
                       </button>
                     );
