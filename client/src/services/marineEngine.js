@@ -1,16 +1,16 @@
 /**
  * Standalone Client-Side Marine Engine
  * Ensures 100% full functionality on mobile devices and hosted Vercel/Netlify environments
- * with rich multilingual support including Kannada and Tulu.
+ * with rich multilingual support including Kannada, Tulu, Tamil, Telugu, Hindi, Malayalam, and English.
  */
 
 export const HARBORS = {
-  chennai: {
-    name: "Chennai Fisheries Harbour (Kasimedu)",
-    state: "Tamil Nadu",
-    lat: 13.125,
-    lng: 80.298,
-    coast: "Bay of Bengal"
+  malpe: {
+    name: "Malpe Fishing Harbour (Udupi)",
+    state: "Karnataka",
+    lat: 13.350,
+    lng: 74.698,
+    coast: "Arabian Sea (Karavali Coast)"
   },
   mangalore: {
     name: "Mangalore Old Port (Dakke / Bunder)",
@@ -19,12 +19,12 @@ export const HARBORS = {
     lng: 74.835,
     coast: "Arabian Sea (Karavali Coast)"
   },
-  malpe: {
-    name: "Malpe Fishing Harbour (Udupi)",
-    state: "Karnataka",
-    lat: 13.350,
-    lng: 74.698,
-    coast: "Arabian Sea (Karavali Coast)"
+  chennai: {
+    name: "Chennai Fisheries Harbour (Kasimedu)",
+    state: "Tamil Nadu",
+    lat: 13.125,
+    lng: 80.298,
+    coast: "Bay of Bengal"
   },
   rameswaram: {
     name: "Rameswaram Fishing Port",
@@ -111,11 +111,11 @@ export const BOUNDARIES = {
 };
 
 const SPECIES = [
-  { species: "Indian Mackerel (ಬಾಂಗ್ಡೆ / Rastrelliger kanagurta)", val: 240 },
-  { species: "Oil Sardines (ಭೂತಾಯಿ / Sardinella longiceps)", val: 180 },
-  { species: "Kingfish / Surmai (ಅಂಜಲ್ / Scomberomorus commerson)", val: 680 },
-  { species: "Silver Pomfret (ಮಾಣಂಜಿ / Pampus argenteus)", val: 750 },
-  { species: "Yellowfin Tuna (ಕುಪ್ಪೆ / Thunnus albacares)", val: 450 }
+  { species: "Indian Mackerel (ಬಾಂಗ್ಡೆ / அயலை)", phon: "Bangude", val: 240 },
+  { species: "Oil Sardines (ಭೂತಾಯಿ / மத்தி)", phon: "Boothai", val: 180 },
+  { species: "Kingfish / Surmai (ಅಂಜಲ್ / வஞ்சிரம்)", phon: "Anjal", val: 680 },
+  { species: "Silver Pomfret (ಮಾಣಂಜಿ / வாவல்)", phon: "Manji", val: 750 },
+  { species: "Yellowfin Tuna (ಕುಪ್ಪೆ / சூர)", phon: "Kuppe", val: 450 }
 ];
 
 function haversine(lat1, lon1, lat2, lon2) {
@@ -133,7 +133,7 @@ function haversine(lat1, lon1, lat2, lon2) {
 }
 
 export function generateHotspots(harborId) {
-  const harbor = HARBORS[harborId] || HARBORS.chennai;
+  const harbor = HARBORS[harborId] || HARBORS.malpe;
   const isEastCoast = harbor.coast.includes("Bengal") || harbor.coast.includes("Palk");
 
   const offsets = [
@@ -164,6 +164,7 @@ export function generateHotspots(harborId) {
       thermal_front_gradient: `${(0.45 + idx * 0.12).toFixed(2)} °C/km`,
       confidence_score: score,
       primary_species: SPECIES[off.speciesIdx].species,
+      species_phonetic: SPECIES[off.speciesIdx].phon,
       secondary_species: SPECIES[(off.speciesIdx + 1) % SPECIES.length].species,
       recommended: idx === 0
     };
@@ -260,7 +261,7 @@ export function generateWeather(lat, lng) {
 }
 
 export function processClientChat(userText, harborId, lang) {
-  const harbor = HARBORS[harborId] || HARBORS.chennai;
+  const harbor = HARBORS[harborId] || HARBORS.malpe;
   const hotspots = generateHotspots(harborId);
   const top = hotspots[0];
   const route = computeVoyageRoute(harbor, top);
@@ -269,39 +270,49 @@ export function processClientChat(userText, harborId, lang) {
 
   const hName = harbor.name.split(" ")[0];
   const species = top.primary_species.split("(")[0].trim();
+  const speciesPhon = top.species_phonetic || "Bangude";
   const fuel = route.cost_saved_inr;
   const dist = top.distance_nm;
   const imbl = geofence.nearest_imbl_distance_km;
 
   let text = "";
-  let voice = "";
+  let voiceNative = "";
+  let voicePhonetic = "";
 
   if (lang === "kn") { // Kannada
     text = `🐟 **ಶಿಫಾರಸು ಮಾಡಿದ ಸಂಭಾವ್ಯ ಮೀನುಗಾರಿಕೆ ವಲಯ (${top.id})**:\n• ${hName} ಬಂದರಿನಿಂದ **${dist} ನಾಟಿಕಲ್ ಮೈಲಿ** ದೂರದಲ್ಲಿ **${species}** ಸಮೃದ್ಧವಾಗಿ ಲಭ್ಯವಿದೆ.\n• ISRO AI ಪ್ರವಾಹ-ಮಾರ್ಗ ಬಳಸುವುದರಿಂದ **₹${fuel} ಡೀಸೆಲ್ ಉಳಿತಾಯವಾಗುತ್ತದೆ** (${route.fuel_savings_percentage}% ಉಳಿತಾಯ).\n• ಸಮುದ್ರದ ಸ್ಥಿತಿ: **ಸುರಕ್ಷಿತ (ಅಲೆಗಳ ಎತ್ತರ ${weather.wave_height_m} ಮೀ)**. ಅಂತಾರಾಷ್ಟ್ರೀಯ ಗಡಿಯಿಂದ ಸುರಕ್ಷಿತ ಅಂತರ: ${imbl} ಕಿ.ಮೀ.`;
-    voice = `${hName} ಬಂದರಿನಿಂದ ${dist} ನಾಟಿಕಲ್ ಮೈಲಿ ದೂರದಲ್ಲಿ ${species} ಮೀನುಗಳು ಲಭ್ಯವಿವೆ. AI ಮಾರ್ಗವನ್ನು ಬಳಸಿದರೆ ${fuel} ರೂಪಾಯಿ ಡೀಸೆಲ್ ಉಳಿತಾಯವಾಗುತ್ತದೆ.`;
-  } else if (lang === "tcy") { // Tulu (Tulunadu Coastal Dialect)
+    voiceNative = `${hName} ಬಂದರಿನಿಂದ ${dist} ನಾಟಿಕಲ್ ಮೈಲಿ ದೂರದಲ್ಲಿ ${species} ಮೀನುಗಳು ಲಭ್ಯವಿವೆ. AI ಮಾರ್ಗದಿಂದ ${fuel} ರೂಪಾಯಿ ಡೀಸೆಲ್ ಉಳಿತಾಯವಾಗುತ್ತದೆ.`;
+    voicePhonetic = `${hName} bandarininda ${dist} nautical mile dooradalli ${speciesPhon} meenugalu labhyavive. AI root balasidaare ${fuel} roopaayi diesel ulithayavaaguthade. Samudra surakshithavaagide.`;
+  } else if (lang === "tcy") { // Tulu
     text = `🐟 **ಮೀನ್ ಪತ್ತುನ ಎಡ್ಡ ಜಾಗೆ (${top.id})**:\n• ${hName} ಬಂದರ್ದ್ **${dist} ನಾಟಿಕಲ್ ಮೈಲ್** ದೂರೊಡು **${species}** ಮೀನ್ ಮಸ್ತ್ ತಿಕ್ಕುಂಡು.\n• ISRO AI ಮಾರ್ಗ ಗಲಸುಂಡ **₹${fuel} ಡೀಸೆಲ್ ಒರಿಪುಂಡು** (${route.fuel_savings_percentage}% ಡೀಸೆಲ್ ಉಳಿತಾಯ).\n• ಕಡಲ್ ಪರಿಸ್ಥಿತಿ: **ಎಡ್ಡ ಉಂಡು (ಅಲೆತ್ತ ಎತ್ತರ ${weather.wave_height_m} ಮೀ)**. ಬಾರ್ಡರ್ ದೂರ: ${imbl} ಕಿ.ಮೀ.`;
-    voice = `${dist} ನಾಟಿಕಲ್ ಮೈಲ್ ದೂರೊಡು ${species} ಮೀನ್ ಉಂಡು. AI ರೂಟ್ ಗಲಸುಂಡ ${fuel} ರೂಪಾಯಿ ಒರಿಪುಂಡು. ಕಡಲ್ ಪರಿಸ್ಥಿತಿ ಎಡ್ಡ ಉಂಡು.`;
+    voiceNative = `${dist} ನಾಟಿಕಲ್ ಮೈಲ್ ದೂರೊಡು ${species} ಮೀನ್ ಉಂಡು. AI ರೂಟ್ ಗಲಸುಂಡ ${fuel} ರೂಪಾಯಿ ಒರಿಪುಂಡು. ಕಡಲ್ ಪರಿಸ್ಥಿತಿ ಎಡ್ಡ ಉಂಡು.`;
+    voicePhonetic = `${hName} bandardh ${dist} nautical mile doorodu ${speciesPhon} meen masth thikkundu. AI route galasunda ${fuel} roopaayi diesel oripundu. Kadal parsthithi yedde undu.`;
   } else if (lang === "ta") { // Tamil
     text = `🐟 **பரிந்துரைக்கப்பட்ட மீன்பிடி மண்டலம் (${top.id})**:\n• ${hName} துறைமுகத்திலிருந்து **${dist} கடல் மைல்** தொலைவில் **${species}** கூட்டம் உள்ளது.\n• AI வழித்தடத்தைப் பயன்படுத்தினால் **₹${fuel} டீசல் சேமிக்கலாம்**.\n• கடல் நிலை பாதுகாப்பாக உள்ளது (அலை உயரம் ${weather.wave_height_m} மீ). எல்லை தூரம்: ${imbl} கி.மீ.`;
-    voice = `${hName} துறைமுகத்திலிருந்து ${dist} கடல் மைல் தொலைவில் ${species} மீன்கள் உள்ளன. AI வழியை பயன்படுத்தினால் ${fuel} ரூபாய் சேமிக்கலாம்.`;
+    voiceNative = `${hName} துறைமுகத்திலிருந்து ${dist} கடல் மைல் தொலைவில் ${species} மீன்கள் உள்ளன. AI வழியை பயன்படுத்தினால் ${fuel} ரூபாய் சேமிக்கலாம்.`;
+    voicePhonetic = `${hName} thuraimugathilirundhu ${dist} nautical mile tholaivil ${speciesPhon} meengal ullana. AI vazhiyil sendraal ${fuel} roobai diesel semikkalaam. Kadal nandraaga ulladhu.`;
   } else if (lang === "te") { // Telugu
-    text = `🐟 **చేపల సంపద జోన్ (${top.id})**:\n• ${hName} నుండి **${dist} నాటికల్ మైళ్ళ** దూరంలో **${species}** చేపలు ఉన్నాయి.\n• AI రూట్ ద్వారా **₹${fuel} డీజిల్ ఆదా** అవుతుంది.\n• సముద్రం సురಕ್ಷితంగా ఉంది. సరిహద్దు దూరం: ${imbl} కి.மீ.`;
-    voice = `${dist} నాటికల్ మైళ్ల దూరంలో ${species} చేపలు ఉన్నాయి. AI రూట్ ద్వారా ${fuel} రూపాయలు ఆదా అవుతాయి.`;
+    text = `🐟 **చేపల సంపద జోన్ (${top.id})**:\n• ${hName} నుండి **${dist} నాటికల్ మైళ్ళ** దూరంలో **${species}** చేపలు ఉన్నాయి.\n• AI రూట్ ద్వారా **₹${fuel} డీజిల్ ఆదా** అవుతుంది.\n• సముద్రం సురಕ್ಷితంగా ఉంది. సరిహద్దు దూరం: ${imbl} కి.మీ.`;
+    voiceNative = `${dist} నాటికల్ మైళ్ల దూరంలో ${species} చేపలు ఉన్నాయి. AI రూట్ ద్వారా ${fuel} రూపాయలు ఆదా అవుతాయి.`;
+    voicePhonetic = `${hName} nundi ${dist} nautical maila dooramlo ${speciesPhon} chepalu unnaayi. AI route dwaaraa ${fuel} roopaayalu diesel aadaa avuthundi. Samudram surakshithamgaa undi.`;
   } else if (lang === "hi") { // Hindi
     text = `🐟 **संभावित मछली क्षेत्र (${top.id})**:\n• ${hName} से **${dist} नॉटिकल मील** दूर **${species}** की संभावना है।\n• AI रूट से जाने पर **₹${fuel} का डीजल बचेगा**।\n• समुद्र की स्थिति सुरक्षित है (लहरें ${weather.wave_height_m} मीटर)। सीमा से दूरी: ${imbl} किमी।`;
-    voice = `${hName} से ${dist} नॉटिकल मील दूर ${species} की संभावना है। AI रूट से ${fuel} रुपये की बचत होगी।`;
+    voiceNative = `${hName} से ${dist} नॉटिकल मील दूर ${species} की संभावना है। AI रूट से ${fuel} रुपये की बचत होगी।`;
+    voicePhonetic = `${hName} se ${dist} nautical mile door ${speciesPhon} machhli ki sambhaavnaa hai. AI route se ${fuel} rupaye diesel bachega.`;
   } else if (lang === "ml") { // Malayalam
     text = `🐟 **മത്സ്യബന്ധന മേഖല (${top.id})**:\n• ${hName} ൽ നിന്ന് **${dist} നോട്ടിക്കൽ മൈൽ** അകലെ **${species}** ലഭ്യമാണ്.\n• AI റൂട്ട് ഉപയോഗിച്ചാൽ **₹${fuel} ഡീസൽ ലാഭിക്കാം**.\n• അതിർത്തിയിലേക്ക് ${imbl} കി.മീ ദൂരമുണ്ട്.`;
-    voice = `${dist} നോട്ടിക്കൽ മൈൽ അകലെ ${species} മീനുകൾ ലഭ്യമാണ്. AI റൂട്ട് വഴി ${fuel} രൂപ ലാഭിക്കാം.`;
+    voiceNative = `${dist} നോട്ടിക്കൽ മൈൽ അകലെ ${species} മീനുകൾ ലഭ്യമാണ്. AI റൂട്ട് വഴി ${fuel} രൂപ ലാഭിക്കാം.`;
+    voicePhonetic = `${hName} thuramukhathu ninnu ${dist} nautical mile dhoorathil ${speciesPhon} meenukal labhyamaanu. AI route vazhi ${fuel} roopa diesel laabhikkaam.`;
   } else { // English
     text = `🛰️ **ORCA Multi-Agent Recommendation for ${harbor.name}**:\n\n1. **Nearest High-Yield PFZ**: **${top.id}** (${dist} NM offshore, Confidence: **${top.confidence_score}%**).\n2. **Target Biomass**: Dense shoals of **${species}** (SST: ${top.sst_celsius}°C, Chl-a: ${top.chlorophyll_mg_m3} mg/m³).\n3. **Fuel Savings**: Current-assisted route cuts fuel burn by **${route.fuel_savings_percentage}%**, saving **₹${fuel}**.\n4. **Safety & Border Status**: Wave height **${weather.wave_height_m}m** (${weather.safety_status}). Distance to IMBL: **${imbl} km** (${geofence.status}).`;
-    voice = `Nearest fish hotspot is ${dist} nautical miles offshore for ${species}. You will save ${fuel} rupees in fuel. Sea conditions are safe.`;
+    voiceNative = `Nearest fish hotspot is ${dist} nautical miles offshore for ${species}. You will save ${fuel} rupees in fuel. Sea conditions are safe.`;
+    voicePhonetic = voiceNative;
   }
 
   return {
     response_text: text,
-    voice_script: voice,
+    voice_script: voiceNative,
+    voice_script_phonetic: voicePhonetic,
     collaborating_agents: [
       { name: "Ocean Analytics Agent", status: "Active", summary: `Detected ${hotspots.length} PFZ clusters (Top: ${species})` },
       { name: "Weather Intelligence Agent", status: "Active", summary: `Sea State: ${weather.sea_state} (Waves ${weather.wave_height_m}m)` },
