@@ -1,5 +1,5 @@
 import React from 'react';
-import { Waves, Wind, Compass, AlertOctagon, CheckCircle2, ShieldCheck, ThermometerSun } from 'lucide-react';
+import { Waves, Wind, Compass, ShieldCheck, ThermometerSun, Anchor } from 'lucide-react';
 
 export default function WeatherCard({ weather, hotspot }) {
   const waveHeight = weather?.wave_height_m || 0.9;
@@ -9,73 +9,79 @@ export default function WeatherCard({ weather, hotspot }) {
   const windSpeed = weather?.wind_speed_knots || 12.0;
   const seaState = weather?.sea_state || 'Calm to Moderate';
   const safetyStatus = weather?.safety_status || 'SAFE';
-  const verdict = weather?.advisory_verdict || 'Normal fishing operations permitted. Favorable drift.';
+  const verdict = weather?.advisory_verdict || 'Normal fishing operations permitted. Favorable current drift.';
 
   return (
-    <div className="bg-ocean-900/80 border border-ocean-700/80 rounded-2xl p-4 shadow-xl space-y-3">
+    <div className="bg-marine-900/90 border border-marine-700/80 rounded-3xl p-4 shadow-2xl space-y-3.5">
       
-      {/* Header with Sea Safety Badge */}
+      {/* Header with Marine Wave State */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Waves className="w-5 h-5 text-cyan-400" />
-          <h3 className="text-sm font-bold text-slate-100">Live Ocean & Weather State</h3>
+          <span className="text-xl">🌊</span>
+          <div>
+            <h3 className="text-sm font-extrabold text-white">Live Ocean State & Wave Dynamics</h3>
+            <p className="text-[10px] text-marine-300 font-mono">ISRO Satellite Telemetry Feed</p>
+          </div>
         </div>
-        <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold font-mono tracking-wide ${
+        <span className={`px-3 py-1 rounded-full text-xs font-black font-mono tracking-wider shadow ${
           safetyStatus === 'SAFE' || safetyStatus === 'EXCELLENT'
-            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-            : 'bg-amber-500/10 text-amber-300 border border-amber-500/30'
+            ? 'bg-biolum-emerald/15 text-biolum-emerald border border-biolum-emerald/40'
+            : 'bg-biolum-amber/15 text-amber-300 border border-biolum-amber/40'
         }`}>
-          {safetyStatus}
+          {safetyStatus === 'SAFE' ? '✓ SAFE TO SAIL' : safetyStatus}
         </span>
       </div>
 
-      {/* 4-Grid Weather Telemetry */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+      {/* 4-Grid Marine Telemetry */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         
-        {/* Wave Height */}
-        <div className="bg-ocean-950/60 border border-ocean-800 p-2.5 rounded-xl">
-          <span className="text-[11px] text-slate-400 flex items-center gap-1">
-            <Waves className="w-3.5 h-3.5 text-cyan-400" /> Sig. Wave
+        {/* Wave Swell */}
+        <div className="bg-marine-950/80 border border-marine-800 p-3 rounded-2xl">
+          <span className="text-[11px] text-marine-300 font-medium flex items-center gap-1.5">
+            <Waves className="w-3.5 h-3.5 text-biolum-teal" /> Significant Wave
           </span>
-          <p className="text-base font-extrabold text-slate-100 font-mono mt-1">{waveHeight} m</p>
-          <p className="text-[10px] text-slate-400 font-mono">Period: {wavePeriod}s</p>
+          <p className="text-lg font-black text-white font-mono mt-1">{waveHeight} m</p>
+          <p className="text-[10px] text-marine-400 font-mono">Period: {wavePeriod}s swell</p>
         </div>
 
         {/* Ocean Current Vector */}
-        <div className="bg-ocean-950/60 border border-ocean-800 p-2.5 rounded-xl">
-          <span className="text-[11px] text-slate-400 flex items-center gap-1">
-            <Compass className="w-3.5 h-3.5 text-blue-400" /> Surface Current
+        <div className="bg-marine-950/80 border border-marine-800 p-3 rounded-2xl">
+          <span className="text-[11px] text-marine-300 font-medium flex items-center gap-1.5">
+            <Compass className="w-3.5 h-3.5 text-biolum-aqua" /> Surface Drift
           </span>
-          <p className="text-base font-extrabold text-slate-100 font-mono mt-1">{currentKnots} kts</p>
-          <p className="text-[10px] text-cyan-300 font-mono">Heading: {currentDir}</p>
+          <p className="text-lg font-black text-white font-mono mt-1">{currentKnots} kts</p>
+          <p className="text-[10px] text-biolum-teal font-mono">Heading: {currentDir}</p>
         </div>
 
-        {/* Wind Speed */}
-        <div className="bg-ocean-950/60 border border-ocean-800 p-2.5 rounded-xl">
-          <span className="text-[11px] text-slate-400 flex items-center gap-1">
-            <Wind className="w-3.5 h-3.5 text-sky-400" /> Marine Wind
+        {/* Marine Wind */}
+        <div className="bg-marine-950/80 border border-marine-800 p-3 rounded-2xl">
+          <span className="text-[11px] text-marine-300 font-medium flex items-center gap-1.5">
+            <Wind className="w-3.5 h-3.5 text-sky-400" /> Coastal Wind
           </span>
-          <p className="text-base font-extrabold text-slate-100 font-mono mt-1">{windSpeed} kts</p>
-          <p className="text-[10px] text-slate-400 font-mono">Moderate Breeze</p>
+          <p className="text-lg font-black text-white font-mono mt-1">{windSpeed} kts</p>
+          <p className="text-[10px] text-marine-400 font-mono">Moderate Breeze</p>
         </div>
 
-        {/* Satellite SST & Chlorophyll */}
-        <div className="bg-ocean-950/60 border border-ocean-800 p-2.5 rounded-xl">
-          <span className="text-[11px] text-slate-400 flex items-center gap-1">
-            <ThermometerSun className="w-3.5 h-3.5 text-amber-400" /> Satellite SST
+        {/* Satellite Plankton & SST */}
+        <div className="bg-marine-950/80 border border-marine-800 p-3 rounded-2xl">
+          <span className="text-[11px] text-marine-300 font-medium flex items-center gap-1.5">
+            <ThermometerSun className="w-3.5 h-3.5 text-amber-400" /> Plankton & SST
           </span>
-          <p className="text-base font-extrabold text-slate-100 font-mono mt-1">{hotspot?.sst_celsius || 27.8} °C</p>
-          <p className="text-[10px] text-emerald-400 font-mono">Chl-a: {hotspot?.chlorophyll_mg_m3 || 1.65} mg/m³</p>
+          <p className="text-lg font-black text-white font-mono mt-1">{hotspot?.sst_celsius || 27.8} °C</p>
+          <p className="text-[10px] text-biolum-teal font-mono">Chl-a: {hotspot?.chlorophyll_mg_m3 || 1.65} mg/m³</p>
         </div>
 
       </div>
 
       {/* Advisory Verdict Banner */}
-      <div className="bg-gradient-to-r from-ocean-950 to-blue-950/50 border border-ocean-700/60 rounded-xl p-3 flex items-start gap-2.5">
-        <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+      <div className="bg-gradient-to-r from-marine-950 to-marine-850 border border-marine-700/80 rounded-2xl p-3.5 flex items-start gap-3 shadow-inner">
+        <span className="text-2xl shrink-0">🛡️</span>
         <div>
-          <p className="text-xs font-semibold text-slate-200">{seaState}</p>
-          <p className="text-[11px] text-slate-300 mt-0.5 leading-relaxed">{verdict}</p>
+          <p className="text-xs font-bold text-white flex items-center gap-1.5">
+            <span>{seaState}</span>
+            <span className="text-biolum-teal">&bull; Coastal Safety Advisory</span>
+          </p>
+          <p className="text-[11px] text-marine-200 mt-1 leading-relaxed">{verdict}</p>
         </div>
       </div>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Mic, MicOff, Volume2, VolumeX, Sparkles, Bot, User, Radio, Cpu, Layers, ChevronDown, ChevronUp } from 'lucide-react';
+import { Send, Mic, MicOff, Volume2, VolumeX, Sparkles, User, Radio, Cpu, ChevronDown, ChevronUp, Compass, Waves, Fish, Shield } from 'lucide-react';
 
 export default function AgentChat({ onSendMessage, messages, isProcessing, collaboratingAgents, activeVoiceScript, selectedLang }) {
   const [input, setInput] = useState('');
@@ -8,13 +8,13 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
   const [showAgentsTrace, setShowAgentsTrace] = useState(true);
   const messagesEndRef = useRef(null);
 
-  // Suggested Prompts based on ISRO Problem Statement
+  // Suggested Prompts themed for Marine & Coastal Fishermen
   const suggestedQueries = [
-    { label: '🐟 Nearest PFZ Hotspot', query: 'Where is the nearest Potential Fishing Zone today?' },
-    { label: '🌊 Sea Safety & Weather', query: 'Is it safe to venture into the sea tomorrow morning?' },
-    { label: '🧭 Fuel-Optimal Route', query: 'Calculate the lowest-fuel current-assisted route to the best Mackerel zone.' },
-    { label: '🛡️ IMBL Border Status', query: 'Check distance to international maritime boundary line.' },
-    { label: '🔬 Fish Productivity Shift', query: 'Why has fish productivity declined in this coastal region?' }
+    { label: '🐟 Nearest Fish Shoal (PFZ)', query: 'Where is the nearest Potential Fishing Zone today?' },
+    { label: '🌊 Sea Waves & Weather', query: 'Is it safe to venture into the sea tomorrow morning?' },
+    { label: '🧭 Low-Fuel Current Route', query: 'Calculate the lowest-fuel current-assisted route to the best Mackerel zone.' },
+    { label: '🛡️ IMBL Border Clearance', query: 'Check distance to international maritime boundary line.' },
+    { label: '🪸 Marine EcoSystem Shift', query: 'Why has fish productivity declined in this coastal region?' }
   ];
 
   // Auto-scroll chat to bottom
@@ -35,10 +35,9 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 0.95;
     
-    // Set language
     const langMap = {
       'kn': 'kn-IN',
-      'tcy': 'kn-IN', // Tulu uses Dravidian acoustic phonetics mapped to kn-IN
+      'tcy': 'kn-IN',
       'ta': 'ta-IN',
       'te': 'te-IN',
       'hi': 'hi-IN',
@@ -103,74 +102,77 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
   };
 
   return (
-    <div className="bg-ocean-900/85 border border-ocean-700/80 rounded-2xl flex flex-col h-[520px] lg:h-[600px] shadow-2xl overflow-hidden">
+    <div className="bg-marine-900/90 border border-marine-700/80 rounded-3xl flex flex-col h-[520px] lg:h-[600px] shadow-2xl overflow-hidden">
       
-      {/* Agent Header & Multi-Agent Status */}
-      <div className="bg-ocean-950 border-b border-ocean-800 p-3.5 flex items-center justify-between">
+      {/* Marine Co-Pilot Header */}
+      <div className="bg-marine-950/95 border-b border-marine-800 p-3.5 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
-            <Bot className="w-4 h-4" />
+          <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-biolum-teal to-marine-600 flex items-center justify-center text-marine-950 font-black text-xl shadow-lg shadow-biolum-teal/20">
+            🐋
           </div>
           <div>
-            <div className="flex items-center gap-1.5">
-              <h2 className="text-xs font-bold text-slate-100 uppercase tracking-wider">ORCA Agentic Engine</h2>
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+            <div className="flex items-center gap-2">
+              <h2 className="text-xs font-black text-white tracking-wider uppercase">ORCA Ocean Co-Pilot</h2>
+              <span className="w-2 h-2 rounded-full bg-biolum-teal animate-ping"></span>
             </div>
-            <p className="text-[10px] text-cyan-300 font-mono">4 Collaborative Subagents Active</p>
+            <p className="text-[10px] text-biolum-teal font-mono">4 Marine EcoSystem Agents Active</p>
           </div>
         </div>
 
         <button
           onClick={() => setShowAgentsTrace(!showAgentsTrace)}
-          className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-cyan-300 transition bg-ocean-900 px-2 py-1 rounded-lg border border-ocean-700 font-mono"
+          className="flex items-center gap-1 text-[11px] text-marine-300 hover:text-biolum-teal transition bg-marine-900 px-2.5 py-1 rounded-xl border border-marine-700 font-mono"
         >
-          <Cpu className="w-3.5 h-3.5 text-cyan-400" />
-          <span>Agents Trace</span>
-          {showAgentsTrace ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          <span>Eco Agents</span>
+          {showAgentsTrace ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
         </button>
       </div>
 
       {/* Subagents Activity Drawer */}
       {showAgentsTrace && collaboratingAgents && (
-        <div className="bg-ocean-950/90 border-b border-ocean-800 p-2.5 grid grid-cols-2 gap-1.5 text-[10px] font-mono animate-fadeIn">
+        <div className="bg-marine-950/95 border-b border-marine-800 p-2.5 grid grid-cols-2 gap-2 text-[10px] font-mono animate-fadeIn">
           {collaboratingAgents.map((ag, i) => (
-            <div key={i} className="bg-ocean-900/70 border border-ocean-800 px-2 py-1 rounded-md flex items-center justify-between">
-              <span className="text-cyan-300 truncate max-w-[120px]">{ag.name.replace(' Agent', '')}:</span>
-              <span className="text-slate-300 truncate max-w-[140px]">{ag.summary}</span>
+            <div key={i} className="bg-marine-900/80 border border-marine-800 px-2.5 py-1.5 rounded-xl flex items-center justify-between shadow-sm">
+              <span className="text-biolum-teal font-bold truncate max-w-[110px]">
+                {ag.name.includes('Ocean') ? '🐟 Matsya' : ag.name.includes('Weather') ? '🌊 Vayu' : ag.name.includes('Routing') ? '🧭 Setu' : '🪸 Raksha'}:
+              </span>
+              <span className="text-marine-200 truncate max-w-[130px]">{ag.summary}</span>
             </div>
           ))}
         </div>
       )}
 
       {/* Messages Thread */}
-      <div className="flex-1 overflow-y-auto p-3.5 space-y-3.5">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((m, idx) => (
           <div
             key={idx}
             className={`flex items-start gap-2.5 ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {m.sender === 'agent' && (
-              <div className="w-7 h-7 rounded-lg bg-cyan-600/30 border border-cyan-500/50 flex items-center justify-center text-cyan-300 shrink-0 mt-0.5">
-                <Bot className="w-4 h-4" />
+              <div className="w-8 h-8 rounded-2xl bg-marine-800 border border-biolum-teal/40 flex items-center justify-center text-lg shadow shrink-0 mt-0.5">
+                🐋
               </div>
             )}
             
-            <div className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed shadow-md ${
+            <div className={`max-w-[85%] rounded-3xl px-4 py-3 text-xs leading-relaxed shadow-lg ${
               m.sender === 'user'
-                ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-tr-none font-medium'
-                : 'bg-ocean-950/90 text-slate-200 border border-ocean-800 rounded-tl-none'
+                ? 'bg-gradient-to-r from-marine-600 to-biolum-teal text-marine-950 font-bold rounded-tr-none shadow-biolum-teal/20'
+                : 'bg-marine-950/95 text-slate-100 border border-marine-700/80 rounded-tl-none'
             }`}>
               <div className="whitespace-pre-wrap">{m.text}</div>
               
               {/* Voice playback button for Agent responses */}
               {m.sender === 'agent' && (
-                <div className="mt-2 pt-2 border-t border-ocean-800/80 flex items-center justify-between text-[11px] text-slate-400">
-                  <span className="text-[10px] font-mono text-cyan-400">ISRO Evidence-Based Synthesis</span>
+                <div className="mt-2.5 pt-2.5 border-t border-marine-800 flex items-center justify-between text-[11px] text-marine-300">
+                  <span className="text-[10px] font-mono text-biolum-teal flex items-center gap-1">
+                    <span>🛰️</span> ISRO Marine Synthesis
+                  </span>
                   <button
                     onClick={() => speakText(m.voiceScript || m.text)}
-                    className="flex items-center gap-1 text-cyan-300 hover:text-cyan-200 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 transition"
+                    className="flex items-center gap-1.5 text-biolum-teal hover:text-white bg-biolum-teal/15 hover:bg-biolum-teal/30 px-2.5 py-1 rounded-lg border border-biolum-teal/30 transition font-semibold"
                   >
-                    {isSpeaking ? <VolumeX className="w-3 h-3 text-rose-400" /> : <Volume2 className="w-3 h-3" />}
+                    {isSpeaking ? <VolumeX className="w-3.5 h-3.5 text-rose-400" /> : <Volume2 className="w-3.5 h-3.5" />}
                     <span>{isSpeaking ? 'Stop Audio' : 'Play Voice'}</span>
                   </button>
                 </div>
@@ -178,47 +180,47 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
             </div>
 
             {m.sender === 'user' && (
-              <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center text-white shrink-0 mt-0.5">
-                <User className="w-4 h-4" />
+              <div className="w-8 h-8 rounded-2xl bg-gradient-to-br from-biolum-aqua to-marine-500 flex items-center justify-center text-marine-950 font-black text-sm shrink-0 mt-0.5 shadow">
+                👤
               </div>
             )}
           </div>
         ))}
 
         {isProcessing && (
-          <div className="flex items-center gap-2 text-xs text-cyan-400 bg-cyan-950/40 border border-cyan-500/20 p-2.5 rounded-xl w-fit font-mono">
-            <Radio className="w-3.5 h-3.5 animate-spin" />
-            <span>Collaborating subagents reasoning over satellite data...</span>
+          <div className="flex items-center gap-2.5 text-xs text-biolum-teal bg-marine-950/80 border border-biolum-teal/30 p-3 rounded-2xl w-fit font-mono shadow">
+            <span className="animate-spin text-sm">🌊</span>
+            <span>Collaborative marine agents reasoning over satellite telemetry...</span>
           </div>
         )}
 
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Suggested Quick Queries */}
-      <div className="px-3 py-1.5 bg-ocean-950/60 border-t border-ocean-800 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+      {/* Suggested Marine Query Chips */}
+      <div className="px-3.5 py-2 bg-marine-950/80 border-t border-marine-800 flex items-center gap-2 overflow-x-auto no-scrollbar">
         {suggestedQueries.map((s, i) => (
           <button
             key={i}
             onClick={() => onSendMessage(s.query)}
-            className="shrink-0 text-[10px] bg-ocean-900 hover:bg-cyan-950 text-slate-300 hover:text-cyan-300 px-2.5 py-1 rounded-full border border-ocean-700 transition"
+            className="shrink-0 text-[11px] font-medium bg-marine-900 hover:bg-marine-800 text-marine-200 hover:text-biolum-teal px-3 py-1.5 rounded-full border border-marine-700 transition shadow-sm"
           >
             {s.label}
           </button>
         ))}
       </div>
 
-      {/* Input Form with Mic */}
-      <form onSubmit={handleSend} className="p-3 bg-ocean-950 border-t border-ocean-800 flex items-center gap-2">
+      {/* Input Form with Microphone */}
+      <form onSubmit={handleSend} className="p-3.5 bg-marine-950 border-t border-marine-800 flex items-center gap-2.5">
         <button
           type="button"
           onClick={toggleListening}
-          className={`p-2 rounded-xl border transition ${
+          className={`p-2.5 rounded-2xl border transition shadow ${
             isListening
               ? 'bg-rose-500/20 border-rose-500 text-rose-400 animate-pulse'
-              : 'bg-ocean-900 border-ocean-700 text-slate-300 hover:text-cyan-400'
+              : 'bg-marine-900 border-marine-700 text-marine-200 hover:text-biolum-teal hover:border-biolum-teal/50'
           }`}
-          title="Voice Speech Recognition in Regional Language"
+          title="Speak in English, ಕನ್ನಡ, ತುಳು, or mother tongue"
         >
           {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
         </button>
@@ -228,13 +230,13 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={`Ask ORCA in English, ಕನ್ನಡ, ತುಳು, or mother tongue...`}
-          className="flex-1 bg-ocean-900 border border-ocean-700 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-cyan-500 font-medium transition"
+          className="flex-1 bg-marine-900 border border-marine-700 rounded-2xl px-3.5 py-2.5 text-xs text-white placeholder-marine-400 outline-none focus:border-biolum-teal font-medium transition shadow-inner"
         />
 
         <button
           type="submit"
           disabled={!input.trim() || isProcessing}
-          className="p-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 disabled:opacity-50 text-white shadow-lg shadow-cyan-500/20 transition"
+          className="p-2.5 rounded-2xl bg-gradient-to-r from-biolum-teal to-marine-500 hover:from-biolum-aqua hover:to-marine-400 disabled:opacity-50 text-marine-950 font-black shadow-lg shadow-biolum-teal/20 transition"
         >
           <Send className="w-4 h-4" />
         </button>

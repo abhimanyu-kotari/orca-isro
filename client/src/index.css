@@ -5,57 +5,66 @@
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', sans-serif;
+    background: radial-gradient(ellipse at top, #082642 0%, #051b30 45%, #020d1a 100%);
+    background-attachment: fixed;
+    color: #f0f9ff;
   }
   code, pre, .font-mono {
     font-family: 'JetBrains Mono', monospace;
   }
 }
 
-/* Custom Scrollbar */
+/* Oceanic Wave Background Accent */
+.ocean-ambient-bg {
+  background-image: radial-gradient(circle at 10% 20%, rgba(0, 245, 196, 0.04) 0%, transparent 40%),
+                    radial-gradient(circle at 90% 80%, rgba(0, 210, 255, 0.04) 0%, transparent 40%);
+}
+
+/* Custom Marine Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #07162c;
+  background: #051b30;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1b4f93;
+  background: #17669e;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #00f0ff;
+  background: #00f5c4;
 }
 
-/* Leaflet Dark Customizations */
+/* Leaflet Marine Customizations */
 .leaflet-container {
-  background: #030b17 !important;
+  background: #020d1a !important;
   font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
 
 .leaflet-popup-content-wrapper {
-  background: #07162c !important;
-  color: #f8fafc !important;
-  border: 1px solid #1e3a8a !important;
-  border-radius: 12px !important;
-  box-shadow: 0 10px 25px -5px rgba(0, 240, 255, 0.15) !important;
+  background: #051b30 !important;
+  color: #f0f9ff !important;
+  border: 1.5px solid #00f5c4 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 15px 30px -5px rgba(0, 245, 196, 0.25) !important;
 }
 
 .leaflet-popup-tip {
-  background: #07162c !important;
+  background: #051b30 !important;
 }
 
-/* Pulse radar glowing markers */
-@keyframes radar-ping {
+/* Radar & Marine Plankton Pulse Rings */
+@keyframes marine-radar {
   0% {
-    transform: scale(0.8);
+    transform: scale(0.85);
     opacity: 0.9;
   }
   100% {
-    transform: scale(2.4);
+    transform: scale(2.6);
     opacity: 0;
   }
 }
@@ -63,5 +72,17 @@
 .radar-pulse-ring {
   position: absolute;
   border-radius: 50%;
-  animation: radar-ping 2s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+  animation: marine-radar 2.4s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+/* Marine Glassmorphism Card */
+.marine-card {
+  background: rgba(5, 27, 48, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 245, 196, 0.18);
+  box-shadow: 0 10px 25px -5px rgba(2, 13, 26, 0.6);
+}
+
+.marine-card:hover {
+  border-color: rgba(0, 245, 196, 0.4);
 }
