@@ -5,7 +5,15 @@ import Telemetry from './components/Telemetry';
 import WeatherCard from './components/WeatherCard';
 import AgentChat from './components/AgentChat';
 import OfflineSync from './components/OfflineSync';
-import { Compass, Sparkles, Navigation, Fish, Shield, Radio, Layers } from 'lucide-react';
+import {
+  HARBORS,
+  BOUNDARIES,
+  generateHotspots,
+  computeVoyageRoute,
+  checkGeofenceProximity,
+  generateWeather,
+  processClientChat
+} from './services/marineEngine';
 
 const API_BASE = 'http://localhost:8000';
 
@@ -15,29 +23,17 @@ export default function App() {
   const [isOffline, setIsOffline] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Core Marine Telemetry State
-  const [harborData, setHarborData] = useState({
-    name: "Chennai Fisheries Harbour (Kasimedu)",
-    state: "Tamil Nadu",
-    lat: 13.125,
-    lng: 80.298,
-    coast: "Bay of Bengal"
-  });
+  // Core Marine State initialized with client-side engine
+  const [harborData, setHarborData] = useState(HARBORS.chennai);
+  const [harborsList, setHarborsList] = useState(HARBORS);
+  const [boundaries, setBoundaries] = useState(BOUNDARIES);
 
-  const [harborsList, setHarborsList] = useState({
-    chennai: { name: "Chennai Fisheries Harbour", state: "Tamil Nadu", lat: 13.125, lng: 80.298, coast: "Bay of Bengal" },
-    rameswaram: { name: "Rameswaram Port", state: "Tamil Nadu", lat: 9.288, lng: 79.313, coast: "Palk Bay / Gulf of Mannar" },
-    kochi: { name: "Kochi Harbour", state: "Kerala", lat: 9.940, lng: 76.260, coast: "Arabian Sea" },
-    visakhapatnam: { name: "Visakhapatnam Port", state: "Andhra Pradesh", lat: 17.695, lng: 83.300, coast: "Bay of Bengal" },
-    mangalore: { name: "Mangalore Port", state: "Karnataka", lat: 12.860, lng: 74.835, coast: "Arabian Sea" }
-  });
-
-  const [hotspots, setHotspots] = useState([]);
-  const [selectedHotspot, setSelectedHotspot] = useState(null);
-  const [route, setRoute] = useState(null);
-  const [weather, setWeather] = useState(null);
-  const [geofence, setGeofence] = useState(null);
-  const [boundaries, setBoundaries] = useState(null);
+  const initialHotspots = generateHotspots('chennai');
+  const [hotspots, setHotspots] = useState(initialHotspots);
+  const [selectedHotspot, setSelectedHotspot] = useState(initialHotspots[0]);
+  const [route, setRoute] = useState(computeVoyageRoute(HARBORS.chennai, initialHotspots[0]));
+  const [weather, setWeather] = useState(generateWeather(initialHotspots[0].lat, initialHotspots[0].lng));
+  const [geofence, setGeofence] = useState(checkGeofenceProximity(initialHotspots[0].lat, initialHotspots[0].lng));
 
   // Multi-Agent Chat Messages
   const [messages, setMessages] = useState([
@@ -55,34 +51,37 @@ export default function App() {
     { name: 'Geofencing & Safety Agent', status: 'Ready', summary: 'IMBL boundary monitoring' }
   ]);
 
-  // Initial Load: Fetch Harbors, Boundaries, and Initial Voyage Data
+  // Harbor Switch Handler
   useEffect(() => {
-    fetchInitialData();
+    updateHarborData(selectedHarbor);
   }, [selectedHarbor]);
 
-  const fetchInitialData = async () => {
+  const updateHarborData = async (harborKey) => {
+    // 1. Immediately apply client-side data (Instant responsiveness on Mobile/Vercel)
+    const currentHarbor = HARBORS[harborKey] || HARBORS.chennai;
+    setHarborData(currentHarbor);
+
+    const newHotspots = generateHotspots(harborKey);
+    setHotspots(newHotspots);
+    const topHotspot = newHotspots[0];
+    setSelectedHotspot(topHotspot);
+
+    const newRoute = computeVoyageRoute(currentHarbor, topHotspot);
+    setRoute(newRoute);
+
+    const newWeather = generateWeather(topHotspot.lat, topHotspot.lng);
+    setWeather(newWeather);
+
+    const newGeofence = checkGeofenceProximity(topHotspot.lat, topHotspot.lng);
+    setGeofence(newGeofence);
+
+    // 2. Try fetching from live FastAPI backend if available
     try {
-      // Fetch harbors list
-      const hRes = await fetch(`${API_BASE}/api/harbors`);
-      if (hRes.ok) {
-        const hData = await hRes.json();
-        setHarborsList(hData);
-      }
-
-      // Fetch boundaries
-      const bRes = await fetch(`${API_BASE}/api/boundaries`);
-      if (bRes.ok) {
-        const bData = await bRes.json();
-        setBoundaries(bData);
-      }
-
-      // Analyze default voyage
       const vRes = await fetch(`${API_BASE}/api/analyze-voyage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ harbor_id: selectedHarbor })
+        body: JSON.stringify({ harbor_id: harborKey })
       });
-
       if (vRes.ok) {
         const vData = await vRes.json();
         setHarborData(vData.harbor);
@@ -92,14 +91,24 @@ export default function App() {
         setWeather(vData.weather);
         setGeofence(vData.geofence);
       }
-    } catch (err) {
-      console.warn('Backend connecting...', err);
+    } catch (e) {
+      // Backend not running on this device (e.g. mobile/cloud); client-side engine is active.
     }
   };
 
-  // Hotspot Selection Handler
+  // Hotspot Click Handler
   const handleSelectHotspot = async (hotspot) => {
     setSelectedHotspot(hotspot);
+
+    // Local calculation
+    const newRoute = computeVoyageRoute(harborData, hotspot);
+    setRoute(newRoute);
+    const newWeather = generateWeather(hotspot.lat, hotspot.lng);
+    setWeather(newWeather);
+    const newGeofence = checkGeofenceProximity(hotspot.lat, hotspot.lng);
+    setGeofence(newGeofence);
+
+    // Backend attempt
     try {
       const res = await fetch(`${API_BASE}/api/analyze-voyage`, {
         method: 'POST',
@@ -115,9 +124,7 @@ export default function App() {
         setWeather(data.weather);
         setGeofence(data.geofence);
       }
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) {}
   };
 
   // Chat Message Submission Handler
@@ -147,7 +154,6 @@ export default function App() {
         setMessages((prev) => [...prev, agentMsg]);
         setCollaboratingAgents(data.collaborating_agents);
 
-        // Update telemetry and map with evidence
         if (data.evidence) {
           setHarborData(data.harbor);
           setSelectedHotspot(data.evidence.top_pfz);
@@ -156,17 +162,32 @@ export default function App() {
           setWeather(data.evidence.weather);
           setGeofence(data.evidence.geofence);
         }
+        return;
       }
     } catch (err) {
-      const fallbackMsg = {
-        sender: 'agent',
-        text: `🛰️ **ORCA Synthesis**: Processed request for **${harborData.name}**.\n• Top Hotspot: **${selectedHotspot?.id || 'PFZ-1'}** (${selectedHotspot?.distance_nm || 18} NM offshore).\n• Estimated Fuel Saved: **₹${route?.cost_saved_inr || 2400}** (${route?.fuel_savings_percentage || 28}%).\n• Sea condition is safe. Safe distance to IMBL boundary.`,
-        voiceScript: `Nearest fish hotspot is ${selectedHotspot?.distance_nm || 18} nautical miles offshore. Sea conditions are safe.`
-      };
-      setMessages((prev) => [...prev, fallbackMsg]);
-    } finally {
-      setIsProcessing(false);
+      // Backend unavailable; process via client-side multi-agent engine
     }
+
+    // Client-side agent execution
+    setTimeout(() => {
+      const clientRes = processClientChat(userText, selectedHarbor, selectedLang);
+      const agentMsg = {
+        sender: 'agent',
+        text: clientRes.response_text,
+        voiceScript: clientRes.voice_script
+      };
+      setMessages((prev) => [...prev, agentMsg]);
+      setCollaboratingAgents(clientRes.collaborating_agents);
+
+      if (clientRes.evidence) {
+        setSelectedHotspot(clientRes.evidence.top_pfz);
+        setHotspots(clientRes.evidence.all_pfz_hotspots);
+        setRoute(clientRes.evidence.route);
+        setWeather(clientRes.evidence.weather);
+        setGeofence(clientRes.evidence.geofence);
+      }
+      setIsProcessing(false);
+    }, 400);
   };
 
   return (
