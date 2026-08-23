@@ -41,7 +41,7 @@ export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, o
     <header className="sticky top-2 sm:top-3 z-50 px-2 sm:px-6">
       <div className="max-w-7xl mx-auto rounded-3xl p-4 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.8)] border border-white/20 relative min-h-[120px] sm:min-h-[140px] flex flex-col justify-between">
         
-        {/* Dedicated Background Layer */}
+        {/* Dedicated Background Layer (Lowest Layer z-0) */}
         <div 
           className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none z-0"
           style={{
@@ -54,8 +54,8 @@ export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, o
           <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-amber-500/10 via-transparent to-transparent pointer-events-none"></div>
         </div>
 
-        {/* Top Row: Brand & Controls */}
-        <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-3 z-10 w-full">
+        {/* Top Row: Brand & Controls (HIGHEST STACKING CONTEXT z-40) */}
+        <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-3 z-40 w-full">
           
           {/* Brand & ISRO Badge */}
           <div className="flex items-center gap-3">
@@ -99,9 +99,9 @@ export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, o
                 <ChevronDown className={`w-3.5 h-3.5 text-slate-300 transition-transform duration-200 shrink-0 ${isHarborOpen ? 'rotate-180' : ''}`} />
               </button>
 
-              {/* Harbor Menu Popover (100% Solid Opaque Background - Zero Ghosting!) */}
+              {/* Harbor Menu Popover */}
               {isHarborOpen && (
-                <div className="absolute left-0 sm:left-auto sm:right-0 top-full mt-2 w-72 sm:w-80 bg-[#020b17] border border-emerald-500/40 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] z-[9999] overflow-hidden animate-fadeIn">
+                <div className="absolute left-0 sm:left-auto sm:right-0 top-full mt-2 w-72 sm:w-80 bg-[#020b17] border border-emerald-500/40 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-50 overflow-hidden animate-fadeIn ring-1 ring-emerald-500/20">
                   <div className="px-4 py-2.5 text-[10px] font-mono font-bold uppercase text-emerald-400 bg-[#01060e] border-b border-white/10 tracking-wider flex items-center gap-1.5">
                     <Anchor className="w-3.5 h-3.5" /> Select Coastal Harbor
                   </div>
@@ -155,9 +155,9 @@ export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, o
                 <ChevronDown className={`w-3.5 h-3.5 text-slate-300 transition-transform duration-200 shrink-0 ${isLangOpen ? 'rotate-180' : ''}`} />
               </button>
 
-              {/* Language Menu Popover (100% Solid Opaque Background - Zero Ghosting!) */}
+              {/* Language Menu Popover */}
               {isLangOpen && (
-                <div className="absolute right-0 top-full mt-2 w-52 sm:w-60 bg-[#020b17] border border-cyan-500/40 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.98)] z-[9999] overflow-hidden animate-fadeIn">
+                <div className="absolute right-0 top-full mt-2 w-52 sm:w-60 bg-[#020b17] border border-cyan-500/40 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-50 overflow-hidden animate-fadeIn ring-1 ring-cyan-500/20">
                   <div className="px-4 py-2.5 text-[10px] font-mono font-bold uppercase text-cyan-400 bg-[#01060e] border-b border-white/10 tracking-wider flex items-center gap-1.5">
                     <Globe2 className="w-3.5 h-3.5" /> Regional Language
                   </div>
@@ -201,8 +201,8 @@ export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, o
 
         </div>
 
-        {/* Bottom Context Banner inside Header */}
-        <div className="relative mt-3 pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 z-10 text-[11px] font-mono">
+        {/* Bottom Context Banner inside Header (LOWER STACKING CONTEXT z-0 - Painted Beneath Dropdowns) */}
+        <div className="relative mt-3 pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 z-0 text-[11px] font-mono pointer-events-auto">
           <div className="flex items-center gap-3 text-slate-300">
             <span className="text-emerald-400 font-bold flex items-center gap-1">
               <span>⚓</span> {currentHarbor.name.split('(')[0].trim()}
