@@ -3,14 +3,21 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, Circle, useMap } from
 import L from 'leaflet';
 import { Navigation2, Fish, AlertTriangle, ShieldAlert, Sparkles, Compass, Waves, Anchor } from 'lucide-react';
 
-// Custom Map Centering Controller
+// Custom Map Centering Controller with exact coordinate listener
 function MapViewController({ center, zoom }) {
   const map = useMap();
+  const lat = center?.[0];
+  const lng = center?.[1];
+
   useEffect(() => {
-    if (center && center.length === 2 && !isNaN(center[0]) && !isNaN(center[1])) {
-      map.flyTo(center, zoom || 8, { duration: 1.5 });
+    if (lat !== undefined && lng !== undefined && !isNaN(lat) && !isNaN(lng)) {
+      map.flyTo([lat, lng], zoom || 9, {
+        animate: true,
+        duration: 1.2
+      });
     }
-  }, [center, zoom, map]);
+  }, [lat, lng, zoom, map]);
+
   return null;
 }
 
@@ -47,7 +54,7 @@ const pfzStandardIcon = L.divIcon({
 });
 
 export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectHotspot, route, boundaries }) {
-  const center = harbor ? [harbor.lat, harbor.lng] : [13.125, 80.298];
+  const center = [harbor?.lat || 13.125, harbor?.lng || 80.298];
 
   // IMBL coordinates polyline arrays
   const imblLines = boundaries?.imbl_lines ? Object.values(boundaries.imbl_lines).map(b => b.points.map(p => [p.lat, p.lng])) : [];
@@ -65,7 +72,7 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
       <div className="absolute top-3 left-3 z-[400] bg-marine-900/95 backdrop-blur-md border border-marine-700/80 rounded-2xl px-4 py-2.5 flex items-center gap-2.5 text-xs shadow-xl">
         <span className="text-base animate-pulse">🌊</span>
         <div>
-          <span className="font-bold text-slate-100">Coastal Marine Canvas:</span>
+          <span className="font-bold text-slate-100">{harbor?.name?.split('(')[0]?.trim() || 'Coast'}:</span>
           <span className="ml-1.5 text-biolum-teal font-mono font-semibold">{harbor?.coast || 'Indian EEZ'}</span>
         </div>
       </div>
@@ -99,11 +106,11 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
 
       <MapContainer
         center={center}
-        zoom={8}
+        zoom={9}
         scrollWheelZoom={true}
         className="w-full h-full"
       >
-        <MapViewController center={center} zoom={8} />
+        <MapViewController center={center} zoom={9} />
 
         {/* Dark Marine Voyager Map Tiles */}
         <TileLayer
@@ -185,7 +192,7 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
           />
         )}
 
-        {/* International Maritime Boundary Lines (IMBL) (Coral Red) */}
+        {/* International Maritime Boundary Lines (IMBL) */}
         {imblLines.map((line, idx) => (
           <Polyline
             key={`imbl-${idx}`}
