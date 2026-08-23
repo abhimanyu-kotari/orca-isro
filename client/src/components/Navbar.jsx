@@ -14,8 +14,12 @@ export default function Navbar({
 }) {
   const [isHarborOpen, setIsHarborOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
-  const harborRef = useRef(null);
-  const langRef = useRef(null);
+  
+  // Distinct refs for Mobile and Desktop to prevent ref collision
+  const mobileHarborRef = useRef(null);
+  const mobileLangRef = useRef(null);
+  const desktopHarborRef = useRef(null);
+  const desktopLangRef = useRef(null);
 
   const languages = [
     { code: 'en', label: 'English' },
@@ -27,17 +31,28 @@ export default function Navbar({
     { code: 'ml', label: 'മലയാളം (Malayalam)' }
   ];
 
+  // Click / Touch outside listener checking both mobile & desktop refs safely
   useEffect(() => {
     function handleClickOutside(event) {
-      if (harborRef.current && !harborRef.current.contains(event.target)) {
+      const isInsideHarbor = 
+        (mobileHarborRef.current && mobileHarborRef.current.contains(event.target)) ||
+        (desktopHarborRef.current && desktopHarborRef.current.contains(event.target));
+
+      if (!isInsideHarbor) {
         setIsHarborOpen(false);
       }
-      if (langRef.current && !langRef.current.contains(event.target)) {
+
+      const isInsideLang = 
+        (mobileLangRef.current && mobileLangRef.current.contains(event.target)) ||
+        (desktopLangRef.current && desktopLangRef.current.contains(event.target));
+
+      if (!isInsideLang) {
         setIsLangOpen(false);
       }
     }
+
     document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('touchstart', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside, { passive: true });
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('touchstart', handleClickOutside);
@@ -47,6 +62,20 @@ export default function Navbar({
   const currentHarbor = harbors[selectedHarbor] || Object.values(harbors)[0];
   const currentLang = languages.find(l => l.code === selectedLang) || languages[0];
   const currentVessel = VESSEL_PROFILES[selectedVessel] || VESSEL_PROFILES.trawler;
+
+  const handleSelectHarbor = (key, e) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    onHarborChange(key);
+    setIsHarborOpen(false);
+  };
+
+  const handleSelectLang = (code, e) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    onLangChange(code);
+    setIsLangOpen(false);
+  };
 
   return (
     <header className="sticky top-2 sm:top-3 z-50 px-2 sm:px-6">
@@ -102,10 +131,11 @@ export default function Navbar({
                 <span className="truncate max-w-[62px]">{currentVessel.short_name.split(' ')[0]}</span>
               </button>
 
-              {/* Harbor Pill */}
-              <div className="relative" ref={harborRef}>
+              {/* Mobile Harbor Pill */}
+              <div className="relative" ref={mobileHarborRef}>
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setIsHarborOpen(!isHarborOpen);
                     setIsLangOpen(false);
                   }}
@@ -116,37 +146,44 @@ export default function Navbar({
                   <ChevronDown className="w-2.5 h-2.5 text-slate-400" />
                 </button>
 
+                {/* Mobile Harbor Popover with direct click & touch handlers */}
                 {isHarborOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-64 bg-[#020b17] border border-emerald-500/40 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-50 overflow-hidden animate-fadeIn ring-1 ring-emerald-500/20">
+                  <div className="absolute right-0 top-full mt-2 w-64 bg-[#020b17] border border-emerald-500/50 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-[9999] overflow-hidden animate-fadeIn ring-1 ring-emerald-500/30">
                     <div className="px-3 py-2 text-[9px] font-mono font-bold uppercase text-emerald-400 bg-[#01060e] border-b border-white/10 tracking-wider flex items-center gap-1">
-                      <Anchor className="w-3 h-3" /> Select Port
+                      <Anchor className="w-3 h-3" /> Select Coastal Port
                     </div>
-                    <div className="max-h-60 overflow-y-auto py-1 divide-y divide-white/[0.04]">
-                      {Object.entries(harbors).map(([key, h]) => (
-                        <button
-                          key={key}
-                          onClick={() => {
-                            onHarborChange(key);
-                            setIsHarborOpen(false);
-                          }}
-                          className="w-full text-left px-3 py-2 text-xs text-slate-200 hover:bg-white/10 flex items-center justify-between"
-                        >
-                          <div>
-                            <div className="font-bold text-white text-[11px]">{h.name.split('(')[0]}</div>
-                            <div className="text-[9px] text-slate-400">{h.state}</div>
-                          </div>
-                          {selectedHarbor === key && <Check className="w-3.5 h-3.5 text-emerald-400" />}
-                        </button>
-                      ))}
+                    <div className="max-h-64 overflow-y-auto py-1 divide-y divide-white/[0.06]">
+                      {Object.entries(harbors).map(([key, h]) => {
+                        const isSelected = selectedHarbor === key;
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            onClick={(e) => handleSelectHarbor(key, e)}
+                            className={`w-full text-left px-3.5 py-2.5 text-xs flex items-center justify-between active:bg-emerald-500/30 transition ${
+                              isSelected
+                                ? 'bg-emerald-500/20 text-emerald-300 font-bold border-l-4 border-emerald-400'
+                                : 'text-slate-200 hover:bg-white/10'
+                            }`}
+                          >
+                            <div>
+                              <div className="font-bold text-white text-[11px]">{h.name.split('(')[0].trim()}</div>
+                              <div className="text-[9px] text-slate-400 font-mono">{h.state} &bull; {h.coast}</div>
+                            </div>
+                            {isSelected && <Check className="w-4 h-4 text-emerald-400 shrink-0" />}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Language Pill */}
-              <div className="relative" ref={langRef}>
+              {/* Mobile Language Pill */}
+              <div className="relative" ref={mobileLangRef}>
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setIsLangOpen(!isLangOpen);
                     setIsHarborOpen(false);
                   }}
@@ -157,25 +194,31 @@ export default function Navbar({
                   <ChevronDown className="w-2.5 h-2.5 text-slate-400" />
                 </button>
 
+                {/* Mobile Language Popover with direct click & touch handlers */}
                 {isLangOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-48 bg-[#020b17] border border-cyan-500/40 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-50 overflow-hidden animate-fadeIn ring-1 ring-cyan-500/20">
+                  <div className="absolute right-0 top-full mt-2 w-52 bg-[#020b17] border border-cyan-500/50 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-[9999] overflow-hidden animate-fadeIn ring-1 ring-cyan-500/30">
                     <div className="px-3 py-2 text-[9px] font-mono font-bold uppercase text-cyan-400 bg-[#01060e] border-b border-white/10 tracking-wider">
-                      Language
+                      Select Language
                     </div>
-                    <div className="max-h-60 overflow-y-auto py-1 divide-y divide-white/[0.04]">
-                      {languages.map((l) => (
-                        <button
-                          key={l.code}
-                          onClick={() => {
-                            onLangChange(l.code);
-                            setIsLangOpen(false);
-                          }}
-                          className="w-full text-left px-3 py-2 text-[11px] text-slate-200 hover:bg-white/10 flex items-center justify-between"
-                        >
-                          <span>{l.label}</span>
-                          {selectedLang === l.code && <Check className="w-3.5 h-3.5 text-cyan-400" />}
-                        </button>
-                      ))}
+                    <div className="max-h-64 overflow-y-auto py-1 divide-y divide-white/[0.06]">
+                      {languages.map((l) => {
+                        const isSelected = selectedLang === l.code;
+                        return (
+                          <button
+                            key={l.code}
+                            type="button"
+                            onClick={(e) => handleSelectLang(l.code, e)}
+                            className={`w-full text-left px-3.5 py-2.5 text-xs flex items-center justify-between active:bg-cyan-500/30 transition ${
+                              isSelected
+                                ? 'bg-cyan-500/20 text-cyan-300 font-bold border-l-4 border-cyan-400'
+                                : 'text-slate-200 hover:bg-white/10'
+                            }`}
+                          >
+                            <span className="font-medium text-white">{l.label}</span>
+                            {isSelected && <Check className="w-4 h-4 text-cyan-400 shrink-0" />}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -240,10 +283,11 @@ export default function Navbar({
                 </div>
               </button>
 
-              {/* Harbor Selector */}
-              <div className="relative" ref={harborRef}>
+              {/* Desktop Harbor Selector */}
+              <div className="relative" ref={desktopHarborRef}>
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setIsHarborOpen(!isHarborOpen);
                     setIsLangOpen(false);
                   }}
@@ -259,45 +303,47 @@ export default function Navbar({
                 </button>
 
                 {isHarborOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-[#020b17] border border-emerald-500/40 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-50 overflow-hidden animate-fadeIn ring-1 ring-emerald-500/20">
+                  <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-[#020b17] border border-emerald-500/40 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-[9999] overflow-hidden animate-fadeIn ring-1 ring-emerald-500/20">
                     <div className="px-4 py-2.5 text-[10px] font-mono font-bold uppercase text-emerald-400 bg-[#01060e] border-b border-white/10 tracking-wider flex items-center gap-1.5">
                       <Anchor className="w-3.5 h-3.5" /> Select Coastal Harbor
                     </div>
                     <div className="max-h-72 overflow-y-auto py-1 divide-y divide-white/[0.04]">
-                      {Object.entries(harbors).map(([key, h]) => (
-                        <button
-                          key={key}
-                          onClick={() => {
-                            onHarborChange(key);
-                            setIsHarborOpen(false);
-                          }}
-                          className={`w-full text-left px-4 py-2.5 text-xs flex items-center justify-between transition ${
-                            selectedHarbor === key 
-                              ? 'bg-emerald-500/20 text-emerald-300 font-bold border-l-4 border-emerald-400' 
-                              : 'text-slate-200 hover:bg-white/[0.08]'
-                          }`}
-                        >
-                          <div>
-                            <div className="flex items-center gap-1.5">
-                              <span>⚓</span>
-                              <span className="text-white font-medium">{h.name.split('(')[0].trim()}</span>
+                      {Object.entries(harbors).map(([key, h]) => {
+                        const isSelected = selectedHarbor === key;
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            onClick={(e) => handleSelectHarbor(key, e)}
+                            className={`w-full text-left px-4 py-2.5 text-xs flex items-center justify-between transition ${
+                              isSelected 
+                                ? 'bg-emerald-500/20 text-emerald-300 font-bold border-l-4 border-emerald-400' 
+                                : 'text-slate-200 hover:bg-white/[0.08]'
+                            }`}
+                          >
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <span>⚓</span>
+                                <span className="text-white font-medium">{h.name.split('(')[0].trim()}</span>
+                              </div>
+                              <div className="text-[10px] text-slate-400 font-mono pl-4 mt-0.5">
+                                {h.state} &bull; {h.coast}
+                              </div>
                             </div>
-                            <div className="text-[10px] text-slate-400 font-mono pl-4 mt-0.5">
-                              {h.state} &bull; {h.coast}
-                            </div>
-                          </div>
-                          {selectedHarbor === key && <Check className="w-4 h-4 text-emerald-400 shrink-0" />}
-                        </button>
-                      ))}
+                            {isSelected && <Check className="w-4 h-4 text-emerald-400 shrink-0" />}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Language Selector */}
-              <div className="relative" ref={langRef}>
+              {/* Desktop Language Selector */}
+              <div className="relative" ref={desktopLangRef}>
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setIsLangOpen(!isLangOpen);
                     setIsHarborOpen(false);
                   }}
@@ -311,28 +357,29 @@ export default function Navbar({
                 </button>
 
                 {isLangOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-52 sm:w-60 bg-[#020b17] border border-cyan-500/40 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-50 overflow-hidden animate-fadeIn ring-1 ring-cyan-500/20">
+                  <div className="absolute right-0 top-full mt-2 w-52 sm:w-60 bg-[#020b17] border border-cyan-500/40 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-[9999] overflow-hidden animate-fadeIn ring-1 ring-cyan-500/20">
                     <div className="px-4 py-2.5 text-[10px] font-mono font-bold uppercase text-cyan-400 bg-[#01060e] border-b border-white/10 tracking-wider flex items-center gap-1.5">
                       <Globe2 className="w-3.5 h-3.5" /> Regional Language
                     </div>
                     <div className="max-h-72 overflow-y-auto py-1 divide-y divide-white/[0.04]">
-                      {languages.map((l) => (
-                        <button
-                          key={l.code}
-                          onClick={() => {
-                            onLangChange(l.code);
-                            setIsLangOpen(false);
-                          }}
-                          className={`w-full text-left px-4 py-2.5 text-xs flex items-center justify-between transition ${
-                            selectedLang === l.code 
-                              ? 'bg-cyan-500/20 text-cyan-300 font-bold border-l-4 border-cyan-400' 
-                              : 'text-slate-200 hover:bg-white/[0.08]'
-                          }`}
-                        >
-                          <span className="text-white font-medium">{l.label}</span>
-                          {selectedLang === l.code && <Check className="w-4 h-4 text-cyan-400 shrink-0" />}
-                        </button>
-                      ))}
+                      {languages.map((l) => {
+                        const isSelected = selectedLang === l.code;
+                        return (
+                          <button
+                            key={l.code}
+                            type="button"
+                            onClick={(e) => handleSelectLang(l.code, e)}
+                            className={`w-full text-left px-4 py-2.5 text-xs flex items-center justify-between transition ${
+                              isSelected 
+                                ? 'bg-cyan-500/20 text-cyan-300 font-bold border-l-4 border-cyan-400' 
+                                : 'text-slate-200 hover:bg-white/[0.08]'
+                            }`}
+                          >
+                            <span className="text-white font-medium">{l.label}</span>
+                            {isSelected && <Check className="w-4 h-4 text-cyan-400 shrink-0" />}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
