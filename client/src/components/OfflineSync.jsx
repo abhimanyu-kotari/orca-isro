@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { DownloadCloud, CheckCircle2, HardDrive, WifiOff, Wifi, FileJson, Trash2, Eye, X, ShieldAlert, Sparkles } from 'lucide-react';
+import { DownloadCloud, CheckCircle2, HardDrive, WifiOff, Wifi, FileText, Trash2, Eye, X, ShieldCheck, Compass, Fuel, Fish, Printer } from 'lucide-react';
 
-export default function OfflineSync({ harbor, selectedHotspot, route, weather, isOffline, onToggleOffline }) {
+export default function OfflineSync({ harbor, selectedHotspot, route, weather, isOffline, onToggleOffline, selectedLang }) {
   const [isSaved, setIsSaved] = useState(false);
-  const [showInspector, setShowInspector] = useState(false);
+  const [showPass, setShowPass] = useState(false);
   const [cachedData, setCachedData] = useState(null);
 
   // Load existing cache on mount
@@ -49,19 +49,13 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
     };
 
     try {
-      // 1. Save directly into Browser LocalStorage
+      // 1. Save directly into Browser LocalStorage for the App to read offline
       localStorage.setItem('orca_offline_voyage_package', JSON.stringify(bundle));
       setCachedData(bundle);
       setIsSaved(true);
 
-      // 2. Trigger automatic physical JSON file download
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(bundle, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `ORCA_Voyage_${harbor?.name?.split(' ')[0] || 'Sea'}_Package.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
+      // 2. Open the Visual Fisherman Pass automatically
+      setShowPass(true);
 
       setTimeout(() => setIsSaved(false), 4000);
     } catch (e) {
@@ -72,7 +66,7 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
   const handleClearCache = () => {
     localStorage.removeItem('orca_offline_voyage_package');
     setCachedData(null);
-    setShowInspector(false);
+    setShowPass(false);
   };
 
   return (
@@ -85,14 +79,14 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h4 className="text-xs font-bold text-slate-100">Deep-Sea Pre-Trip Offline Package</h4>
-              <span className="text-[10px] bg-cyan-500/20 text-cyan-300 px-1.5 py-0.2 rounded font-mono">100% Offline</span>
+              <h4 className="text-xs font-bold text-slate-100">Deep-Sea Offline Pre-Trip Pass</h4>
+              <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.2 rounded font-mono">100% Offline</span>
             </div>
             <p className="text-[11px] text-slate-400 mt-0.5">
               {cachedData ? (
-                <span className="text-emerald-400 font-medium">✓ Package Cached in Browser &bull; Ready for 0-Internet Sea Voyage</span>
+                <span className="text-emerald-400 font-medium">✓ Voyage Pass Saved &bull; App is ready for 0-Internet Sea Navigation</span>
               ) : (
-                <span>Download waypoints, bathymetry, and IMBL alarms before departing.</span>
+                <span>Download easy visual pass and offline waypoints before leaving harbor.</span>
               )}
             </p>
           </div>
@@ -106,18 +100,18 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
             className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 text-xs bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold px-3.5 py-2 rounded-xl transition shadow-lg shadow-cyan-500/20"
           >
             {isSaved ? <CheckCircle2 className="w-4 h-4 text-white animate-bounce" /> : <DownloadCloud className="w-4 h-4" />}
-            <span>{isSaved ? 'Downloaded & Cached!' : 'Download for Sea'}</span>
+            <span>{isSaved ? 'Pass Created!' : 'Get Fisherman Pass'}</span>
           </button>
 
-          {/* Inspect Cache Button */}
+          {/* View Pass Button */}
           {cachedData && (
             <button
-              onClick={() => setShowInspector(true)}
+              onClick={() => setShowPass(true)}
               className="flex items-center gap-1 text-xs bg-ocean-950 hover:bg-ocean-800 text-cyan-300 px-2.5 py-2 rounded-xl border border-ocean-700 transition"
-              title="Inspect Saved Offline Data"
+              title="View Visual Fisherman Voyage Pass"
             >
-              <Eye className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">Inspect</span>
+              <FileText className="w-3.5 h-3.5" />
+              <span>View Pass</span>
             </button>
           )}
 
@@ -139,48 +133,108 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
 
       </div>
 
-      {/* Offline Package Inspector Modal */}
-      {showInspector && cachedData && (
-        <div className="fixed inset-0 z-[1000] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-ocean-900 border border-ocean-700 rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4 animate-fadeIn">
+      {/* Visual Fisherman Voyage Pass Modal */}
+      {showPass && cachedData && (
+        <div className="fixed inset-0 z-[1000] bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-ocean-950 border-2 border-cyan-500/60 rounded-3xl max-w-md w-full p-5 shadow-2xl shadow-cyan-500/20 space-y-4 animate-fadeIn text-slate-100">
             
+            {/* Header: ISRO Co-Pilot Pass */}
             <div className="flex items-center justify-between border-b border-ocean-800 pb-3">
               <div className="flex items-center gap-2">
-                <FileJson className="w-5 h-5 text-cyan-400" />
-                <h3 className="text-sm font-bold text-slate-100">Cached Offline Voyage Bundle</h3>
+                <div className="w-8 h-8 rounded-xl bg-cyan-500/20 border border-cyan-400 flex items-center justify-center text-cyan-300">
+                  <Compass className="w-5 h-5 animate-pulse" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-extrabold tracking-wide text-white">FISHERMAN VOYAGE PASS</h3>
+                  <p className="text-[10px] text-cyan-300 font-mono">ISRO Safe Navigation Co-Pilot</p>
+                </div>
               </div>
               <button
-                onClick={() => setShowInspector(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-ocean-800 transition"
+                onClick={() => setShowPass(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-ocean-800 transition"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-2.5 text-xs text-slate-300 font-mono bg-ocean-950 p-3.5 rounded-xl border border-ocean-800 max-h-72 overflow-y-auto">
-              <p className="text-cyan-300 font-bold">📦 Stored in LocalStorage: <span className="text-slate-100 font-normal">orca_offline_voyage_package</span></p>
-              <p>📅 Saved At: {cachedData.exportTimestamp}</p>
-              <p>⚓ Origin: {cachedData.originHarbor?.name}</p>
-              <p>🐟 Target PFZ: {cachedData.targetPFZ?.id} ({cachedData.targetPFZ?.species})</p>
-              <p>⛽ Fuel Savings: {cachedData.navigationRoute?.fuelSavings} ({cachedData.navigationRoute?.costSavedINR})</p>
-              <p>🧭 Waypoints: {cachedData.navigationRoute?.waypoints?.length || 5} GPS coordinates stored</p>
-              <p className="text-emerald-400">🛡️ Status: 100% Ready for Deep-Sea GPS Navigation</p>
+            {/* Target Catch Card */}
+            <div className="bg-gradient-to-br from-emerald-950 to-ocean-900 border border-emerald-500/40 rounded-2xl p-3.5 space-y-1.5">
+              <div className="flex items-center justify-between text-xs text-emerald-400 font-bold">
+                <span className="flex items-center gap-1.5">
+                  <Fish className="w-4 h-4" /> Target Fish Shoal
+                </span>
+                <span className="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full text-[10px] font-mono">
+                  {cachedData.targetPFZ?.confidence} Match
+                </span>
+              </div>
+              <p className="text-base font-extrabold text-white">{cachedData.targetPFZ?.species}</p>
+              <div className="flex items-center justify-between text-xs text-slate-300 pt-1 border-t border-emerald-900/60">
+                <span>📍 Distance: <strong className="text-cyan-300">{cachedData.targetPFZ?.distance_nm}</strong></span>
+                <span>🌡️ Water: <strong className="text-emerald-300">{cachedData.targetPFZ?.sst_celsius}</strong></span>
+              </div>
             </div>
 
-            <div className="flex items-center justify-between pt-2">
+            {/* 3 Visual Big Telemetry Badges */}
+            <div className="grid grid-cols-2 gap-2 text-center">
+              
+              <div className="bg-ocean-900/90 border border-cyan-500/30 p-2.5 rounded-xl">
+                <div className="text-[11px] text-cyan-300 font-medium flex items-center justify-center gap-1">
+                  <Fuel className="w-3.5 h-3.5" /> Diesel Saved
+                </div>
+                <div className="text-lg font-black text-white font-mono mt-0.5">
+                  {cachedData.navigationRoute?.costSavedINR}
+                </div>
+                <div className="text-[10px] text-cyan-200">
+                  {cachedData.navigationRoute?.dieselSavedLitres} saved
+                </div>
+              </div>
+
+              <div className="bg-ocean-900/90 border border-emerald-500/30 p-2.5 rounded-xl">
+                <div className="text-[11px] text-emerald-300 font-medium flex items-center justify-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5" /> Border Status
+                </div>
+                <div className="text-lg font-black text-emerald-400 mt-0.5">
+                  SAFE
+                </div>
+                <div className="text-[10px] text-slate-300">
+                  Far from IMBL boundary
+                </div>
+              </div>
+
+            </div>
+
+            {/* Simple Step-by-Step Waypoint Instructions */}
+            <div className="bg-ocean-900/80 border border-ocean-800 rounded-xl p-3 space-y-2">
+              <h5 className="text-[11px] font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1">
+                <Compass className="w-3.5 h-3.5 text-cyan-400" /> Route Navigation Steps
+              </h5>
+              <div className="space-y-1 text-xs text-slate-300 font-mono max-h-28 overflow-y-auto pr-1">
+                {cachedData.navigationRoute?.waypoints?.map((w, idx) => (
+                  <div key={idx} className="flex items-center justify-between py-0.5 border-b border-ocean-800/50 text-[11px]">
+                    <span className="text-cyan-300 font-bold">Step {w.step}:</span>
+                    <span className="text-slate-200">{w.label}</span>
+                    <span className="text-slate-400 text-[10px]">{w.lat.toFixed(2)}°, {w.lng.toFixed(2)}°</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Note & Action Buttons */}
+            <div className="flex items-center justify-between pt-1">
               <button
                 onClick={handleClearCache}
-                className="flex items-center gap-1.5 text-xs text-rose-400 hover:text-rose-300 bg-rose-500/10 border border-rose-500/20 px-3 py-1.5 rounded-xl transition"
+                className="flex items-center gap-1 text-[11px] text-rose-400 hover:text-rose-300 bg-rose-500/10 border border-rose-500/20 px-2.5 py-1.5 rounded-xl transition"
               >
-                <Trash2 className="w-3.5 h-3.5" />
-                <span>Clear Cache</span>
+                <Trash2 className="w-3 h-3" />
+                <span>Reset</span>
               </button>
 
               <button
-                onClick={() => setShowInspector(false)}
-                className="text-xs bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-4 py-1.5 rounded-xl transition"
+                onClick={() => window.print()}
+                className="flex items-center gap-1.5 text-xs bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-4 py-2 rounded-xl transition shadow-lg"
               >
-                Close
+                <Printer className="w-4 h-4" />
+                <span>Print / Save Card</span>
               </button>
             </div>
 
