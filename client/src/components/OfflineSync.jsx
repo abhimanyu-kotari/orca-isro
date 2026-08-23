@@ -21,7 +21,7 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
       project: "Project ORCA (ISRO PS-26176)",
       exportTimestamp: new Date().toLocaleString(),
       originHarbor: {
-        name: harbor?.name || "Mangalore Old Port",
+        name: harbor?.name || "Malpe Fishing Harbour",
         state: harbor?.state || "Karnataka",
         coordinates: [harbor?.lat, harbor?.lng]
       },
@@ -67,35 +67,35 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
 
   return (
     <>
-      <div className="bg-marine-900/90 border border-marine-700/80 rounded-3xl p-4 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-3.5">
+      <div className="glass-panel rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
         
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-biolum-teal/20 to-marine-800 border border-biolum-teal/40 flex items-center justify-center text-xl shrink-0 shadow-lg">
+        <div className="flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-emerald-500/30 flex items-center justify-center text-xl shrink-0 shadow-lg">
             🧭
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h4 className="text-xs font-bold text-white">Deep-Sea Pre-Trip Offline Pass</h4>
-              <span className="text-[10px] bg-biolum-teal/20 text-biolum-teal px-2 py-0.5 rounded-full font-mono font-bold">100% Offline</span>
+            <div className="flex items-center gap-2.5">
+              <h4 className="text-xs font-black text-white tracking-wide">Deep-Sea Pre-Trip Offline Pass</h4>
+              <span className="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-mono font-bold">100% Offline</span>
             </div>
-            <p className="text-[11px] text-marine-200 mt-0.5">
+            <p className="text-[11px] text-slate-400 mt-0.5">
               {cachedData ? (
-                <span className="text-biolum-emerald font-semibold">✓ Pass Saved &bull; Ready for 0-Internet Sea Voyage</span>
+                <span className="text-emerald-400 font-semibold">✓ Pass Cached &bull; Ready for 0-Internet Deep-Sea Navigation</span>
               ) : (
-                <span>Download visual pass and waypoints before sailing out of harbor.</span>
+                <span>Download visual pass and GPS waypoints before sailing out.</span>
               )}
             </p>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
+        <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end">
           
           {/* Download for Sea Button */}
           <button
             onClick={handleSaveAndDownload}
-            className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 text-xs bg-gradient-to-r from-biolum-teal to-marine-500 hover:from-biolum-aqua hover:to-marine-400 text-marine-950 font-black px-4 py-2.5 rounded-2xl transition shadow-lg shadow-biolum-teal/20"
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 text-xs bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-500 hover:opacity-90 text-slate-950 font-black px-4 py-2.5 rounded-2xl transition shadow-[0_0_25px_rgba(0,245,160,0.3)]"
           >
-            {isSaved ? <CheckCircle2 className="w-4 h-4 text-marine-950 animate-bounce" /> : <DownloadCloud className="w-4 h-4" />}
+            {isSaved ? <CheckCircle2 className="w-4 h-4 text-slate-950 animate-bounce" /> : <DownloadCloud className="w-4 h-4" />}
             <span>{isSaved ? 'Pass Created!' : 'Get Fisherman Pass 🎫'}</span>
           </button>
 
@@ -103,7 +103,7 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
           {cachedData && (
             <button
               onClick={() => setShowPass(true)}
-              className="flex items-center gap-1 text-xs bg-marine-950 hover:bg-marine-800 text-biolum-teal px-3 py-2.5 rounded-2xl border border-marine-700 transition font-bold"
+              className="flex items-center gap-1.5 text-xs bg-white/[0.05] hover:bg-white/[0.09] text-emerald-300 px-3.5 py-2.5 rounded-2xl border border-white/10 transition font-bold"
               title="View Visual Fisherman Voyage Pass"
             >
               <FileText className="w-3.5 h-3.5" />
@@ -114,14 +114,14 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
           {/* 0-Internet Simulator */}
           <button
             onClick={onToggleOffline}
-            className={`flex items-center justify-center gap-1.5 text-xs px-3 py-2.5 rounded-2xl border transition font-semibold ${
+            className={`flex items-center justify-center gap-2 text-xs px-3.5 py-2.5 rounded-2xl border transition font-bold ${
               isOffline
-                ? 'bg-biolum-amber/20 border-biolum-amber text-amber-300'
-                : 'bg-marine-950 border-marine-700 text-marine-300 hover:text-white'
+                ? 'bg-amber-500/20 border-amber-500 text-amber-300'
+                : 'bg-white/[0.05] border-white/10 text-slate-400 hover:text-white'
             }`}
             title="Toggle Deep-Sea No-Internet Simulator"
           >
-            {isOffline ? <WifiOff className="w-4 h-4 text-amber-400" /> : <Wifi className="w-4 h-4 text-marine-400" />}
+            {isOffline ? <WifiOff className="w-4 h-4 text-amber-400" /> : <Wifi className="w-4 h-4 text-slate-400" />}
             <span className="hidden md:inline">{isOffline ? 'Offline Active' : 'Simulate 0-Internet'}</span>
           </button>
 
@@ -132,67 +132,67 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
       {/* Visual Fisherman Voyage Pass Modal */}
       {showPass && cachedData && (
         <div className="fixed inset-0 z-[1000] bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-marine-950 border-2 border-biolum-teal/60 rounded-3xl max-w-md w-full p-5 shadow-2xl shadow-biolum-teal/20 space-y-4 animate-fadeIn text-slate-100">
+          <div className="glass-panel border border-emerald-500/40 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-fadeIn text-slate-100">
             
             {/* Header: ISRO Co-Pilot Pass */}
-            <div className="flex items-center justify-between border-b border-marine-800 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-biolum-teal to-marine-600 flex items-center justify-center text-marine-950 text-2xl font-black shadow-lg">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-slate-950 text-2xl font-black shadow-lg">
                   🐋
                 </div>
                 <div>
                   <h3 className="text-sm font-black tracking-wide text-white">FISHERMAN VOYAGE PASS</h3>
-                  <p className="text-[10px] text-biolum-teal font-mono">ISRO Safe Navigation Co-Pilot</p>
+                  <p className="text-[10px] text-emerald-400 font-mono">ISRO Marine Safe Co-Pilot</p>
                 </div>
               </div>
               <button
                 onClick={() => setShowPass(false)}
-                className="p-1.5 rounded-xl text-marine-300 hover:text-white hover:bg-marine-800 transition"
+                className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Target Catch Card */}
-            <div className="bg-gradient-to-br from-marine-900 via-marine-850 to-marine-950 border border-biolum-teal/40 rounded-2xl p-4 space-y-2 shadow-inner">
-              <div className="flex items-center justify-between text-xs text-biolum-teal font-bold">
+            <div className="bg-white/[0.04] border border-emerald-500/30 rounded-2xl p-4 space-y-2 shadow-inner">
+              <div className="flex items-center justify-between text-xs text-emerald-400 font-bold">
                 <span className="flex items-center gap-1.5">
                   <span className="text-base">🐟</span> Target Marine Shoal
                 </span>
-                <span className="bg-biolum-teal/20 text-biolum-teal px-2 py-0.5 rounded-full text-[10px] font-mono font-bold">
+                <span className="bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold">
                   {cachedData.targetPFZ?.confidence} Match
                 </span>
               </div>
               <p className="text-base font-black text-white">{cachedData.targetPFZ?.species}</p>
-              <div className="flex items-center justify-between text-xs text-marine-200 pt-1.5 border-t border-marine-800">
-                <span>📍 Distance: <strong className="text-biolum-teal">{cachedData.targetPFZ?.distance_nm}</strong></span>
+              <div className="flex items-center justify-between text-xs text-slate-300 pt-2 border-t border-white/10">
+                <span>📍 Distance: <strong className="text-cyan-400">{cachedData.targetPFZ?.distance_nm}</strong></span>
                 <span>🌡️ Water Temp: <strong className="text-emerald-400">{cachedData.targetPFZ?.sst_celsius}</strong></span>
               </div>
             </div>
 
             {/* 2 Visual Big Telemetry Badges */}
-            <div className="grid grid-cols-2 gap-2.5 text-center">
+            <div className="grid grid-cols-2 gap-3 text-center">
               
-              <div className="bg-marine-900/90 border border-biolum-aqua/40 p-3 rounded-2xl">
-                <div className="text-[11px] text-biolum-aqua font-bold flex items-center justify-center gap-1">
+              <div className="bg-white/[0.04] border border-cyan-500/30 p-3.5 rounded-2xl">
+                <div className="text-[11px] text-cyan-300 font-bold flex items-center justify-center gap-1">
                   <Fuel className="w-3.5 h-3.5" /> Diesel Saved
                 </div>
-                <div className="text-xl font-black text-white font-mono mt-0.5">
+                <div className="text-xl font-black text-white font-mono mt-1">
                   {cachedData.navigationRoute?.costSavedINR}
                 </div>
-                <div className="text-[10px] text-biolum-teal font-medium">
+                <div className="text-[10px] text-emerald-400 font-medium">
                   {cachedData.navigationRoute?.dieselSavedLitres} saved
                 </div>
               </div>
 
-              <div className="bg-marine-900/90 border border-emerald-500/40 p-3 rounded-2xl">
+              <div className="bg-white/[0.04] border border-emerald-500/30 p-3.5 rounded-2xl">
                 <div className="text-[11px] text-emerald-300 font-bold flex items-center justify-center gap-1">
                   <ShieldCheck className="w-3.5 h-3.5" /> Border Status
                 </div>
-                <div className="text-xl font-black text-biolum-emerald mt-0.5">
+                <div className="text-xl font-black text-emerald-400 mt-1">
                   SAFE
                 </div>
-                <div className="text-[10px] text-marine-200 font-medium">
+                <div className="text-[10px] text-slate-400 font-medium">
                   Clear of IMBL line
                 </div>
               </div>
@@ -200,16 +200,16 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
             </div>
 
             {/* Simple Step-by-Step Waypoint Instructions */}
-            <div className="bg-marine-900/80 border border-marine-800 rounded-2xl p-3.5 space-y-2">
-              <h5 className="text-[11px] font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                <Compass className="w-3.5 h-3.5 text-biolum-teal" /> Route Navigation Steps
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-4 space-y-2">
+              <h5 className="text-[11px] font-extrabold text-white uppercase tracking-wider flex items-center gap-2">
+                <Compass className="w-3.5 h-3.5 text-cyan-400" /> Route Navigation Steps
               </h5>
-              <div className="space-y-1.5 text-xs text-marine-200 font-mono max-h-28 overflow-y-auto pr-1">
+              <div className="space-y-1.5 text-xs text-slate-300 font-mono max-h-28 overflow-y-auto pr-1">
                 {cachedData.navigationRoute?.waypoints?.map((w, idx) => (
-                  <div key={idx} className="flex items-center justify-between py-0.5 border-b border-marine-800/50 text-[11px]">
-                    <span className="text-biolum-teal font-bold">Step {w.step}:</span>
-                    <span className="text-slate-100 font-sans">{w.label}</span>
-                    <span className="text-marine-400 text-[10px]">{w.lat.toFixed(2)}°, {w.lng.toFixed(2)}°</span>
+                  <div key={idx} className="flex items-center justify-between py-1 border-b border-white/[0.06] text-[11px]">
+                    <span className="text-cyan-400 font-bold">Step {w.step}:</span>
+                    <span className="text-slate-100 font-sans font-medium">{w.label}</span>
+                    <span className="text-slate-400 text-[10px]">{w.lat.toFixed(2)}°, {w.lng.toFixed(2)}°</span>
                   </div>
                 ))}
               </div>
@@ -227,7 +227,7 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
 
               <button
                 onClick={() => window.print()}
-                className="flex items-center gap-1.5 text-xs bg-gradient-to-r from-biolum-teal to-marine-500 hover:from-biolum-aqua hover:to-marine-400 text-marine-950 font-black px-4 py-2.5 rounded-2xl transition shadow-lg shadow-biolum-teal/20"
+                className="flex items-center gap-2 text-xs bg-gradient-to-r from-emerald-400 to-cyan-500 hover:opacity-90 text-slate-950 font-black px-4 py-2.5 rounded-2xl transition shadow-lg shadow-emerald-500/20"
               >
                 <Printer className="w-4 h-4" />
                 <span>Print / Save Card 🖨️</span>

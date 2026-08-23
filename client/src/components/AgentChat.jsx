@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Mic, MicOff, Volume2, VolumeX, Sparkles, User, Radio, Cpu, ChevronDown, ChevronUp, Compass, Waves, Fish, Shield } from 'lucide-react';
+import { Send, Mic, MicOff, Volume2, VolumeX, Sparkles, Bot, Radio, Cpu, ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function AgentChat({ onSendMessage, messages, isProcessing, collaboratingAgents, activeVoiceScript, selectedLang }) {
   const [input, setInput] = useState('');
@@ -8,12 +8,12 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
   const [showAgentsTrace, setShowAgentsTrace] = useState(true);
   const messagesEndRef = useRef(null);
 
-  // Suggested Prompts themed for Marine & Coastal Fishermen
+  // Suggested Prompts based on ISRO Problem Statement
   const suggestedQueries = [
     { label: '🐟 Nearest Fish Shoal (PFZ)', query: 'Where is the nearest Potential Fishing Zone today?' },
     { label: '🌊 Sea Waves & Weather', query: 'Is it safe to venture into the sea tomorrow morning?' },
     { label: '🧭 Low-Fuel Current Route', query: 'Calculate the lowest-fuel current-assisted route to the best Mackerel zone.' },
-    { label: '🛡️ IMBL Border Clearance', query: 'Check distance to international maritime boundary line.' },
+    { label: '🛡️ IMBL Border Status', query: 'Check distance to international maritime boundary line.' },
     { label: '🪸 Marine EcoSystem Shift', query: 'Why has fish productivity declined in this coastal region?' }
   ];
 
@@ -102,41 +102,42 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
   };
 
   return (
-    <div className="bg-marine-900/90 border border-marine-700/80 rounded-3xl flex flex-col h-[520px] lg:h-[600px] shadow-2xl overflow-hidden">
+    <div className="glass-panel rounded-3xl flex flex-col h-[520px] lg:h-[600px] shadow-2xl overflow-hidden">
       
-      {/* Marine Co-Pilot Header */}
-      <div className="bg-marine-950/95 border-b border-marine-800 p-3.5 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-biolum-teal to-marine-600 flex items-center justify-center text-marine-950 font-black text-xl shadow-lg shadow-biolum-teal/20">
+      {/* Header */}
+      <div className="bg-white/[0.03] border-b border-white/[0.08] p-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-slate-950 text-xl font-black shadow-[0_0_20px_rgba(0,245,160,0.35)]">
             🐋
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xs font-black text-white tracking-wider uppercase">ORCA Ocean Co-Pilot</h2>
-              <span className="w-2 h-2 rounded-full bg-biolum-teal animate-ping"></span>
+              <h2 className="text-xs font-black text-white tracking-wider uppercase">ORCA Conversational Co-Pilot</h2>
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
             </div>
-            <p className="text-[10px] text-biolum-teal font-mono">4 Marine EcoSystem Agents Active</p>
+            <p className="text-[10px] text-emerald-400 font-mono">4 Collaborative Agents Active</p>
           </div>
         </div>
 
         <button
           onClick={() => setShowAgentsTrace(!showAgentsTrace)}
-          className="flex items-center gap-1 text-[11px] text-marine-300 hover:text-biolum-teal transition bg-marine-900 px-2.5 py-1 rounded-xl border border-marine-700 font-mono"
+          className="flex items-center gap-1 text-[11px] text-slate-300 hover:text-white transition bg-white/[0.05] hover:bg-white/[0.08] px-3 py-1.5 rounded-xl border border-white/10 font-mono"
         >
-          <span>Eco Agents</span>
-          {showAgentsTrace ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          <Cpu className="w-3.5 h-3.5 text-cyan-400" />
+          <span>Agents</span>
+          {showAgentsTrace ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
         </button>
       </div>
 
       {/* Subagents Activity Drawer */}
       {showAgentsTrace && collaboratingAgents && (
-        <div className="bg-marine-950/95 border-b border-marine-800 p-2.5 grid grid-cols-2 gap-2 text-[10px] font-mono animate-fadeIn">
+        <div className="bg-slate-950/60 border-b border-white/[0.06] p-3 grid grid-cols-2 gap-2 text-[10px] font-mono animate-fadeIn">
           {collaboratingAgents.map((ag, i) => (
-            <div key={i} className="bg-marine-900/80 border border-marine-800 px-2.5 py-1.5 rounded-xl flex items-center justify-between shadow-sm">
-              <span className="text-biolum-teal font-bold truncate max-w-[110px]">
+            <div key={i} className="bg-white/[0.03] border border-white/[0.06] px-2.5 py-1.5 rounded-xl flex items-center justify-between shadow-sm">
+              <span className="text-emerald-400 font-bold truncate max-w-[110px]">
                 {ag.name.includes('Ocean') ? '🐟 Matsya' : ag.name.includes('Weather') ? '🌊 Vayu' : ag.name.includes('Routing') ? '🧭 Setu' : '🪸 Raksha'}:
               </span>
-              <span className="text-marine-200 truncate max-w-[130px]">{ag.summary}</span>
+              <span className="text-slate-300 truncate max-w-[130px]">{ag.summary}</span>
             </div>
           ))}
         </div>
@@ -147,30 +148,30 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
         {messages.map((m, idx) => (
           <div
             key={idx}
-            className={`flex items-start gap-2.5 ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`flex items-start gap-3 ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {m.sender === 'agent' && (
-              <div className="w-8 h-8 rounded-2xl bg-marine-800 border border-biolum-teal/40 flex items-center justify-center text-lg shadow shrink-0 mt-0.5">
+              <div className="w-8 h-8 rounded-2xl bg-white/[0.06] border border-emerald-500/30 flex items-center justify-center text-lg shadow shrink-0 mt-0.5">
                 🐋
               </div>
             )}
             
             <div className={`max-w-[85%] rounded-3xl px-4 py-3 text-xs leading-relaxed shadow-lg ${
               m.sender === 'user'
-                ? 'bg-gradient-to-r from-marine-600 to-biolum-teal text-marine-950 font-bold rounded-tr-none shadow-biolum-teal/20'
-                : 'bg-marine-950/95 text-slate-100 border border-marine-700/80 rounded-tl-none'
+                ? 'bg-gradient-to-r from-emerald-400 to-cyan-500 text-slate-950 font-bold rounded-tr-none shadow-[0_0_25px_rgba(0,245,160,0.25)]'
+                : 'bg-white/[0.04] text-slate-100 border border-white/[0.08] rounded-tl-none'
             }`}>
               <div className="whitespace-pre-wrap">{m.text}</div>
               
               {/* Voice playback button for Agent responses */}
               {m.sender === 'agent' && (
-                <div className="mt-2.5 pt-2.5 border-t border-marine-800 flex items-center justify-between text-[11px] text-marine-300">
-                  <span className="text-[10px] font-mono text-biolum-teal flex items-center gap-1">
-                    <span>🛰️</span> ISRO Marine Synthesis
+                <div className="mt-3 pt-2.5 border-t border-white/[0.08] flex items-center justify-between text-[11px] text-slate-400">
+                  <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
+                    <span>🛰️</span> ISRO Evidence-Based Synthesis
                   </span>
                   <button
                     onClick={() => speakText(m.voiceScript || m.text)}
-                    className="flex items-center gap-1.5 text-biolum-teal hover:text-white bg-biolum-teal/15 hover:bg-biolum-teal/30 px-2.5 py-1 rounded-lg border border-biolum-teal/30 transition font-semibold"
+                    className="flex items-center gap-1.5 text-emerald-300 hover:text-white bg-emerald-500/10 hover:bg-emerald-500/20 px-2.5 py-1 rounded-xl border border-emerald-500/25 transition font-semibold"
                   >
                     {isSpeaking ? <VolumeX className="w-3.5 h-3.5 text-rose-400" /> : <Volume2 className="w-3.5 h-3.5" />}
                     <span>{isSpeaking ? 'Stop Audio' : 'Play Voice'}</span>
@@ -180,7 +181,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
             </div>
 
             {m.sender === 'user' && (
-              <div className="w-8 h-8 rounded-2xl bg-gradient-to-br from-biolum-aqua to-marine-500 flex items-center justify-center text-marine-950 font-black text-sm shrink-0 mt-0.5 shadow">
+              <div className="w-8 h-8 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-slate-950 font-black text-sm shrink-0 mt-0.5 shadow">
                 👤
               </div>
             )}
@@ -188,7 +189,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
         ))}
 
         {isProcessing && (
-          <div className="flex items-center gap-2.5 text-xs text-biolum-teal bg-marine-950/80 border border-biolum-teal/30 p-3 rounded-2xl w-fit font-mono shadow">
+          <div className="flex items-center gap-2.5 text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-2xl w-fit font-mono shadow">
             <span className="animate-spin text-sm">🌊</span>
             <span>Collaborative marine agents reasoning over satellite telemetry...</span>
           </div>
@@ -197,28 +198,28 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Suggested Marine Query Chips */}
-      <div className="px-3.5 py-2 bg-marine-950/80 border-t border-marine-800 flex items-center gap-2 overflow-x-auto no-scrollbar">
+      {/* Suggested Quick Query Chips */}
+      <div className="px-4 py-2.5 bg-white/[0.02] border-t border-white/[0.06] flex items-center gap-2 overflow-x-auto no-scrollbar">
         {suggestedQueries.map((s, i) => (
           <button
             key={i}
             onClick={() => onSendMessage(s.query)}
-            className="shrink-0 text-[11px] font-medium bg-marine-900 hover:bg-marine-800 text-marine-200 hover:text-biolum-teal px-3 py-1.5 rounded-full border border-marine-700 transition shadow-sm"
+            className="shrink-0 text-[11px] font-semibold bg-white/[0.04] hover:bg-white/[0.09] text-slate-300 hover:text-emerald-400 px-3.5 py-1.5 rounded-full border border-white/[0.08] transition shadow-sm"
           >
             {s.label}
           </button>
         ))}
       </div>
 
-      {/* Input Form with Microphone */}
-      <form onSubmit={handleSend} className="p-3.5 bg-marine-950 border-t border-marine-800 flex items-center gap-2.5">
+      {/* Input Box with Microphone */}
+      <form onSubmit={handleSend} className="p-3.5 bg-white/[0.03] border-t border-white/[0.08] flex items-center gap-2.5">
         <button
           type="button"
           onClick={toggleListening}
-          className={`p-2.5 rounded-2xl border transition shadow ${
+          className={`p-3 rounded-2xl border transition shadow ${
             isListening
               ? 'bg-rose-500/20 border-rose-500 text-rose-400 animate-pulse'
-              : 'bg-marine-900 border-marine-700 text-marine-200 hover:text-biolum-teal hover:border-biolum-teal/50'
+              : 'bg-white/[0.04] border-white/10 text-slate-300 hover:text-emerald-400 hover:border-emerald-400/40'
           }`}
           title="Speak in English, ಕನ್ನಡ, ತುಳು, or mother tongue"
         >
@@ -230,13 +231,13 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={`Ask ORCA in English, ಕನ್ನಡ, ತುಳು, or mother tongue...`}
-          className="flex-1 bg-marine-900 border border-marine-700 rounded-2xl px-3.5 py-2.5 text-xs text-white placeholder-marine-400 outline-none focus:border-biolum-teal font-medium transition shadow-inner"
+          className="flex-1 bg-white/[0.04] border border-white/10 rounded-2xl px-4 py-3 text-xs text-white placeholder-slate-500 outline-none focus:border-emerald-400 font-medium transition shadow-inner"
         />
 
         <button
           type="submit"
           disabled={!input.trim() || isProcessing}
-          className="p-2.5 rounded-2xl bg-gradient-to-r from-biolum-teal to-marine-500 hover:from-biolum-aqua hover:to-marine-400 disabled:opacity-50 text-marine-950 font-black shadow-lg shadow-biolum-teal/20 transition"
+          className="p-3 rounded-2xl bg-gradient-to-r from-emerald-400 to-cyan-500 hover:opacity-90 disabled:opacity-50 text-slate-950 font-black shadow-lg shadow-emerald-500/20 transition"
         >
           <Send className="w-4 h-4" />
         </button>

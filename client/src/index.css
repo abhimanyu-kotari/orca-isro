@@ -4,85 +4,96 @@
 
 @layer base {
   body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    background: radial-gradient(ellipse at top, #082642 0%, #051b30 45%, #020d1a 100%);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #020712;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(0, 245, 160, 0.08) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(0, 217, 245, 0.08) 0px, transparent 50%),
+      radial-gradient(at 50% 100%, rgba(16, 73, 117, 0.2) 0px, transparent 60%);
     background-attachment: fixed;
-    color: #f0f9ff;
+    color: #f1f5f9;
   }
   code, pre, .font-mono {
     font-family: 'JetBrains Mono', monospace;
   }
 }
 
-/* Oceanic Wave Background Accent */
-.ocean-ambient-bg {
-  background-image: radial-gradient(circle at 10% 20%, rgba(0, 245, 196, 0.04) 0%, transparent 40%),
-                    radial-gradient(circle at 90% 80%, rgba(0, 210, 255, 0.04) 0%, transparent 40%);
+/* Next-Gen Glassmorphism Container */
+.glass-panel {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
 }
 
-/* Custom Marine Scrollbar */
+.glass-panel-interactive {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-panel-interactive:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 100%);
+  border-color: rgba(0, 245, 160, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 20px 35px -10px rgba(0, 245, 160, 0.12), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #051b30;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #17669e;
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #00f5c4;
+  background: #00f5a0;
 }
 
-/* Leaflet Marine Customizations */
+/* Leaflet Dark Matter Customizations */
 .leaflet-container {
-  background: #020d1a !important;
+  background: #020712 !important;
   font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
 
 .leaflet-popup-content-wrapper {
-  background: #051b30 !important;
-  color: #f0f9ff !important;
-  border: 1.5px solid #00f5c4 !important;
-  border-radius: 16px !important;
-  box-shadow: 0 15px 30px -5px rgba(0, 245, 196, 0.25) !important;
+  background: rgba(3, 15, 30, 0.92) !important;
+  backdrop-filter: blur(16px) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(0, 245, 160, 0.3) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px 0 rgba(0, 245, 160, 0.15) !important;
+  padding: 4px !important;
 }
 
 .leaflet-popup-tip {
-  background: #051b30 !important;
+  background: rgba(3, 15, 30, 0.92) !important;
 }
 
-/* Radar & Marine Plankton Pulse Rings */
-@keyframes marine-radar {
+/* Bioluminescent Pulse */
+@keyframes bio-pulse {
   0% {
     transform: scale(0.85);
     opacity: 0.9;
   }
   100% {
-    transform: scale(2.6);
+    transform: scale(2.8);
     opacity: 0;
   }
 }
 
-.radar-pulse-ring {
+.bio-pulse-ring {
   position: absolute;
   border-radius: 50%;
-  animation: marine-radar 2.4s cubic-bezier(0, 0.2, 0.8, 1) infinite;
-}
-
-/* Marine Glassmorphism Card */
-.marine-card {
-  background: rgba(5, 27, 48, 0.75);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 245, 196, 0.18);
-  box-shadow: 0 10px 25px -5px rgba(2, 13, 26, 0.6);
-}
-
-.marine-card:hover {
-  border-color: rgba(0, 245, 196, 0.4);
+  animation: bio-pulse 2.2s cubic-bezier(0.1, 0.2, 0.8, 1) infinite;
 }
