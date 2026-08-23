@@ -37,6 +37,8 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
     
     // Set language
     const langMap = {
+      'kn': 'kn-IN',
+      'tcy': 'kn-IN', // Tulu uses Dravidian acoustic phonetics mapped to kn-IN
       'ta': 'ta-IN',
       'te': 'te-IN',
       'hi': 'hi-IN',
@@ -70,6 +72,8 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
     recognition.interimResults = false;
     
     const langMap = {
+      'kn': 'kn-IN',
+      'tcy': 'kn-IN',
       'ta': 'ta-IN',
       'te': 'te-IN',
       'hi': 'hi-IN',
@@ -223,7 +227,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={`Ask ORCA in English or regional mother tongue...`}
+          placeholder={`Ask ORCA in English, ಕನ್ನಡ, ತುಳು, or mother tongue...`}
           className="flex-1 bg-ocean-900 border border-ocean-700 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-cyan-500 font-medium transition"
         />
 

@@ -1,7 +1,7 @@
 /**
  * Standalone Client-Side Marine Engine
  * Ensures 100% full functionality on mobile devices and hosted Vercel/Netlify environments
- * even when the local Python backend is not connected.
+ * with rich multilingual support including Kannada and Tulu.
  */
 
 export const HARBORS = {
@@ -11,6 +11,20 @@ export const HARBORS = {
     lat: 13.125,
     lng: 80.298,
     coast: "Bay of Bengal"
+  },
+  mangalore: {
+    name: "Mangalore Old Port (Dakke / Bunder)",
+    state: "Karnataka",
+    lat: 12.860,
+    lng: 74.835,
+    coast: "Arabian Sea (Karavali Coast)"
+  },
+  malpe: {
+    name: "Malpe Fishing Harbour (Udupi)",
+    state: "Karnataka",
+    lat: 13.350,
+    lng: 74.698,
+    coast: "Arabian Sea (Karavali Coast)"
   },
   rameswaram: {
     name: "Rameswaram Fishing Port",
@@ -32,13 +46,6 @@ export const HARBORS = {
     lat: 17.695,
     lng: 83.300,
     coast: "Bay of Bengal"
-  },
-  mangalore: {
-    name: "Mangalore Old Port (Bunder)",
-    state: "Karnataka",
-    lat: 12.860,
-    lng: 74.835,
-    coast: "Arabian Sea"
   },
   veraval: {
     name: "Veraval Fishing Port",
@@ -104,11 +111,11 @@ export const BOUNDARIES = {
 };
 
 const SPECIES = [
-  { species: "Indian Mackerel (Rastrelliger kanagurta)", val: 240 },
-  { species: "Oil Sardines (Sardinella longiceps)", val: 180 },
-  { species: "Yellowfin Tuna (Thunnus albacares)", val: 450 },
-  { species: "Silver Pomfret (Pampus argenteus)", val: 680 },
-  { species: "King Seer Fish (Scomberomorus commerson)", val: 600 }
+  { species: "Indian Mackerel (ಬಾಂಗ್ಡೆ / Rastrelliger kanagurta)", val: 240 },
+  { species: "Oil Sardines (ಭೂತಾಯಿ / Sardinella longiceps)", val: 180 },
+  { species: "Kingfish / Surmai (ಅಂಜಲ್ / Scomberomorus commerson)", val: 680 },
+  { species: "Silver Pomfret (ಮಾಣಂಜಿ / Pampus argenteus)", val: 750 },
+  { species: "Yellowfin Tuna (ಕುಪ್ಪೆ / Thunnus albacares)", val: 450 }
 ];
 
 function haversine(lat1, lon1, lat2, lon2) {
@@ -143,7 +150,7 @@ export function generateHotspots(harborId) {
     const distNm = Number((Math.sqrt(Math.pow(off.dlat * 60, 2) + Math.pow(dlng * 60, 2))).toFixed(1));
     const sst = Number((27.4 + idx * 0.35).toFixed(1));
     const chla = Number((1.45 + (3 - idx) * 0.25).toFixed(2));
-    const score = 80 + (3 - idx) * 5;
+    const score = 82 + (3 - idx) * 5;
 
     return {
       id: `PFZ-${harborId.toUpperCase().slice(0, 3)}-${idx + 1}`,
@@ -167,7 +174,6 @@ export function computeVoyageRoute(harbor, targetHotspot) {
   const straightDistKm = haversine(harbor.lat, harbor.lng, targetHotspot.lat, targetHotspot.lng);
   const straightDistNm = Number((straightDistKm / 1.852).toFixed(1));
 
-  // Generate A* waypoint curves
   const waypoints = [];
   const count = 5;
   const perpFactor = harbor.coast.includes("Bengal") ? 0.03 : -0.03;
@@ -270,19 +276,25 @@ export function processClientChat(userText, harborId, lang) {
   let text = "";
   let voice = "";
 
-  if (lang === "ta") {
+  if (lang === "kn") { // Kannada
+    text = `🐟 **ಶಿಫಾರಸು ಮಾಡಿದ ಸಂಭಾವ್ಯ ಮೀನುಗಾರಿಕೆ ವಲಯ (${top.id})**:\n• ${hName} ಬಂದರಿನಿಂದ **${dist} ನಾಟಿಕಲ್ ಮೈಲಿ** ದೂರದಲ್ಲಿ **${species}** ಸಮೃದ್ಧವಾಗಿ ಲಭ್ಯವಿದೆ.\n• ISRO AI ಪ್ರವಾಹ-ಮಾರ್ಗ ಬಳಸುವುದರಿಂದ **₹${fuel} ಡೀಸೆಲ್ ಉಳಿತಾಯವಾಗುತ್ತದೆ** (${route.fuel_savings_percentage}% ಉಳಿತಾಯ).\n• ಸಮುದ್ರದ ಸ್ಥಿತಿ: **ಸುರಕ್ಷಿತ (ಅಲೆಗಳ ಎತ್ತರ ${weather.wave_height_m} ಮೀ)**. ಅಂತಾರಾಷ್ಟ್ರೀಯ ಗಡಿಯಿಂದ ಸುರಕ್ಷಿತ ಅಂತರ: ${imbl} ಕಿ.ಮೀ.`;
+    voice = `${hName} ಬಂದರಿನಿಂದ ${dist} ನಾಟಿಕಲ್ ಮೈಲಿ ದೂರದಲ್ಲಿ ${species} ಮೀನುಗಳು ಲಭ್ಯವಿವೆ. AI ಮಾರ್ಗವನ್ನು ಬಳಸಿದರೆ ${fuel} ರೂಪಾಯಿ ಡೀಸೆಲ್ ಉಳಿತಾಯವಾಗುತ್ತದೆ.`;
+  } else if (lang === "tcy") { // Tulu (Tulunadu Coastal Dialect)
+    text = `🐟 **ಮೀನ್ ಪತ್ತುನ ಎಡ್ಡ ಜಾಗೆ (${top.id})**:\n• ${hName} ಬಂದರ್ದ್ **${dist} ನಾಟಿಕಲ್ ಮೈಲ್** ದೂರೊಡು **${species}** ಮೀನ್ ಮಸ್ತ್ ತಿಕ್ಕುಂಡು.\n• ISRO AI ಮಾರ್ಗ ಗಲಸುಂಡ **₹${fuel} ಡೀಸೆಲ್ ಒರಿಪುಂಡು** (${route.fuel_savings_percentage}% ಡೀಸೆಲ್ ಉಳಿತಾಯ).\n• ಕಡಲ್ ಪರಿಸ್ಥಿತಿ: **ಎಡ್ಡ ಉಂಡು (ಅಲೆತ್ತ ಎತ್ತರ ${weather.wave_height_m} ಮೀ)**. ಬಾರ್ಡರ್ ದೂರ: ${imbl} ಕಿ.ಮೀ.`;
+    voice = `${dist} ನಾಟಿಕಲ್ ಮೈಲ್ ದೂರೊಡು ${species} ಮೀನ್ ಉಂಡು. AI ರೂಟ್ ಗಲಸುಂಡ ${fuel} ರೂಪಾಯಿ ಒರಿಪುಂಡು. ಕಡಲ್ ಪರಿಸ್ಥಿತಿ ಎಡ್ಡ ಉಂಡು.`;
+  } else if (lang === "ta") { // Tamil
     text = `🐟 **பரிந்துரைக்கப்பட்ட மீன்பிடி மண்டலம் (${top.id})**:\n• ${hName} துறைமுகத்திலிருந்து **${dist} கடல் மைல்** தொலைவில் **${species}** கூட்டம் உள்ளது.\n• AI வழித்தடத்தைப் பயன்படுத்தினால் **₹${fuel} டீசல் சேமிக்கலாம்**.\n• கடல் நிலை பாதுகாப்பாக உள்ளது (அலை உயரம் ${weather.wave_height_m} மீ). எல்லை தூரம்: ${imbl} கி.மீ.`;
     voice = `${hName} துறைமுகத்திலிருந்து ${dist} கடல் மைல் தொலைவில் ${species} மீன்கள் உள்ளன. AI வழியை பயன்படுத்தினால் ${fuel} ரூபாய் சேமிக்கலாம்.`;
-  } else if (lang === "te") {
-    text = `🐟 **చేపల సంపద జోన్ (${top.id})**:\n• ${hName} నుండి **${dist} నాటికల్ మైళ్ళ** దూరంలో **${species}** చేపలు ఉన్నాయి.\n• AI రూట్ ద్వారా **₹${fuel} డీజిల్ ఆదా** అవుతుంది.\n• సముద్రం సురక్షితంగా ఉంది. సరిహద్దు దూరం: ${imbl} కి.మీ.`;
+  } else if (lang === "te") { // Telugu
+    text = `🐟 **చేపల సంపద జోన్ (${top.id})**:\n• ${hName} నుండి **${dist} నాటికల్ మైళ్ళ** దూరంలో **${species}** చేపలు ఉన్నాయి.\n• AI రూట్ ద్వారా **₹${fuel} డీజిల్ ఆదా** అవుతుంది.\n• సముద్రం సురಕ್ಷితంగా ఉంది. సరిహద్దు దూరం: ${imbl} కి.மீ.`;
     voice = `${dist} నాటికల్ మైళ్ల దూరంలో ${species} చేపలు ఉన్నాయి. AI రూట్ ద్వారా ${fuel} రూపాయలు ఆదా అవుతాయి.`;
-  } else if (lang === "hi") {
+  } else if (lang === "hi") { // Hindi
     text = `🐟 **संभावित मछली क्षेत्र (${top.id})**:\n• ${hName} से **${dist} नॉटिकल मील** दूर **${species}** की संभावना है।\n• AI रूट से जाने पर **₹${fuel} का डीजल बचेगा**।\n• समुद्र की स्थिति सुरक्षित है (लहरें ${weather.wave_height_m} मीटर)। सीमा से दूरी: ${imbl} किमी।`;
     voice = `${hName} से ${dist} नॉटिकल मील दूर ${species} की संभावना है। AI रूट से ${fuel} रुपये की बचत होगी।`;
-  } else if (lang === "ml") {
+  } else if (lang === "ml") { // Malayalam
     text = `🐟 **മത്സ്യബന്ധന മേഖല (${top.id})**:\n• ${hName} ൽ നിന്ന് **${dist} നോട്ടിക്കൽ മൈൽ** അകലെ **${species}** ലഭ്യമാണ്.\n• AI റൂട്ട് ഉപയോഗിച്ചാൽ **₹${fuel} ഡീസൽ ലാഭിക്കാം**.\n• അതിർത്തിയിലേക്ക് ${imbl} കി.മീ ദൂരമുണ്ട്.`;
     voice = `${dist} നോട്ടിക്കൽ മൈൽ അകലെ ${species} മീനുകൾ ലഭ്യമാണ്. AI റൂട്ട് വഴി ${fuel} രൂപ ലാഭിക്കാം.`;
-  } else {
+  } else { // English
     text = `🛰️ **ORCA Multi-Agent Recommendation for ${harbor.name}**:\n\n1. **Nearest High-Yield PFZ**: **${top.id}** (${dist} NM offshore, Confidence: **${top.confidence_score}%**).\n2. **Target Biomass**: Dense shoals of **${species}** (SST: ${top.sst_celsius}°C, Chl-a: ${top.chlorophyll_mg_m3} mg/m³).\n3. **Fuel Savings**: Current-assisted route cuts fuel burn by **${route.fuel_savings_percentage}%**, saving **₹${fuel}**.\n4. **Safety & Border Status**: Wave height **${weather.wave_height_m}m** (${weather.safety_status}). Distance to IMBL: **${imbl} km** (${geofence.status}).`;
     voice = `Nearest fish hotspot is ${dist} nautical miles offshore for ${species}. You will save ${fuel} rupees in fuel. Sea conditions are safe.`;
   }

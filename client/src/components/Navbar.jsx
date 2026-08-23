@@ -4,6 +4,8 @@ import { Anchor, Globe2, Radio, ShieldCheck, Sparkles } from 'lucide-react';
 export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, onLangChange, harbors, isOffline }) {
   const languages = [
     { code: 'en', label: 'English' },
+    { code: 'kn', label: 'ಕನ್ನಡ (Kannada)' },
+    { code: 'tcy', label: 'ತುಳು (Tulu - ಕರಾವಳಿ)' },
     { code: 'ta', label: 'தமிழ் (Tamil)' },
     { code: 'te', label: 'తెలుగు (Telugu)' },
     { code: 'hi', label: 'हिन्दी (Hindi)' },
