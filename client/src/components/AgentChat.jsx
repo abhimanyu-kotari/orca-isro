@@ -6,7 +6,24 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [showAgentsTrace, setShowAgentsTrace] = useState(true);
+  const [voices, setVoices] = useState([]);
   const messagesEndRef = useRef(null);
+
+  // Load and cache browser speech synthesis voices
+  useEffect(() => {
+    const loadVoices = () => {
+      if ('speechSynthesis' in window) {
+        const available = window.speechSynthesis.getVoices();
+        if (available.length > 0) {
+          setVoices(available);
+        }
+      }
+    };
+    loadVoices();
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+  }, []);
 
   // Suggested Prompts based on ISRO Problem Statement
   const suggestedQueries = [
@@ -22,9 +39,12 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isProcessing]);
 
-  // Web Speech Synthesis (Text to Speech in Regional Languages)
+  // Robust Multilingual Web Speech Synthesis
   const speakText = (text) => {
-    if (!('speechSynthesis' in window)) return;
+    if (!('speechSynthesis' in window)) {
+      alert('Speech synthesis is not supported in this browser.');
+      return;
+    }
 
     window.speechSynthesis.cancel();
     if (isSpeaking) {
@@ -32,19 +52,42 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
       return;
     }
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.95;
-    
+    // Clean markdown characters and emojis before speech
+    const cleanText = text
+      .replace(/\*\*/g, '')
+      .replace(/\*/g, '')
+      .replace(/#/g, '')
+      .replace(/•/g, '')
+      .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
+      .trim();
+
     const langMap = {
-      'kn': 'kn-IN',
-      'tcy': 'kn-IN',
-      'ta': 'ta-IN',
-      'te': 'te-IN',
-      'hi': 'hi-IN',
-      'ml': 'ml-IN',
-      'en': 'en-IN'
+      'ta': { code: 'ta-IN', prefix: 'ta', name: 'tamil' },
+      'kn': { code: 'kn-IN', prefix: 'kn', name: 'kannada' },
+      'tcy': { code: 'kn-IN', prefix: 'kn', name: 'kannada' }, // Tulu maps to Dravidian phonetic voice
+      'te': { code: 'te-IN', prefix: 'te', name: 'telugu' },
+      'hi': { code: 'hi-IN', prefix: 'hi', name: 'hindi' },
+      'ml': { code: 'ml-IN', prefix: 'ml', name: 'malayalam' },
+      'en': { code: 'en-IN', prefix: 'en', name: 'english' }
     };
-    utterance.lang = langMap[selectedLang] || 'en-IN';
+
+    const target = langMap[selectedLang] || langMap['en'];
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = target.code;
+    utterance.rate = 0.92;
+    utterance.pitch = 1.0;
+
+    // Explicitly locate the regional language voice in the device
+    const availableVoices = window.speechSynthesis.getVoices();
+    const matchedVoice = availableVoices.find(v => 
+      v.lang === target.code || 
+      v.lang.toLowerCase().replace('_', '-').startsWith(target.prefix) ||
+      v.name.toLowerCase().includes(target.name)
+    );
+
+    if (matchedVoice) {
+      utterance.voice = matchedVoice;
+    }
 
     utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => setIsSpeaking(false);
@@ -53,7 +96,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
     window.speechSynthesis.speak(utterance);
   };
 
-  // Web Speech Recognition (Voice to Text)
+  // Web Speech Recognition (Voice to Text in Regional Mother Tongue)
   const toggleListening = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -71,9 +114,9 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
     recognition.interimResults = false;
     
     const langMap = {
+      'ta': 'ta-IN',
       'kn': 'kn-IN',
       'tcy': 'kn-IN',
-      'ta': 'ta-IN',
       'te': 'te-IN',
       'hi': 'hi-IN',
       'ml': 'ml-IN',
@@ -167,14 +210,14 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
               {m.sender === 'agent' && (
                 <div className="mt-3 pt-2.5 border-t border-white/[0.08] flex items-center justify-between text-[11px] text-slate-400">
                   <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
-                    <span>🛰️</span> ISRO Evidence-Based Synthesis
+                    <span>🛰️</span> ISRO Synthesis
                   </span>
                   <button
                     onClick={() => speakText(m.voiceScript || m.text)}
                     className="flex items-center gap-1.5 text-emerald-300 hover:text-white bg-emerald-500/10 hover:bg-emerald-500/20 px-2.5 py-1 rounded-xl border border-emerald-500/25 transition font-semibold"
                   >
                     {isSpeaking ? <VolumeX className="w-3.5 h-3.5 text-rose-400" /> : <Volume2 className="w-3.5 h-3.5" />}
-                    <span>{isSpeaking ? 'Stop Audio' : 'Play Voice'}</span>
+                    <span>{isSpeaking ? 'Stop Audio' : 'Play Voice 🔊'}</span>
                   </button>
                 </div>
               )}
@@ -221,7 +264,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
               ? 'bg-rose-500/20 border-rose-500 text-rose-400 animate-pulse'
               : 'bg-white/[0.04] border-white/10 text-slate-300 hover:text-emerald-400 hover:border-emerald-400/40'
           }`}
-          title="Speak in English, ಕನ್ನಡ, ತುಳು, or mother tongue"
+          title="Speak in Tamil (தமிழ்), Kannada (ಕನ್ನಡ), or your mother tongue"
         >
           {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
         </button>
@@ -230,7 +273,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={`Ask ORCA in English, ಕನ್ನಡ, ತುಳು, or mother tongue...`}
+          placeholder={`Ask ORCA in Tamil, Kannada, Telugu, Hindi, or English...`}
           className="flex-1 bg-white/[0.04] border border-white/10 rounded-2xl px-4 py-3 text-xs text-white placeholder-slate-500 outline-none focus:border-emerald-400 font-medium transition shadow-inner"
         />
 
