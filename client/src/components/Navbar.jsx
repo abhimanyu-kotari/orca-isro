@@ -1,7 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Anchor, Globe2, ChevronDown, Check } from 'lucide-react';
+import { Anchor, Globe2, ChevronDown, Check, Ship } from 'lucide-react';
+import { VESSEL_PROFILES } from '../services/marineEngine';
 
-export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, onLangChange, harbors, isOffline }) {
+export default function Navbar({ 
+  selectedHarbor, 
+  onHarborChange, 
+  selectedLang, 
+  onLangChange, 
+  selectedVessel,
+  onOpenVesselModal,
+  harbors, 
+  isOffline 
+}) {
   const [isHarborOpen, setIsHarborOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
   const harborRef = useRef(null);
@@ -36,12 +46,13 @@ export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, o
 
   const currentHarbor = harbors[selectedHarbor] || Object.values(harbors)[0];
   const currentLang = languages.find(l => l.code === selectedLang) || languages[0];
+  const currentVessel = VESSEL_PROFILES[selectedVessel] || VESSEL_PROFILES.trawler;
 
   return (
     <header className="sticky top-2 sm:top-3 z-50 px-2 sm:px-6">
       <div className="max-w-7xl mx-auto rounded-3xl p-4 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.8)] border border-white/20 relative min-h-[120px] sm:min-h-[140px] flex flex-col justify-between">
         
-        {/* Dedicated Background Layer (Lowest Layer z-0) */}
+        {/* Dedicated Background Layer */}
         <div 
           className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none z-0"
           style={{
@@ -54,7 +65,7 @@ export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, o
           <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-amber-500/10 via-transparent to-transparent pointer-events-none"></div>
         </div>
 
-        {/* Top Row: Brand & Controls (HIGHEST STACKING CONTEXT z-40) */}
+        {/* Top Row: Brand & Controls */}
         <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-3 z-40 w-full">
           
           {/* Brand & ISRO Badge */}
@@ -78,10 +89,25 @@ export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, o
             </div>
           </div>
 
-          {/* Controls: Port & Language */}
-          <div className="flex items-center gap-2.5 w-full md:w-auto justify-between sm:justify-end">
+          {/* Controls: Vessel Profile, Port & Language */}
+          <div className="flex flex-wrap items-center gap-2 w-full md:w-auto justify-between sm:justify-end">
             
-            {/* 1. Harbor Selector */}
+            {/* 1. Optional Vessel Profile Pill */}
+            <button
+              onClick={onOpenVesselModal}
+              className="flex items-center gap-1.5 bg-[#020a14] hover:bg-[#04152a] border border-emerald-500/40 active:scale-95 rounded-2xl px-3 py-2.5 text-xs text-slate-100 transition shadow-xl group"
+              title="Configure Boat Type & Fuel Consumption Rate"
+            >
+              <span className="text-sm">⛵</span>
+              <div className="text-left">
+                <div className="text-[9px] text-emerald-400 font-mono font-bold leading-none">VESSEL</div>
+                <div className="text-[11px] font-bold text-white leading-none mt-0.5 group-hover:text-emerald-300">
+                  {currentVessel.short_name}
+                </div>
+              </div>
+            </button>
+
+            {/* 2. Harbor Selector */}
             <div className="relative flex-1 sm:flex-initial" ref={harborRef}>
               <button
                 onClick={() => {
@@ -92,7 +118,7 @@ export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, o
               >
                 <div className="flex items-center gap-2 truncate">
                   <Anchor className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span className="font-bold truncate max-w-[130px] sm:max-w-[200px] text-white">
+                  <span className="font-bold truncate max-w-[110px] sm:max-w-[180px] text-white">
                     {currentHarbor?.name?.split('(')[0]?.trim() || 'Port'}
                   </span>
                 </div>
@@ -139,7 +165,7 @@ export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, o
               )}
             </div>
 
-            {/* 2. Language Selector */}
+            {/* 3. Language Selector */}
             <div className="relative" ref={langRef}>
               <button
                 onClick={() => {
@@ -188,20 +214,20 @@ export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, o
             </div>
 
             {/* Desktop Live Status */}
-            <div className={`hidden md:flex items-center gap-2 px-3.5 py-2.5 rounded-2xl border text-xs font-bold shadow-xl backdrop-blur-xl ${
+            <div className={`hidden lg:flex items-center gap-2 px-3.5 py-2.5 rounded-2xl border text-xs font-bold shadow-xl backdrop-blur-xl ${
               isOffline 
                 ? 'bg-amber-500/25 text-amber-300 border-amber-500/50'
                 : 'bg-emerald-500/25 text-emerald-300 border-emerald-400/50 shadow-[0_0_20px_rgba(0,245,160,0.3)]'
             }`}>
               <span className={`w-2.5 h-2.5 rounded-full ${isOffline ? 'bg-amber-400 animate-ping' : 'bg-emerald-400 animate-pulse'}`}></span>
-              <span className="tracking-wide">Live Satellite Feed</span>
+              <span className="tracking-wide">Live Feed</span>
             </div>
 
           </div>
 
         </div>
 
-        {/* Bottom Context Banner inside Header (LOWER STACKING CONTEXT z-0 - Painted Beneath Dropdowns) */}
+        {/* Bottom Context Banner inside Header */}
         <div className="relative mt-3 pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 z-0 text-[11px] font-mono pointer-events-auto">
           <div className="flex items-center gap-3 text-slate-300">
             <span className="text-emerald-400 font-bold flex items-center gap-1">
@@ -210,7 +236,9 @@ export default function Navbar({ selectedHarbor, onHarborChange, selectedLang, o
             <span>&bull;</span>
             <span className="text-slate-200">{currentHarbor.coast}</span>
             <span className="hidden sm:inline">&bull;</span>
-            <span className="hidden sm:inline text-cyan-300 font-sans font-semibold">🌊 Surface Drift & SST Contours Online</span>
+            <span className="hidden sm:inline text-cyan-300 font-sans font-semibold">
+              ⛵ {currentVessel.name} ({currentVessel.burn_rate_lph} L/hr)
+            </span>
           </div>
 
           <div className="flex items-center gap-2">

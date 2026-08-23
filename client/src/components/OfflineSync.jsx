@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DownloadCloud, CheckCircle2, HardDrive, WifiOff, Wifi, FileText, Trash2, Eye, X, ShieldCheck, Compass, Fuel, Fish, Printer } from 'lucide-react';
+import { DownloadCloud, CheckCircle2, HardDrive, WifiOff, Wifi, FileText, Trash2, Eye, X, ShieldCheck, Compass, Fuel, Fish, Printer, Ship } from 'lucide-react';
 
 export default function OfflineSync({ harbor, selectedHotspot, route, weather, isOffline, onToggleOffline, selectedLang }) {
   const [isSaved, setIsSaved] = useState(false);
@@ -17,9 +17,21 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
   }, [isSaved]);
 
   const handleSaveAndDownload = () => {
+    const vessel = route?.vessel_profile || {
+      name: 'Mechanized Trawler (45–110 HP)',
+      vessel_reg: 'IND-KA-02-MM-1842',
+      burn_rate_lph: 20.0
+    };
+
     const bundle = {
       project: "Project ORCA (ISRO PS-26176)",
       exportTimestamp: new Date().toLocaleString(),
+      vesselProfile: {
+        name: vessel.name,
+        reg: vessel.vessel_reg,
+        burnRate: `${vessel.burn_rate_lph} L/hr`,
+        speed: `${vessel.cruising_speed_knots || 10.4} kts`
+      },
       originHarbor: {
         name: harbor?.name || "Malpe Fishing Harbour",
         state: harbor?.state || "Karnataka",
@@ -151,6 +163,20 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
               >
                 <X className="w-5 h-5" />
               </button>
+            </div>
+
+            {/* Registered Vessel Badge */}
+            <div className="bg-emerald-500/10 border border-emerald-500/25 rounded-2xl p-3 flex items-center justify-between text-xs font-mono">
+              <div className="flex items-center gap-2">
+                <Ship className="w-4 h-4 text-emerald-400" />
+                <div>
+                  <div className="text-white font-bold">{cachedData.vesselProfile?.name || "Mechanized Trawler"}</div>
+                  <div className="text-[10px] text-slate-400">Reg: <strong className="text-emerald-300">{cachedData.vesselProfile?.reg || "IND-KA-02-MM-1842"}</strong></div>
+                </div>
+              </div>
+              <div className="text-right text-[10px] text-cyan-300 font-bold">
+                {cachedData.vesselProfile?.burnRate || "20 L/hr"}
+              </div>
             </div>
 
             {/* Target Catch Card */}

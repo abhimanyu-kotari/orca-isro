@@ -6,10 +6,12 @@ import WeatherCard from './components/WeatherCard';
 import AgentChat from './components/AgentChat';
 import OfflineSync from './components/OfflineSync';
 import MobileBottomNav from './components/MobileBottomNav';
+import VesselModal from './components/VesselModal';
 
 import {
   HARBORS,
   BOUNDARIES,
+  VESSEL_PROFILES,
   generateHotspots,
   computeVoyageRoute,
   checkGeofenceProximity,
@@ -23,11 +25,13 @@ const isLocalEnv = typeof window !== 'undefined' && (window.location.hostname ==
 function App() {
   const [selectedHarbor, setSelectedHarbor] = useState('malpe');
   const [selectedLang, setSelectedLang] = useState('en');
+  const [selectedVessel, setSelectedVessel] = useState('trawler'); // 'trawler' | 'fibre' | 'canoe'
+  const [isVesselModalOpen, setIsVesselModalOpen] = useState(false);
   const [activeMobileTab, setActiveMobileTab] = useState('map'); // 'map' | 'chat' | 'weather' | 'pass'
   const [harbors, setHarbors] = useState(HARBORS);
   const [hotspots, setHotspots] = useState(() => generateHotspots('malpe'));
   const [selectedHotspot, setSelectedHotspot] = useState(() => generateHotspots('malpe')[0]);
-  const [route, setRoute] = useState(() => computeVoyageRoute(HARBORS.malpe, generateHotspots('malpe')[0]));
+  const [route, setRoute] = useState(() => computeVoyageRoute(HARBORS.malpe, generateHotspots('malpe')[0], 'trawler'));
   const [weather, setWeather] = useState(() => generateWeather(generateHotspots('malpe')[0].lat, generateHotspots('malpe')[0].lng));
   const [boundaries, setBoundaries] = useState(BOUNDARIES);
   const [geofence, setGeofence] = useState(() => checkGeofenceProximity(generateHotspots('malpe')[0].lat, generateHotspots('malpe')[0].lng));
@@ -49,13 +53,13 @@ function App() {
     { name: 'Samudra Raksha Agent', status: 'Active', summary: 'IMBL boundary monitoring' }
   ]);
 
-  // Update harbor data on selection change
-  const updateHarborData = async (harborKey) => {
+  // Update harbor & vessel data on selection change
+  const updateHarborData = async (harborKey, vesselKey = selectedVessel) => {
     const validHarborKey = HARBORS[harborKey] ? harborKey : 'malpe';
     const localHarbor = HARBORS[validHarborKey];
     const localHotspots = generateHotspots(validHarborKey);
     const topHotspot = localHotspots[0];
-    const localRoute = computeVoyageRoute(localHarbor, topHotspot);
+    const localRoute = computeVoyageRoute(localHarbor, topHotspot, vesselKey);
     const localGeofence = checkGeofenceProximity(topHotspot.lat, topHotspot.lng);
     const localWeather = generateWeather(topHotspot.lat, topHotspot.lng);
 
@@ -91,8 +95,16 @@ function App() {
 
   // Initial Load
   useEffect(() => {
-    updateHarborData(selectedHarbor);
-  }, [selectedHarbor]);
+    updateHarborData(selectedHarbor, selectedVessel);
+  }, [selectedHarbor, selectedVessel]);
+
+  // Handle Vessel Change
+  const handleVesselChange = (vesselKey) => {
+    setSelectedVessel(vesselKey);
+    const currentHarborObj = safeHarbors[selectedHarbor] || safeHarbors.malpe || HARBORS.malpe;
+    const newRoute = computeVoyageRoute(currentHarborObj, selectedHotspot, vesselKey);
+    setRoute(newRoute);
+  };
 
   // Handle Hotspot Click
   const handleSelectHotspot = async (spot) => {
@@ -101,7 +113,7 @@ function App() {
     const validHarborKey = harbors?.[selectedHarbor] ? selectedHarbor : 'malpe';
     const currentHarborObj = harbors?.[validHarborKey] || HARBORS[validHarborKey] || HARBORS.malpe;
 
-    const localRoute = computeVoyageRoute(currentHarborObj, spot);
+    const localRoute = computeVoyageRoute(currentHarborObj, spot, selectedVessel);
     const localGeofence = checkGeofenceProximity(spot.lat, spot.lng);
     const localWeather = generateWeather(spot.lat, spot.lng);
     setRoute(localRoute);
@@ -116,7 +128,8 @@ function App() {
           body: JSON.stringify({
             harbor_id: validHarborKey,
             target_hotspot_id: spot.id,
-            language: selectedLang
+            language: selectedLang,
+            vessel_profile: selectedVessel
           })
         });
         if (routeRes.ok) {
@@ -135,7 +148,7 @@ function App() {
 
     if (isOffline || !isLocalEnv) {
       setTimeout(() => {
-        const result = processClientChat(userText, selectedHarbor, selectedLang);
+        const result = processClientChat(userText, selectedHarbor, selectedLang, selectedVessel);
         setMessages([
           ...newMessages,
           {
@@ -158,7 +171,8 @@ function App() {
         body: JSON.stringify({
           message: userText,
           harbor_id: selectedHarbor,
-          language: selectedLang
+          language: selectedLang,
+          vessel_profile: selectedVessel
         })
       });
 
@@ -183,7 +197,7 @@ function App() {
         if (data.evidence.geofence) setGeofence(data.evidence.geofence);
       }
     } catch (error) {
-      const result = processClientChat(userText, selectedHarbor, selectedLang);
+      const result = processClientChat(userText, selectedHarbor, selectedLang, selectedVessel);
       setMessages([
         ...newMessages,
         {
@@ -211,6 +225,8 @@ function App() {
         onHarborChange={(h) => setSelectedHarbor(h)}
         selectedLang={selectedLang}
         onLangChange={(l) => setSelectedLang(l)}
+        selectedVessel={selectedVessel}
+        onOpenVesselModal={() => setIsVesselModalOpen(true)}
         harbors={safeHarbors}
         isOffline={isOffline}
       />
@@ -285,6 +301,14 @@ function App() {
         </div>
 
       </main>
+
+      {/* Vessel Profile Setup Modal */}
+      <VesselModal
+        isOpen={isVesselModalOpen}
+        onClose={() => setIsVesselModalOpen(false)}
+        selectedVessel={selectedVessel}
+        onSelectVessel={handleVesselChange}
+      />
 
       {/* Native Mobile Bottom Tab Bar */}
       <MobileBottomNav
