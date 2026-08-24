@@ -148,9 +148,9 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
       
       {/* Top Floating Notification Toast */}
       {showToast && (
-        <div className="absolute top-14 left-1/2 -translate-x-1/2 z-[500] bg-emerald-500/90 backdrop-blur-xl text-slate-950 font-black text-xs px-4 py-2 rounded-2xl shadow-[0_10px_30px_rgba(0,245,160,0.5)] flex items-center gap-2 animate-bounce">
-          <CheckCircle className="w-4 h-4 text-slate-950" />
-          <span>AI Current Route Activated &bull; Steer {headingDeg}° {compassDir}</span>
+        <div className="absolute top-14 left-1/2 -translate-x-1/2 z-[500] bg-emerald-500/95 backdrop-blur-xl text-slate-950 font-black text-xs px-4 py-2.5 rounded-2xl shadow-[0_10px_35px_rgba(0,245,160,0.6)] flex items-center gap-2 animate-bounce border border-white/20">
+          <CheckCircle className="w-4 h-4 text-slate-950 shrink-0" />
+          <span>From {harbor?.name?.split('(')[0]?.trim() || 'Harbour'}: Steer {headingDeg}° {compassDir} &bull; Next Turn in {distToNextNm} NM</span>
         </div>
       )}
 
