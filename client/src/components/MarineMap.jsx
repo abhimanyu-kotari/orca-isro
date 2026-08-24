@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { Compass, Waves, Anchor, Sparkles, MessageSquare, ChevronRight } from 'lucide-react';
+import { Compass, Waves, Anchor, Sparkles, MessageSquare, Navigation, Volume2, VolumeX, CheckCircle, ChevronRight, Play } from 'lucide-react';
 
 // Custom Map Centering Controller with smooth coordinate listener
 function MapViewController({ center, zoom }) {
@@ -53,9 +53,26 @@ const pfzStandardIcon = L.divIcon({
   popupAnchor: [0, -18]
 });
 
-export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectHotspot, route, boundaries, onOpenChat }) {
-  const center = [harbor?.lat || 13.125, harbor?.lng || 80.298];
+// Calculate compass heading degree between 2 GPS coordinates
+function calculateBearing(lat1, lon1, lat2, lon2) {
+  const y = Math.sin((lon2 - lon1) * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180);
+  const x = Math.cos(lat1 * Math.PI / 180) * Math.sin(lat2 * Math.PI / 180) -
+            Math.sin(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.cos((lon2 - lon1) * Math.PI / 180);
+  let brng = Math.atan2(y, x) * 180 / Math.PI;
+  return Math.round((brng + 360) % 360);
+}
 
+function getCompassDirection(deg) {
+  const directions = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+  return directions[Math.round(deg / 22.5) % 16];
+}
+
+export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectHotspot, route, boundaries, onOpenChat, selectedLang = 'en' }) {
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [currentStepIdx, setCurrentStepIdx] = useState(0);
+  const [isSpeakingSteer, setIsSpeakingSteer] = useState(false);
+
+  const center = [harbor?.lat || 13.125, harbor?.lng || 80.298];
   const imblLines = boundaries?.imbl_lines ? Object.values(boundaries.imbl_lines).map(b => b.points.map(p => [p.lat, p.lng])) : [];
   const aiRoutePoints = route?.ai_waypoints ? route.ai_waypoints.map(w => [w.lat, w.lng]) : [];
   const straightPoints = route?.straight_path ? route.straight_path.map(p => [p.lat, p.lng]) : [];
@@ -63,18 +80,56 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
   const rawSpecies = selectedHotspot?.primary_species || "Indian Mackerel";
   const cleanSpecies = rawSpecies.split('(')[0].trim();
 
+  // Compute live compass steer heading for current step
+  const waypoints = route?.ai_waypoints || [];
+  const targetWaypoint = waypoints[currentStepIdx + 1] || waypoints[waypoints.length - 1] || { lat: selectedHotspot?.lat || center[0], lng: selectedHotspot?.lng || center[1], label: "PFZ Hotspot" };
+  const originCoord = currentStepIdx === 0 ? { lat: harbor?.lat || center[0], lng: harbor?.lng || center[1] } : (waypoints[currentStepIdx] || { lat: harbor?.lat || center[0], lng: harbor?.lng || center[1] });
+  
+  const headingDeg = calculateBearing(originCoord.lat, originCoord.lng, targetWaypoint.lat, targetWaypoint.lng);
+  const compassDir = getCompassDirection(headingDeg);
+  const distToNextNm = Number((selectedHotspot?.distance_nm ? selectedHotspot.distance_nm / (waypoints.length || 4) : 4.5).toFixed(1));
+
+  // Speech guidance for fisherman steering
+  const handlePlaySteerVoice = () => {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    if (isSpeakingSteer) {
+      setIsSpeakingSteer(false);
+      return;
+    }
+
+    let text = "";
+    if (selectedLang === 'kn') {
+      text = `ಮೀನುಗಾರರೇ, ನಿಮ್ಮ ದೋಣಿಯನ್ನು ದಿಕ್ಸೂಚಿಯಲ್ಲಿ ${headingDeg} ಡಿಗ್ರಿ ${compassDir} ದಿಕ್ಕಿಗೆ ತಿರುಗಿಸಿ. ಸಮುದ್ರ ಪ್ರವಾಹದೊಂದಿಗೆ ${distToNextNm} ನಾಟಿಕಲ್ ಮೈಲಿ ಚಲಿಸಿ.`;
+    } else if (selectedLang === 'ta') {
+      text = `மீனவர்களே, உங்கள் படகை திசைகாட்டியில் ${headingDeg} டிகிரி ${compassDir} திசையில் செலுத்துங்கள். ${distToNextNm} கடல் மைல் செல்லவும்.`;
+    } else if (selectedLang === 'hi') {
+      text = `मछुआरों, अपनी नाव को कम्पास में ${headingDeg} डिग्री ${compassDir} दिशा में मोड़ें। ${distToNextNm} समुद्री मील चलें।`;
+    } else {
+      text = `Captains, steer compass heading ${headingDeg} degrees ${compassDir}. Maintain cruising speed with surface drift for ${distToNextNm} nautical miles.`;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.90;
+    utterance.pitch = 1.05;
+    utterance.onstart = () => setIsSpeakingSteer(true);
+    utterance.onend = () => setIsSpeakingSteer(false);
+    utterance.onerror = () => setIsSpeakingSteer(false);
+    window.speechSynthesis.speak(utterance);
+  };
+
   return (
-    <div className="relative w-full h-[430px] sm:h-[480px] lg:h-[580px] rounded-3xl overflow-hidden glass-panel shadow-2xl border border-white/15">
+    <div className="relative w-full h-[450px] sm:h-[500px] lg:h-[590px] rounded-3xl overflow-hidden glass-panel shadow-2xl border border-white/15">
       
       {/* Map Header Floating Pill */}
-      <div className="absolute top-3 left-3 z-[400] bg-slate-950/85 backdrop-blur-xl border border-white/20 px-3 py-1.5 rounded-2xl flex items-center gap-2 text-[11px] shadow-xl">
+      <div className="absolute top-3 left-3 z-[400] bg-slate-950/90 backdrop-blur-xl border border-white/20 px-3 py-1.5 rounded-2xl flex items-center gap-2 text-[11px] shadow-xl">
         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
         <span className="font-bold text-white truncate max-w-[110px] sm:max-w-none">{harbor?.name?.split('(')[0]?.trim() || 'Coast'}:</span>
         <span className="text-emerald-400 font-mono font-bold">{harbor?.coast || 'Indian EEZ'}</span>
       </div>
 
       {/* Floating Tactical Legend (Desktop) */}
-      <div className="absolute top-3 right-3 z-[400] bg-slate-950/85 backdrop-blur-xl border border-white/20 p-2.5 rounded-2xl text-[10px] text-slate-200 shadow-2xl space-y-1.5 hidden md:block max-w-[210px]">
+      <div className="absolute top-3 right-3 z-[400] bg-slate-950/90 backdrop-blur-xl border border-white/20 p-2.5 rounded-2xl text-[10px] text-slate-200 shadow-2xl space-y-1.5 hidden md:block max-w-[210px]">
         <div className="flex items-center gap-1.5 font-bold text-white border-b border-white/10 pb-1">
           <Compass className="w-3 h-3 text-cyan-400" />
           <span>Tactical Marine Layers</span>
@@ -93,31 +148,137 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
         </div>
       </div>
 
-      {/* Floating Bottom Action HUD directly on the map (Zero scrolling required on phone!) */}
-      <div className="absolute bottom-3 left-3 right-3 z-[400] bg-slate-950/92 backdrop-blur-2xl border border-white/25 p-3 rounded-2xl flex items-center justify-between gap-2 shadow-[0_15px_35px_rgba(0,0,0,0.9)] animate-fadeIn">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 font-black text-sm shrink-0">
-            🐟
-          </div>
-          <div className="min-w-0">
-            <div className="text-[10px] text-slate-400 font-medium truncate">Selected Target Shoal:</div>
-            <div className="text-xs font-black text-white truncate flex items-center gap-1.5">
-              <span className="text-emerald-400">{cleanSpecies}</span>
-              <span className="text-[10px] text-slate-300 font-mono font-normal">({selectedHotspot?.distance_nm || 20} NM)</span>
+      {/* ========================================================================= */}
+      {/* FISHERMAN COMPASS STEER NAVIGATION HUD (Live Waypoint Guide) */}
+      {/* ========================================================================= */}
+      {isNavigating ? (
+        <div className="absolute bottom-3 left-3 right-3 z-[400] bg-slate-950/95 backdrop-blur-2xl border-2 border-emerald-400/60 p-3 sm:p-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] animate-fadeIn space-y-2.5 text-white">
+          
+          {/* HUD Top Bar */}
+          <div className="flex items-center justify-between border-b border-white/10 pb-2">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+              <span className="text-xs font-black text-emerald-400 uppercase font-mono tracking-wider">
+                Live Steer HUD (Step {currentStepIdx + 1} of {waypoints.length || 5})
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              {/* Voice Steer Button */}
+              <button
+                onClick={handlePlaySteerVoice}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-bold border transition ${
+                  isSpeakingSteer ? 'bg-rose-500/20 text-rose-300 border-rose-500' : 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40'
+                }`}
+              >
+                {isSpeakingSteer ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                <span>{isSpeakingSteer ? 'Stop' : 'Voice Steer 🔊'}</span>
+              </button>
+
+              {/* Exit Nav */}
+              <button
+                onClick={() => setIsNavigating(false)}
+                className="text-[10px] font-mono text-slate-400 hover:text-white px-2 py-1 bg-white/10 rounded-lg"
+              >
+                ✕ Close
+              </button>
             </div>
           </div>
-        </div>
 
-        {onOpenChat && (
-          <button
-            onClick={onOpenChat}
-            className="flex items-center gap-1.5 bg-gradient-to-r from-emerald-400 to-cyan-500 hover:opacity-90 active:scale-95 text-slate-950 font-black px-3.5 py-2 rounded-xl text-xs shadow-lg shadow-emerald-500/20 shrink-0 transition"
-          >
-            <MessageSquare className="w-3.5 h-3.5" />
-            <span>Ask AI Co-Pilot</span>
-          </button>
-        )}
-      </div>
+          {/* Large Compass Heading & Steer Instruction */}
+          <div className="grid grid-cols-12 gap-2.5 items-center">
+            
+            {/* Big Heading Dial (4 Cols) */}
+            <div className="col-span-5 sm:col-span-4 bg-emerald-500/15 border border-emerald-400/40 rounded-2xl p-2 text-center">
+              <div className="text-[9px] text-slate-300 font-mono uppercase font-bold">STEER COMPASS</div>
+              <div className="text-xl sm:text-2xl font-black text-emerald-300 font-mono tracking-tight flex items-center justify-center gap-1 mt-0.5">
+                <Navigation className="w-4 h-4 text-emerald-400 transform -rotate-45 animate-pulse" />
+                <span>{headingDeg}°</span>
+                <span className="text-sm text-cyan-300">{compassDir}</span>
+              </div>
+            </div>
+
+            {/* Steer Details (7 Cols) */}
+            <div className="col-span-7 sm:col-span-8 space-y-1 text-xs">
+              <div className="font-black text-white truncate flex items-center gap-1.5">
+                <span>🎯</span>
+                <span className="truncate">{targetWaypoint.label || "PFZ Hotspot"}</span>
+              </div>
+              <div className="text-[11px] text-slate-300 font-mono flex items-center justify-between">
+                <span>Distance: <strong className="text-cyan-300">{distToNextNm} NM</strong></span>
+                <span>Assist: <strong className="text-emerald-400">+1.35 kts</strong></span>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Stepper Navigation Buttons */}
+          <div className="flex items-center justify-between gap-2 pt-1 border-t border-white/10 text-[11px]">
+            <button
+              disabled={currentStepIdx === 0}
+              onClick={() => setCurrentStepIdx(Math.max(0, currentStepIdx - 1))}
+              className="px-3 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/10 disabled:opacity-30 text-slate-200 font-bold"
+            >
+              &larr; Prev Step
+            </button>
+            
+            <span className="text-[10px] text-slate-400 font-mono">
+              Next Waypoint: {targetWaypoint.lat?.toFixed(2)}°, {targetWaypoint.lng?.toFixed(2)}°
+            </span>
+
+            <button
+              disabled={currentStepIdx >= (waypoints.length - 2)}
+              onClick={() => setCurrentStepIdx(Math.min(waypoints.length - 2, currentStepIdx + 1))}
+              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-400 to-cyan-500 text-slate-950 font-black"
+            >
+              Next Step &rarr;
+            </button>
+          </div>
+
+        </div>
+      ) : (
+        /* Standard Floating Action HUD */
+        <div className="absolute bottom-3 left-3 right-3 z-[400] bg-slate-950/92 backdrop-blur-2xl border border-white/25 p-3 rounded-2xl flex items-center justify-between gap-2 shadow-[0_15px_35px_rgba(0,0,0,0.9)] animate-fadeIn">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 font-black text-sm shrink-0">
+              🐟
+            </div>
+            <div className="min-w-0">
+              <div className="text-[10px] text-slate-400 font-medium truncate">Target Shoal:</div>
+              <div className="text-xs font-black text-white truncate flex items-center gap-1.5">
+                <span className="text-emerald-400">{cleanSpecies}</span>
+                <span className="text-[10px] text-slate-300 font-mono font-normal">({selectedHotspot?.distance_nm || 20} NM)</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Start Live Steer HUD Button */}
+            <button
+              onClick={() => {
+                setIsNavigating(true);
+                setCurrentStepIdx(0);
+              }}
+              className="flex items-center gap-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-emerald-300 font-bold px-3 py-2 rounded-xl text-xs transition active:scale-95"
+              title="Open Fisherman Compass & Heading Steer Guidance"
+            >
+              <Compass className="w-3.5 h-3.5 text-emerald-400 animate-spin" style={{ animationDuration: '16s' }} />
+              <span className="hidden sm:inline">Steer Guidance</span>
+              <span className="sm:hidden">Steer 🧭</span>
+            </button>
+
+            {onOpenChat && (
+              <button
+                onClick={onOpenChat}
+                className="flex items-center gap-1.5 bg-gradient-to-r from-emerald-400 to-cyan-500 hover:opacity-90 active:scale-95 text-slate-950 font-black px-3.5 py-2 rounded-xl text-xs shadow-lg shadow-emerald-500/20 transition"
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span>Ask AI</span>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       <MapContainer
         center={center}
@@ -175,10 +336,14 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
                     <div>📈 Front: <strong className="text-slate-200">{h.thermal_front_gradient}</strong></div>
                   </div>
                   <button
-                    onClick={() => onSelectHotspot(h)}
+                    onClick={() => {
+                      onSelectHotspot(h);
+                      setIsNavigating(true);
+                      setCurrentStepIdx(0);
+                    }}
                     className="w-full mt-1 bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 hover:opacity-90 text-slate-950 text-xs font-black py-2 rounded-xl transition shadow-lg shadow-emerald-500/20"
                   >
-                    Plot Fuel-Optimal Route ⚡
+                    Plot & Steer Route ⚡
                   </button>
                 </div>
               </Popup>

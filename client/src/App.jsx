@@ -257,6 +257,7 @@ function App() {
               route={route}
               boundaries={boundaries}
               onOpenChat={() => setActiveMobileTab('chat')}
+              selectedLang={selectedLang}
             />
           </div>
 
