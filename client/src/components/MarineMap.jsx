@@ -18,14 +18,14 @@ function MapController({ center, targetSpot, onMapReady }) {
   useEffect(() => {
     if (lat !== undefined && lng !== undefined && !isNaN(lat) && !isNaN(lng)) {
       if (targetSpot && targetSpot.lat && targetSpot.lng && !isNaN(targetSpot.lat) && !isNaN(targetSpot.lng)) {
-        // Fit bounds tightly around Harbour + Target Fish Shoal
+        // Fit bounds around Departure Port + Target PFZ Shoal
         const bounds = L.latLngBounds([
           [lat, lng],
           [targetSpot.lat, targetSpot.lng]
         ]);
-        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10.5, animate: true });
+        map.fitBounds(bounds, { padding: [60, 60], maxZoom: 10.5, animate: true });
       } else {
-        // Center coastal harbor with clear 10x zoom
+        // Center coastal harbor with clear zoom
         map.setView([lat, lng], 10, {
           animate: true,
           duration: 0.8
@@ -120,11 +120,11 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
         [harbor.lat, harbor.lng],
         [h.lat, h.lng]
       ]);
-      mapRef.current.fitBounds(bounds, { padding: [50, 50], maxZoom: 10.5, animate: true });
+      mapRef.current.fitBounds(bounds, { padding: [60, 60], maxZoom: 10.5, animate: true });
     }
 
     setShowToast(true);
-    setTimeout(() => setShowToast(false), 4000);
+    setTimeout(() => setShowToast(false), 4500);
   };
 
   // Speech guidance for fisherman steering
@@ -157,173 +157,16 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
   };
 
   return (
-    <div className="relative w-full h-[390px] sm:h-[510px] lg:h-[610px] rounded-3xl overflow-hidden glass-panel shadow-2xl border-2 border-white/20 z-10">
+    <div className="relative w-full h-[440px] sm:h-[520px] lg:h-[620px] rounded-3xl overflow-hidden glass-panel shadow-2xl border-2 border-white/20">
       
-      {/* Top Floating Notification Toast */}
-      {showToast && (
-        <div className="absolute top-14 left-1/2 -translate-x-1/2 z-[500] bg-emerald-500/95 backdrop-blur-xl text-slate-950 font-black text-xs px-4 py-2.5 rounded-2xl shadow-[0_10px_35px_rgba(0,245,160,0.6)] flex items-center gap-2 animate-bounce border border-white/20 whitespace-nowrap">
-          <CheckCircle className="w-4 h-4 text-slate-950 shrink-0" />
-          <span>From {harbor?.name?.split('(')[0]?.trim() || 'Harbour'}: Steer {headingDeg}° {compassDir} &bull; Next Turn in {distToNextNm} NM</span>
-        </div>
-      )}
-
-      {/* Map Header Floating Pill */}
-      <div className="absolute top-3 left-3 z-[400] bg-[#020b17]/95 backdrop-blur-xl border border-white/25 px-3.5 py-1.5 rounded-2xl flex items-center gap-2 text-[11px] shadow-2xl">
-        <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span className="font-bold text-white truncate max-w-[120px] sm:max-w-none">{harbor?.name?.split('(')[0]?.trim() || 'Coast'}:</span>
-        <span className="text-emerald-400 font-mono font-black">{harbor?.coast || 'Indian EEZ'}</span>
-      </div>
-
-      {/* Floating Tactical Legend (Desktop) */}
-      <div className="absolute top-3 right-3 z-[400] bg-[#020b17]/95 backdrop-blur-xl border border-white/25 p-2.5 rounded-2xl text-[10px] text-slate-200 shadow-2xl space-y-1.5 hidden md:block max-w-[210px]">
-        <div className="flex items-center gap-1.5 font-bold text-white border-b border-white/10 pb-1">
-          <Compass className="w-3.5 h-3.5 text-cyan-400" />
-          <span>Tactical Marine Layers</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-md bg-emerald-400 border border-white"></span>
-          <span>PFZ Hotspot Zone</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-1 bg-emerald-400 rounded-full"></span>
-          <span>AI Current Route (-{route?.fuel_savings_percentage || 28}%)</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-0.5 border-t border-dashed border-rose-500"></span>
-          <span className="text-rose-400">IMBL Border Line</span>
-        </div>
-      </div>
-
-      {/* ========================================================================= */}
-      {/* FISHERMAN COMPASS STEER NAVIGATION HUD (100% Mobile Optimized) */}
-      {/* ========================================================================= */}
-      {isNavigating ? (
-        <div className="absolute bottom-3 left-3 right-3 z-[400] bg-[#020b17]/98 backdrop-blur-3xl border-2 border-emerald-400 p-3.5 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,1)] animate-fadeIn text-white ring-2 ring-emerald-400/30">
-          
-          {/* Top Row: Steer Compass Angle + Distance + Voice Button + Close */}
-          <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-2">
-            
-            {/* Compass Badge */}
-            <div className="flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/60 px-3 py-1.5 rounded-xl shadow-inner">
-              <Navigation className="w-4 h-4 text-emerald-400 transform -rotate-45 animate-pulse shrink-0" />
-              <div className="flex items-baseline gap-1 font-mono">
-                <span className="text-base sm:text-lg font-black text-white">{headingDeg}°</span>
-                <span className="text-xs font-bold text-cyan-300">{compassDir}</span>
-              </div>
-            </div>
-
-            {/* Next Waypoint Info */}
-            <div className="text-left flex-1 min-w-0 px-1">
-              <div className="text-xs font-black text-emerald-300 truncate">
-                {targetWaypoint.label || "PFZ Hotspot"}
-              </div>
-              <div className="text-[10px] text-slate-300 font-mono">
-                In <strong className="text-cyan-300 font-bold">{distToNextNm} NM</strong> (+1.35 kts)
-              </div>
-            </div>
-
-            {/* Actions: Voice & Close */}
-            <div className="flex items-center gap-1.5 shrink-0">
-              <button
-                type="button"
-                onClick={handlePlaySteerVoice}
-                className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
-                  isSpeakingSteer ? 'bg-rose-500/20 text-rose-300 border-rose-500 animate-pulse' : 'bg-emerald-500/25 text-emerald-300 border-emerald-400/50 hover:bg-emerald-500/40'
-                }`}
-              >
-                {isSpeakingSteer ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
-                <span className="hidden sm:inline">{isSpeakingSteer ? 'Stop' : 'Voice'}</span>
-                <span className="sm:hidden">🔊</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setIsNavigating(false)}
-                className="text-xs font-mono text-slate-400 hover:text-white px-2 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg transition"
-              >
-                ✕
-              </button>
-            </div>
-
-          </div>
-
-          {/* Stepper Buttons Row */}
-          <div className="flex items-center justify-between gap-2 pt-2 text-xs font-mono">
-            <button
-              disabled={currentStepIdx === 0}
-              onClick={() => setCurrentStepIdx(Math.max(0, currentStepIdx - 1))}
-              className="px-3.5 py-1.5 rounded-xl bg-white/[0.08] hover:bg-white/15 disabled:opacity-30 text-slate-200 font-bold transition text-xs"
-            >
-              &larr; Prev
-            </button>
-            
-            <div className="text-center">
-              <span className="text-xs text-emerald-400 font-black">
-                Step {currentStepIdx + 1} of {waypoints.length || 4}
-              </span>
-            </div>
-
-            <button
-              disabled={currentStepIdx >= (waypoints.length - 2)}
-              onClick={() => setCurrentStepIdx(Math.min(waypoints.length - 2, currentStepIdx + 1))}
-              className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-400 to-cyan-500 hover:opacity-90 disabled:opacity-30 text-slate-950 font-black shadow transition text-xs"
-            >
-              Next &rarr;
-            </button>
-          </div>
-
-        </div>
-      ) : (
-        /* Standard Floating Action HUD */
-        <div className="absolute bottom-3 left-3 right-3 z-[400] bg-[#020b17]/95 backdrop-blur-2xl border border-white/25 p-3 rounded-2xl flex items-center justify-between gap-2 shadow-[0_15px_35px_rgba(0,0,0,0.9)] animate-fadeIn">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 font-black text-sm shrink-0">
-              🐟
-            </div>
-            <div className="min-w-0">
-              <div className="text-[10px] text-slate-400 font-medium truncate">Target Shoal:</div>
-              <div className="text-xs font-black text-white truncate flex items-center gap-1.5">
-                <span className="text-emerald-400">{cleanSpecies}</span>
-                <span className="text-[10px] text-slate-300 font-mono font-normal">({selectedHotspot?.distance_nm || 20} NM)</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            {/* Start Live Steer HUD Button */}
-            <button
-              onClick={() => {
-                setIsNavigating(true);
-                setCurrentStepIdx(0);
-              }}
-              className="flex items-center gap-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-emerald-300 font-bold px-3 py-2 rounded-xl text-xs transition active:scale-95 shadow-md"
-              title="Open Fisherman Compass & Heading Steer Guidance"
-            >
-              <Compass className="w-3.5 h-3.5 text-emerald-400 animate-spin" style={{ animationDuration: '16s' }} />
-              <span className="hidden sm:inline">Steer Guidance</span>
-              <span className="sm:hidden">Steer 🧭</span>
-            </button>
-
-            {onOpenChat && (
-              <button
-                onClick={onOpenChat}
-                className="flex items-center gap-1.5 bg-gradient-to-r from-emerald-400 to-cyan-500 hover:opacity-90 active:scale-95 text-slate-950 font-black px-3.5 py-2 rounded-xl text-xs shadow-lg shadow-emerald-500/20 transition"
-              >
-                <MessageSquare className="w-3.5 h-3.5" />
-                <span>Ask AI</span>
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-
+      {/* 1. LEAFLET MAP CONTAINER (Rendered First so Overlays Sit on Top) */}
       <MapContainer
         center={center}
         zoom={10}
-        minZoom={8}
+        minZoom={7}
         maxZoom={16}
         scrollWheelZoom={true}
-        className="w-full h-full"
+        className="w-full h-full z-0"
       >
         <MapController center={center} targetSpot={selectedHotspot} onMapReady={(m) => (mapRef.current = m)} />
 
@@ -387,7 +230,7 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
           );
         })}
 
-        {/* AI Current-Assisted Optimal Route (Bioluminescent Cyan Glow) */}
+        {/* AI Current-Assisted Optimal Route */}
         {aiRoutePoints.length > 0 && (
           <Polyline
             positions={aiRoutePoints}
@@ -420,7 +263,7 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
           />
         ))}
 
-        {/* Marine Protected Areas (Turtle & Coral Sanctuaries) */}
+        {/* Marine Protected Areas (Sanctuaries) */}
         {boundaries?.protected_areas?.map((mpa) => (
           <Circle
             key={mpa.id}
@@ -445,8 +288,180 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
             </Popup>
           </Circle>
         ))}
-
       </MapContainer>
+
+      {/* ========================================================================= */}
+      {/* 2. OVERLAYS PLACED AFTER MAP CONTAINER WITH z-[1200] (GUARANTEED ON TOP) */}
+      {/* ========================================================================= */}
+
+      {/* Top Floating Notification Toast (Responsive Width) */}
+      {showToast && (
+        <div className="absolute top-12 left-3 right-3 sm:left-auto sm:right-auto sm:left-1/2 sm:-translate-x-1/2 z-[1400] bg-emerald-500/95 backdrop-blur-xl text-slate-950 font-black text-[11px] sm:text-xs px-4 py-2.5 rounded-2xl shadow-[0_10px_35px_rgba(0,245,160,0.6)] flex items-center justify-center gap-2 animate-bounce border border-white/20 text-center">
+          <CheckCircle className="w-4 h-4 text-slate-950 shrink-0" />
+          <span className="truncate">Steer {headingDeg}° {compassDir} &bull; Next Turn in {distToNextNm} NM</span>
+        </div>
+      )}
+
+      {/* Top Left Harbor Pill */}
+      <div className="absolute top-3 left-3 z-[1200] bg-[#020b17]/95 backdrop-blur-xl border border-white/25 px-3 py-1.5 rounded-2xl flex items-center gap-1.5 text-[10px] sm:text-[11px] shadow-2xl pointer-events-auto">
+        <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+        <span className="font-bold text-white truncate max-w-[100px] sm:max-w-none">{harbor?.name?.split('(')[0]?.trim() || 'Coast'}:</span>
+        <span className="text-emerald-400 font-mono font-black truncate">{harbor?.coast || 'Indian EEZ'}</span>
+      </div>
+
+      {/* Top Right Tactical Legend (Desktop Only) */}
+      <div className="absolute top-3 right-3 z-[1200] bg-[#020b17]/95 backdrop-blur-xl border border-white/25 p-2.5 rounded-2xl text-[10px] text-slate-200 shadow-2xl space-y-1.5 hidden md:block max-w-[210px] pointer-events-auto">
+        <div className="flex items-center gap-1.5 font-bold text-white border-b border-white/10 pb-1">
+          <Compass className="w-3.5 h-3.5 text-cyan-400" />
+          <span>Tactical Marine Layers</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-md bg-emerald-400 border border-white"></span>
+          <span>PFZ Hotspot Zone</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-1 bg-emerald-400 rounded-full"></span>
+          <span>AI Route (-{route?.fuel_savings_percentage || 28}%)</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-0.5 border-t border-dashed border-rose-500"></span>
+          <span className="text-rose-400">IMBL Border Line</span>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 3. PERMANENT / DYNAMIC BOTTOM ACTION HUD (z-[1300] - 100% VISIBLE) */}
+      {/* ========================================================================= */}
+      {isNavigating ? (
+        /* LIVE STEER NAVIGATION COCKPIT HUD */
+        <div className="absolute bottom-2.5 left-2.5 right-2.5 sm:bottom-3 sm:left-3 sm:right-3 z-[1300] bg-[#020b17]/98 backdrop-blur-3xl border-2 border-emerald-400 p-3 sm:p-3.5 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,1)] animate-fadeIn text-white ring-2 ring-emerald-400/40 pointer-events-auto">
+          
+          {/* Top Row: Steer Compass Angle + Distance + Voice + Close */}
+          <div className="flex items-center justify-between gap-2 border-b border-white/15 pb-2">
+            
+            {/* Compass Heading Angle */}
+            <div className="flex items-center gap-2 bg-emerald-500/25 border border-emerald-400/60 px-3 py-1 rounded-xl shadow-inner shrink-0">
+              <Navigation className="w-4 h-4 text-emerald-400 transform -rotate-45 animate-pulse shrink-0" />
+              <div className="flex items-baseline gap-1 font-mono">
+                <span className="text-base sm:text-lg font-black text-white">{headingDeg}°</span>
+                <span className="text-xs font-black text-cyan-300">{compassDir}</span>
+              </div>
+            </div>
+
+            {/* Next Waypoint Info */}
+            <div className="text-left flex-1 min-w-0 px-1">
+              <div className="text-[11px] sm:text-xs font-black text-emerald-300 truncate">
+                {targetWaypoint.label || "PFZ Hotspot"}
+              </div>
+              <div className="text-[10px] text-slate-300 font-mono truncate">
+                In <strong className="text-cyan-300 font-bold">{distToNextNm} NM</strong> (+1.35 kts)
+              </div>
+            </div>
+
+            {/* Actions: Voice & Close */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                type="button"
+                onClick={handlePlaySteerVoice}
+                className={`flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-black border transition ${
+                  isSpeakingSteer ? 'bg-rose-500/25 text-rose-300 border-rose-500 animate-pulse' : 'bg-emerald-500/25 text-emerald-300 border-emerald-400/50 hover:bg-emerald-500/40'
+                }`}
+              >
+                {isSpeakingSteer ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                <span className="hidden sm:inline">{isSpeakingSteer ? 'Stop' : 'Voice'}</span>
+                <span className="sm:hidden">🔊</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsNavigating(false)}
+                className="text-xs font-mono text-slate-300 hover:text-white px-2.5 py-1.5 bg-white/10 hover:bg-white/20 rounded-xl transition"
+                title="Exit Navigation Steer"
+              >
+                ✕
+              </button>
+            </div>
+
+          </div>
+
+          {/* Bottom Stepper Buttons Row */}
+          <div className="flex items-center justify-between gap-2 pt-2 text-xs font-mono">
+            <button
+              disabled={currentStepIdx === 0}
+              onClick={() => setCurrentStepIdx(Math.max(0, currentStepIdx - 1))}
+              className="px-3 sm:px-4 py-1.5 rounded-xl bg-white/[0.08] hover:bg-white/15 disabled:opacity-30 text-slate-200 font-bold transition text-[11px] sm:text-xs"
+            >
+              &larr; Prev
+            </button>
+            
+            <div className="text-center">
+              <span className="text-[11px] sm:text-xs text-emerald-400 font-black">
+                Step {currentStepIdx + 1} of {waypoints.length || 4}
+              </span>
+            </div>
+
+            <button
+              disabled={currentStepIdx >= (waypoints.length - 2)}
+              onClick={() => setCurrentStepIdx(Math.min(waypoints.length - 2, currentStepIdx + 1))}
+              className="px-3.5 sm:px-5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-400 to-cyan-500 hover:opacity-90 disabled:opacity-30 text-slate-950 font-black shadow transition text-[11px] sm:text-xs"
+            >
+              Next &rarr;
+            </button>
+          </div>
+
+        </div>
+      ) : (
+        /* STANDARD BOTTOM ACTION BAR (Always visible above map tiles) */
+        <div className="absolute bottom-2.5 left-2.5 right-2.5 sm:bottom-3 sm:left-3 sm:right-3 z-[1300] bg-[#020b17]/95 backdrop-blur-2xl border-2 border-white/20 p-2.5 sm:p-3 rounded-2xl flex items-center justify-between gap-2 shadow-[0_20px_50px_rgba(0,0,0,0.95)] animate-fadeIn pointer-events-auto">
+          
+          {/* Target Shoal Summary */}
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 font-black text-sm shrink-0">
+              🐟
+            </div>
+            <div className="min-w-0">
+              <div className="text-[9px] sm:text-[10px] text-slate-400 font-medium truncate">Target Catch:</div>
+              <div className="text-[11px] sm:text-xs font-black text-white truncate flex items-center gap-1">
+                <span className="text-emerald-400 truncate">{cleanSpecies}</span>
+                <span className="text-[10px] text-slate-300 font-mono font-normal shrink-0">({selectedHotspot?.distance_nm || 20} NM)</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons: Steer Guidance + Ask AI */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            
+            {/* Steer Guidance Trigger */}
+            <button
+              onClick={() => {
+                setIsNavigating(true);
+                setCurrentStepIdx(0);
+              }}
+              className="flex items-center gap-1 sm:gap-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/60 text-emerald-300 font-bold px-2.5 sm:px-3 py-2 rounded-xl text-xs transition active:scale-95 shadow-md"
+              title="Open Live Fisherman Steer Navigation HUD"
+            >
+              <Compass className="w-3.5 h-3.5 text-emerald-400 animate-spin" style={{ animationDuration: '16s' }} />
+              <span className="hidden sm:inline">Steer Guidance</span>
+              <span className="sm:hidden">Steer 🧭</span>
+            </button>
+
+            {/* Ask AI Co-Pilot Button */}
+            {onOpenChat && (
+              <button
+                onClick={onOpenChat}
+                className="flex items-center gap-1 sm:gap-1.5 bg-gradient-to-r from-emerald-400 to-cyan-500 hover:opacity-90 active:scale-95 text-slate-950 font-black px-3 sm:px-3.5 py-2 rounded-xl text-xs shadow-lg shadow-emerald-500/25 transition"
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Ask AI</span>
+                <span className="sm:hidden">AI 💬</span>
+              </button>
+            )}
+
+          </div>
+
+        </div>
+      )}
+
     </div>
   );
 }
