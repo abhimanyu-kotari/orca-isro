@@ -1,13 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { Compass, Waves, Anchor, Sparkles, MessageSquare, Navigation, Volume2, VolumeX, CheckCircle, ChevronRight, Play } from 'lucide-react';
+import { Compass, Waves, Anchor, Sparkles, MessageSquare, Navigation, Volume2, VolumeX, CheckCircle, ChevronRight, Play, Check } from 'lucide-react';
 
-// Custom Map Centering Controller with smooth coordinate listener
-function MapViewController({ center, zoom }) {
+// Custom Map Controller storing map instance and providing smooth zoom/close helpers
+function MapController({ center, zoom, onMapReady }) {
   const map = useMap();
   const lat = center?.[0];
   const lng = center?.[1];
+
+  useEffect(() => {
+    if (onMapReady) {
+      onMapReady(map);
+    }
+  }, [map, onMapReady]);
 
   useEffect(() => {
     if (lat !== undefined && lng !== undefined && !isNaN(lat) && !isNaN(lng)) {
@@ -71,6 +77,8 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
   const [isNavigating, setIsNavigating] = useState(false);
   const [currentStepIdx, setCurrentStepIdx] = useState(0);
   const [isSpeakingSteer, setIsSpeakingSteer] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const mapRef = useRef(null);
 
   const center = [harbor?.lat || 13.125, harbor?.lng || 80.298];
   const imblLines = boundaries?.imbl_lines ? Object.values(boundaries.imbl_lines).map(b => b.points.map(p => [p.lat, p.lng])) : [];
@@ -88,6 +96,23 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
   const headingDeg = calculateBearing(originCoord.lat, originCoord.lng, targetWaypoint.lat, targetWaypoint.lng);
   const compassDir = getCompassDirection(headingDeg);
   const distToNextNm = Number((selectedHotspot?.distance_nm ? selectedHotspot.distance_nm / (waypoints.length || 4) : 4.5).toFixed(1));
+
+  // Handle Plot & Steer Click with immediate popup close and HUD activation
+  const handlePlotAndSteer = (h, e) => {
+    e?.stopPropagation();
+    onSelectHotspot(h);
+    setIsNavigating(true);
+    setCurrentStepIdx(0);
+    
+    // Auto-close open popup so map and HUD are clearly visible
+    if (mapRef.current) {
+      mapRef.current.closePopup();
+    }
+
+    // Flash confirmation toast
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 4000);
+  };
 
   // Speech guidance for fisherman steering
   const handlePlaySteerVoice = () => {
@@ -121,6 +146,14 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
   return (
     <div className="relative w-full h-[450px] sm:h-[500px] lg:h-[590px] rounded-3xl overflow-hidden glass-panel shadow-2xl border border-white/15">
       
+      {/* Top Floating Notification Toast */}
+      {showToast && (
+        <div className="absolute top-14 left-1/2 -translate-x-1/2 z-[500] bg-emerald-500/90 backdrop-blur-xl text-slate-950 font-black text-xs px-4 py-2 rounded-2xl shadow-[0_10px_30px_rgba(0,245,160,0.5)] flex items-center gap-2 animate-bounce">
+          <CheckCircle className="w-4 h-4 text-slate-950" />
+          <span>AI Current Route Activated &bull; Steer {headingDeg}° {compassDir}</span>
+        </div>
+      )}
+
       {/* Map Header Floating Pill */}
       <div className="absolute top-3 left-3 z-[400] bg-slate-950/90 backdrop-blur-xl border border-white/20 px-3 py-1.5 rounded-2xl flex items-center gap-2 text-[11px] shadow-xl">
         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -152,7 +185,7 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
       {/* FISHERMAN COMPASS STEER NAVIGATION HUD (Live Waypoint Guide) */}
       {/* ========================================================================= */}
       {isNavigating ? (
-        <div className="absolute bottom-3 left-3 right-3 z-[400] bg-slate-950/95 backdrop-blur-2xl border-2 border-emerald-400/60 p-3 sm:p-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] animate-fadeIn space-y-2.5 text-white">
+        <div className="absolute bottom-3 left-3 right-3 z-[400] bg-[#020b17]/98 backdrop-blur-3xl border-2 border-emerald-400 p-3 sm:p-4 rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,1)] animate-fadeIn space-y-2.5 text-white ring-2 ring-emerald-400/30">
           
           {/* HUD Top Bar */}
           <div className="flex items-center justify-between border-b border-white/10 pb-2">
@@ -166,19 +199,21 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
             <div className="flex items-center gap-2">
               {/* Voice Steer Button */}
               <button
+                type="button"
                 onClick={handlePlaySteerVoice}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-bold border transition ${
-                  isSpeakingSteer ? 'bg-rose-500/20 text-rose-300 border-rose-500' : 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40'
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold border transition shadow-lg ${
+                  isSpeakingSteer ? 'bg-rose-500/20 text-rose-300 border-rose-500 animate-pulse' : 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border-emerald-400/50'
                 }`}
               >
                 {isSpeakingSteer ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
-                <span>{isSpeakingSteer ? 'Stop' : 'Voice Steer 🔊'}</span>
+                <span>{isSpeakingSteer ? 'Stop Voice' : 'Voice Steer 🔊'}</span>
               </button>
 
               {/* Exit Nav */}
               <button
+                type="button"
                 onClick={() => setIsNavigating(false)}
-                className="text-[10px] font-mono text-slate-400 hover:text-white px-2 py-1 bg-white/10 rounded-lg"
+                className="text-[11px] font-mono text-slate-400 hover:text-white px-2.5 py-1.5 bg-white/10 hover:bg-white/20 rounded-xl transition font-bold"
               >
                 ✕ Close
               </button>
@@ -188,17 +223,17 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
           {/* Large Compass Heading & Steer Instruction */}
           <div className="grid grid-cols-12 gap-2.5 items-center">
             
-            {/* Big Heading Dial (4 Cols) */}
-            <div className="col-span-5 sm:col-span-4 bg-emerald-500/15 border border-emerald-400/40 rounded-2xl p-2 text-center">
-              <div className="text-[9px] text-slate-300 font-mono uppercase font-bold">STEER COMPASS</div>
-              <div className="text-xl sm:text-2xl font-black text-emerald-300 font-mono tracking-tight flex items-center justify-center gap-1 mt-0.5">
-                <Navigation className="w-4 h-4 text-emerald-400 transform -rotate-45 animate-pulse" />
+            {/* Big Heading Dial */}
+            <div className="col-span-5 sm:col-span-4 bg-emerald-500/20 border border-emerald-400/60 rounded-2xl p-2.5 text-center shadow-inner">
+              <div className="text-[9px] text-emerald-300 font-mono uppercase font-bold tracking-wider">STEER COMPASS</div>
+              <div className="text-xl sm:text-2xl font-black text-white font-mono tracking-tight flex items-center justify-center gap-1.5 mt-0.5">
+                <Navigation className="w-5 h-5 text-emerald-400 transform -rotate-45 animate-pulse" />
                 <span>{headingDeg}°</span>
-                <span className="text-sm text-cyan-300">{compassDir}</span>
+                <span className="text-sm text-cyan-300 font-bold">{compassDir}</span>
               </div>
             </div>
 
-            {/* Steer Details (7 Cols) */}
+            {/* Steer Details */}
             <div className="col-span-7 sm:col-span-8 space-y-1 text-xs">
               <div className="font-black text-white truncate flex items-center gap-1.5">
                 <span>🎯</span>
@@ -206,7 +241,10 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
               </div>
               <div className="text-[11px] text-slate-300 font-mono flex items-center justify-between">
                 <span>Distance: <strong className="text-cyan-300">{distToNextNm} NM</strong></span>
-                <span>Assist: <strong className="text-emerald-400">+1.35 kts</strong></span>
+                <span>Current Boost: <strong className="text-emerald-400">+1.35 kts</strong></span>
+              </div>
+              <div className="text-[10px] text-slate-400 font-mono">
+                Lat: {targetWaypoint.lat?.toFixed(3)}° &bull; Lng: {targetWaypoint.lng?.toFixed(3)}°
               </div>
             </div>
 
@@ -217,19 +255,19 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
             <button
               disabled={currentStepIdx === 0}
               onClick={() => setCurrentStepIdx(Math.max(0, currentStepIdx - 1))}
-              className="px-3 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/10 disabled:opacity-30 text-slate-200 font-bold"
+              className="px-3 py-1.5 rounded-xl bg-white/[0.08] hover:bg-white/15 disabled:opacity-30 text-slate-200 font-bold transition"
             >
               &larr; Prev Step
             </button>
             
-            <span className="text-[10px] text-slate-400 font-mono">
-              Next Waypoint: {targetWaypoint.lat?.toFixed(2)}°, {targetWaypoint.lng?.toFixed(2)}°
+            <span className="text-[10px] text-emerald-400 font-mono font-bold">
+              Step {currentStepIdx + 1} / {waypoints.length || 5}
             </span>
 
             <button
               disabled={currentStepIdx >= (waypoints.length - 2)}
               onClick={() => setCurrentStepIdx(Math.min(waypoints.length - 2, currentStepIdx + 1))}
-              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-400 to-cyan-500 text-slate-950 font-black"
+              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-400 to-cyan-500 hover:opacity-90 disabled:opacity-30 text-slate-950 font-black shadow transition"
             >
               Next Step &rarr;
             </button>
@@ -259,7 +297,7 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
                 setIsNavigating(true);
                 setCurrentStepIdx(0);
               }}
-              className="flex items-center gap-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-emerald-300 font-bold px-3 py-2 rounded-xl text-xs transition active:scale-95"
+              className="flex items-center gap-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-emerald-300 font-bold px-3 py-2 rounded-xl text-xs transition active:scale-95 shadow-md"
               title="Open Fisherman Compass & Heading Steer Guidance"
             >
               <Compass className="w-3.5 h-3.5 text-emerald-400 animate-spin" style={{ animationDuration: '16s' }} />
@@ -286,7 +324,7 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
         scrollWheelZoom={true}
         className="w-full h-full"
       >
-        <MapViewController center={center} zoom={9} />
+        <MapController center={center} zoom={9} onMapReady={(m) => (mapRef.current = m)} />
 
         {/* Seamless Dark Matter Map Tiles */}
         <TileLayer
@@ -336,12 +374,9 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
                     <div>📈 Front: <strong className="text-slate-200">{h.thermal_front_gradient}</strong></div>
                   </div>
                   <button
-                    onClick={() => {
-                      onSelectHotspot(h);
-                      setIsNavigating(true);
-                      setCurrentStepIdx(0);
-                    }}
-                    className="w-full mt-1 bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 hover:opacity-90 text-slate-950 text-xs font-black py-2 rounded-xl transition shadow-lg shadow-emerald-500/20"
+                    type="button"
+                    onClick={(e) => handlePlotAndSteer(h, e)}
+                    className="w-full mt-1 bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 hover:opacity-90 active:scale-95 text-slate-950 text-xs font-black py-2.5 rounded-xl transition shadow-lg shadow-emerald-500/25"
                   >
                     Plot & Steer Route ⚡
                   </button>
