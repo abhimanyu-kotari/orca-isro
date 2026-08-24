@@ -20,25 +20,25 @@
 
 /* Next-Gen Glassmorphism Container */
 .glass-panel {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
 }
 
 .glass-panel-interactive {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-panel-interactive:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 100%);
-  border-color: rgba(0, 245, 160, 0.35);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.04) 100%);
+  border-color: rgba(0, 245, 160, 0.45);
   transform: translateY(-2px);
-  box-shadow: 0 20px 35px -10px rgba(0, 245, 160, 0.12), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 35px -10px rgba(0, 245, 160, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
 }
 
 /* Custom Scrollbar */
@@ -52,7 +52,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 9999px;
 }
 
@@ -67,17 +67,17 @@
 }
 
 .leaflet-popup-content-wrapper {
-  background: rgba(3, 15, 30, 0.92) !important;
-  backdrop-filter: blur(16px) !important;
+  background: rgba(2, 11, 23, 0.96) !important;
+  backdrop-filter: blur(20px) !important;
   color: #f8fafc !important;
-  border: 1px solid rgba(0, 245, 160, 0.3) !important;
+  border: 1px solid rgba(0, 245, 160, 0.5) !important;
   border-radius: 20px !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px 0 rgba(0, 245, 160, 0.15) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9), 0 0 30px 0 rgba(0, 245, 160, 0.25) !important;
   padding: 4px !important;
 }
 
 .leaflet-popup-tip {
-  background: rgba(3, 15, 30, 0.92) !important;
+  background: rgba(2, 11, 23, 0.96) !important;
 }
 
 /* Bioluminescent Pulse */
@@ -96,4 +96,33 @@
   position: absolute;
   border-radius: 50%;
   animation: bio-pulse 2.2s cubic-bezier(0.1, 0.2, 0.8, 1) infinite;
+}
+
+/* ========================================================================= */
+/* DEDICATED FISHERMAN VOYAGE PASS PRINT STYLESHEET (@media print) */
+/* ========================================================================= */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  
+  /* Hide the entire interactive web app when printing */
+  header, nav, main, footer, .leaflet-container, #root > div > *:not(.print-only-container) {
+    display: none !important;
+  }
+
+  /* Show only the dedicated printable pass */
+  .print-only-container {
+    display: block !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    z-index: 99999 !important;
+  }
 }
