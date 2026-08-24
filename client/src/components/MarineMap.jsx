@@ -157,7 +157,7 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
   };
 
   return (
-    <div className="relative w-full h-[470px] sm:h-[510px] lg:h-[610px] rounded-3xl overflow-hidden glass-panel shadow-2xl border-2 border-white/20 z-10">
+    <div className="relative w-full h-[390px] sm:h-[510px] lg:h-[610px] rounded-3xl overflow-hidden glass-panel shadow-2xl border-2 border-white/20 z-10">
       
       {/* Top Floating Notification Toast */}
       {showToast && (

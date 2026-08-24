@@ -78,11 +78,11 @@ export default function Navbar({
   };
 
   return (
-    <header className="sticky top-2 sm:top-3 z-50 px-2 sm:px-6">
-      {/* Outer Container MUST NOT have overflow-hidden so popovers don't get sliced */}
-      <div className="max-w-7xl mx-auto rounded-2xl sm:rounded-3xl p-3.5 sm:py-7 sm:px-6 shadow-[0_25px_60px_rgba(0,0,0,0.95)] border-2 border-white/20 relative flex flex-col justify-between min-h-[110px] sm:min-h-[145px]">
+    <header className="relative sm:sticky sm:top-3 z-30 px-2 sm:px-6">
+      {/* Outer Container without overflow-hidden so popovers don't get sliced */}
+      <div className="max-w-7xl mx-auto rounded-2xl sm:rounded-3xl p-3 sm:py-7 sm:px-6 shadow-[0_20px_50px_rgba(0,0,0,0.95)] border-2 border-white/20 relative flex flex-col justify-between min-h-[90px] sm:min-h-[145px]">
         
-        {/* Background Layer (overflow-hidden is strictly kept here so photo corners stay rounded) */}
+        {/* Background Layer */}
         <div 
           className="absolute inset-0 rounded-2xl sm:rounded-3xl overflow-hidden pointer-events-none z-0"
           style={{
@@ -92,7 +92,6 @@ export default function Navbar({
             backgroundRepeat: "no-repeat"
           }}
         >
-          {/* Subtle bottom shadow overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#020712]/90 via-transparent to-black/20 pointer-events-none"></div>
         </div>
 
@@ -302,7 +301,6 @@ export default function Navbar({
                   <ChevronDown className={`w-3.5 h-3.5 text-slate-300 transition-transform duration-200 shrink-0 ${isHarborOpen ? 'rotate-180' : ''}`} />
                 </button>
 
-                {/* Popover Menu with Ultra-High z-index to Float Over Map */}
                 {isHarborOpen && (
                   <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-[#020b17] border-2 border-emerald-500/80 rounded-2xl shadow-[0_30px_70px_rgba(0,0,0,1)] z-[99999] overflow-hidden animate-fadeIn ring-2 ring-emerald-500/40">
                     <div className="px-4 py-2.5 text-[10px] font-mono font-bold uppercase text-emerald-400 bg-[#01060e] border-b border-white/10 tracking-wider flex items-center gap-1.5">
