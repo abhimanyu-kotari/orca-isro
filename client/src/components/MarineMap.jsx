@@ -3,8 +3,8 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, Circle, useMap } from
 import L from 'leaflet';
 import { Compass, Waves, Anchor, Sparkles, MessageSquare, Navigation, Volume2, VolumeX, CheckCircle, ChevronRight, Play, Check } from 'lucide-react';
 
-// Custom Map Controller storing map instance and enforcing smooth harbor centering
-function MapController({ center, zoom = 9, onMapReady }) {
+// Custom Map Controller automatically framing the coastal route and hotspot with perfect zoom
+function MapController({ center, targetSpot, onMapReady }) {
   const map = useMap();
   const lat = center?.[0];
   const lng = center?.[1];
@@ -17,12 +17,22 @@ function MapController({ center, zoom = 9, onMapReady }) {
 
   useEffect(() => {
     if (lat !== undefined && lng !== undefined && !isNaN(lat) && !isNaN(lng)) {
-      map.setView([lat, lng], zoom, {
-        animate: true,
-        duration: 0.8
-      });
+      if (targetSpot && targetSpot.lat && targetSpot.lng && !isNaN(targetSpot.lat) && !isNaN(targetSpot.lng)) {
+        // Fit bounds tightly around Harbour + Target Fish Shoal
+        const bounds = L.latLngBounds([
+          [lat, lng],
+          [targetSpot.lat, targetSpot.lng]
+        ]);
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10.5, animate: true });
+      } else {
+        // Center coastal harbor with clear 10x zoom
+        map.setView([lat, lng], 10, {
+          animate: true,
+          duration: 0.8
+        });
+      }
     }
-  }, [lat, lng, zoom, map]);
+  }, [lat, lng, targetSpot, map]);
 
   return null;
 }
@@ -30,33 +40,33 @@ function MapController({ center, zoom = 9, onMapReady }) {
 // Luminous Modern Leaflet Icons
 const harborIcon = L.divIcon({
   className: 'custom-harbor-icon',
-  html: `<div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border-2 border-emerald-400 flex items-center justify-center text-white shadow-[0_0_20px_rgba(0,245,160,0.5)] text-lg font-bold">⚓</div>`,
-  iconSize: [40, 40],
-  iconAnchor: [20, 20],
-  popupAnchor: [0, -22]
-});
-
-const pfzActiveIcon = L.divIcon({
-  className: 'custom-pfz-active-icon',
-  html: `
-    <div class="relative flex items-center justify-center w-11 h-11">
-      <div class="bio-pulse-ring w-11 h-11 bg-emerald-400/30 border border-emerald-400"></div>
-      <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 border-2 border-white flex items-center justify-center text-slate-950 font-black text-base shadow-[0_0_25px_rgba(0,245,160,0.8)]">🐟</div>
-    </div>
-  `,
+  html: `<div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border-2 border-emerald-400 flex items-center justify-center text-white shadow-[0_0_25px_rgba(0,245,160,0.6)] text-xl font-black">⚓</div>`,
   iconSize: [44, 44],
   iconAnchor: [22, 22],
   popupAnchor: [0, -24]
 });
 
+const pfzActiveIcon = L.divIcon({
+  className: 'custom-pfz-active-icon',
+  html: `
+    <div class="relative flex items-center justify-center w-12 h-12">
+      <div class="bio-pulse-ring w-12 h-12 bg-emerald-400/30 border-2 border-emerald-400"></div>
+      <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 border-2 border-white flex items-center justify-center text-slate-950 font-black text-lg shadow-[0_0_25px_rgba(0,245,160,0.9)]">🐟</div>
+    </div>
+  `,
+  iconSize: [48, 48],
+  iconAnchor: [24, 24],
+  popupAnchor: [0, -26]
+});
+
 const pfzStandardIcon = L.divIcon({
   className: 'custom-pfz-std-icon',
   html: `
-    <div class="w-8 h-8 rounded-xl bg-slate-900/90 border border-emerald-400/70 flex items-center justify-center text-white text-sm shadow-[0_0_15px_rgba(0,245,160,0.3)]">🐟</div>
+    <div class="w-9 h-9 rounded-xl bg-slate-900/95 border-2 border-emerald-400/80 flex items-center justify-center text-white text-base shadow-[0_0_20px_rgba(0,245,160,0.4)]">🐟</div>
   `,
-  iconSize: [32, 32],
-  iconAnchor: [16, 16],
-  popupAnchor: [0, -18]
+  iconSize: [36, 36],
+  iconAnchor: [18, 18],
+  popupAnchor: [0, -20]
 });
 
 // Calculate compass heading degree between 2 GPS coordinates
@@ -106,8 +116,11 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
     
     if (mapRef.current) {
       mapRef.current.closePopup();
-      // Keep focused on the coastal route
-      mapRef.current.setView([harbor.lat, harbor.lng], 9);
+      const bounds = L.latLngBounds([
+        [harbor.lat, harbor.lng],
+        [h.lat, h.lng]
+      ]);
+      mapRef.current.fitBounds(bounds, { padding: [50, 50], maxZoom: 10.5, animate: true });
     }
 
     setShowToast(true);
@@ -144,7 +157,7 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
   };
 
   return (
-    <div className="relative w-full h-[460px] sm:h-[500px] lg:h-[600px] rounded-3xl overflow-hidden glass-panel shadow-2xl border border-white/15">
+    <div className="relative w-full h-[470px] sm:h-[510px] lg:h-[610px] rounded-3xl overflow-hidden glass-panel shadow-2xl border-2 border-white/20 z-10">
       
       {/* Top Floating Notification Toast */}
       {showToast && (
@@ -155,16 +168,16 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
       )}
 
       {/* Map Header Floating Pill */}
-      <div className="absolute top-3 left-3 z-[400] bg-slate-950/90 backdrop-blur-xl border border-white/20 px-3 py-1.5 rounded-2xl flex items-center gap-2 text-[11px] shadow-xl">
-        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span className="font-bold text-white truncate max-w-[110px] sm:max-w-none">{harbor?.name?.split('(')[0]?.trim() || 'Coast'}:</span>
-        <span className="text-emerald-400 font-mono font-bold">{harbor?.coast || 'Indian EEZ'}</span>
+      <div className="absolute top-3 left-3 z-[400] bg-[#020b17]/95 backdrop-blur-xl border border-white/25 px-3.5 py-1.5 rounded-2xl flex items-center gap-2 text-[11px] shadow-2xl">
+        <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span className="font-bold text-white truncate max-w-[120px] sm:max-w-none">{harbor?.name?.split('(')[0]?.trim() || 'Coast'}:</span>
+        <span className="text-emerald-400 font-mono font-black">{harbor?.coast || 'Indian EEZ'}</span>
       </div>
 
       {/* Floating Tactical Legend (Desktop) */}
-      <div className="absolute top-3 right-3 z-[400] bg-slate-950/90 backdrop-blur-xl border border-white/20 p-2.5 rounded-2xl text-[10px] text-slate-200 shadow-2xl space-y-1.5 hidden md:block max-w-[210px]">
+      <div className="absolute top-3 right-3 z-[400] bg-[#020b17]/95 backdrop-blur-xl border border-white/25 p-2.5 rounded-2xl text-[10px] text-slate-200 shadow-2xl space-y-1.5 hidden md:block max-w-[210px]">
         <div className="flex items-center gap-1.5 font-bold text-white border-b border-white/10 pb-1">
-          <Compass className="w-3 h-3 text-cyan-400" />
+          <Compass className="w-3.5 h-3.5 text-cyan-400" />
           <span>Tactical Marine Layers</span>
         </div>
         <div className="flex items-center gap-2">
@@ -185,27 +198,27 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
       {/* FISHERMAN COMPASS STEER NAVIGATION HUD (100% Mobile Optimized) */}
       {/* ========================================================================= */}
       {isNavigating ? (
-        <div className="absolute bottom-2.5 left-2.5 right-2.5 z-[400] bg-[#020b17]/98 backdrop-blur-3xl border-2 border-emerald-400 p-3 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,1)] animate-fadeIn text-white ring-2 ring-emerald-400/30">
+        <div className="absolute bottom-3 left-3 right-3 z-[400] bg-[#020b17]/98 backdrop-blur-3xl border-2 border-emerald-400 p-3.5 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,1)] animate-fadeIn text-white ring-2 ring-emerald-400/30">
           
           {/* Top Row: Steer Compass Angle + Distance + Voice Button + Close */}
           <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-2">
             
             {/* Compass Badge */}
-            <div className="flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/50 px-2.5 py-1 rounded-xl">
+            <div className="flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/60 px-3 py-1.5 rounded-xl shadow-inner">
               <Navigation className="w-4 h-4 text-emerald-400 transform -rotate-45 animate-pulse shrink-0" />
               <div className="flex items-baseline gap-1 font-mono">
-                <span className="text-sm sm:text-base font-black text-white">{headingDeg}°</span>
+                <span className="text-base sm:text-lg font-black text-white">{headingDeg}°</span>
                 <span className="text-xs font-bold text-cyan-300">{compassDir}</span>
               </div>
             </div>
 
             {/* Next Waypoint Info */}
             <div className="text-left flex-1 min-w-0 px-1">
-              <div className="text-[11px] font-black text-emerald-300 truncate">
+              <div className="text-xs font-black text-emerald-300 truncate">
                 {targetWaypoint.label || "PFZ Hotspot"}
               </div>
               <div className="text-[10px] text-slate-300 font-mono">
-                In <strong className="text-cyan-300">{distToNextNm} NM</strong> (+1.35 kts)
+                In <strong className="text-cyan-300 font-bold">{distToNextNm} NM</strong> (+1.35 kts)
               </div>
             </div>
 
@@ -214,7 +227,7 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
               <button
                 type="button"
                 onClick={handlePlaySteerVoice}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-bold border transition ${
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
                   isSpeakingSteer ? 'bg-rose-500/20 text-rose-300 border-rose-500 animate-pulse' : 'bg-emerald-500/25 text-emerald-300 border-emerald-400/50 hover:bg-emerald-500/40'
                 }`}
               >
@@ -226,7 +239,7 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
               <button
                 type="button"
                 onClick={() => setIsNavigating(false)}
-                className="text-[11px] font-mono text-slate-400 hover:text-white p-1 bg-white/10 hover:bg-white/20 rounded-lg transition"
+                className="text-xs font-mono text-slate-400 hover:text-white px-2 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg transition"
               >
                 ✕
               </button>
@@ -239,13 +252,13 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
             <button
               disabled={currentStepIdx === 0}
               onClick={() => setCurrentStepIdx(Math.max(0, currentStepIdx - 1))}
-              className="px-3 py-1.5 rounded-xl bg-white/[0.08] hover:bg-white/15 disabled:opacity-30 text-slate-200 font-bold transition text-[11px]"
+              className="px-3.5 py-1.5 rounded-xl bg-white/[0.08] hover:bg-white/15 disabled:opacity-30 text-slate-200 font-bold transition text-xs"
             >
               &larr; Prev
             </button>
             
             <div className="text-center">
-              <span className="text-[11px] text-emerald-400 font-bold">
+              <span className="text-xs text-emerald-400 font-black">
                 Step {currentStepIdx + 1} of {waypoints.length || 4}
               </span>
             </div>
@@ -253,7 +266,7 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
             <button
               disabled={currentStepIdx >= (waypoints.length - 2)}
               onClick={() => setCurrentStepIdx(Math.min(waypoints.length - 2, currentStepIdx + 1))}
-              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-400 to-cyan-500 hover:opacity-90 disabled:opacity-30 text-slate-950 font-black shadow transition text-[11px]"
+              className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-400 to-cyan-500 hover:opacity-90 disabled:opacity-30 text-slate-950 font-black shadow transition text-xs"
             >
               Next &rarr;
             </button>
@@ -262,7 +275,7 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
         </div>
       ) : (
         /* Standard Floating Action HUD */
-        <div className="absolute bottom-3 left-3 right-3 z-[400] bg-slate-950/92 backdrop-blur-2xl border border-white/25 p-3 rounded-2xl flex items-center justify-between gap-2 shadow-[0_15px_35px_rgba(0,0,0,0.9)] animate-fadeIn">
+        <div className="absolute bottom-3 left-3 right-3 z-[400] bg-[#020b17]/95 backdrop-blur-2xl border border-white/25 p-3 rounded-2xl flex items-center justify-between gap-2 shadow-[0_15px_35px_rgba(0,0,0,0.9)] animate-fadeIn">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 font-black text-sm shrink-0">
               🐟
@@ -306,13 +319,13 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
 
       <MapContainer
         center={center}
-        zoom={9}
-        minZoom={7}
+        zoom={10}
+        minZoom={8}
         maxZoom={16}
         scrollWheelZoom={true}
         className="w-full h-full"
       >
-        <MapController center={center} zoom={9} onMapReady={(m) => (mapRef.current = m)} />
+        <MapController center={center} targetSpot={selectedHotspot} onMapReady={(m) => (mapRef.current = m)} />
 
         {/* Seamless Dark Matter Map Tiles */}
         <TileLayer
@@ -379,7 +392,7 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
           <Polyline
             positions={aiRoutePoints}
             color="#00f5a0"
-            weight={4.5}
+            weight={5}
             opacity={0.95}
           />
         )}
