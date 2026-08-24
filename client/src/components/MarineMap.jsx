@@ -139,8 +139,12 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
     let text = "";
     if (selectedLang === 'kn') {
       text = `ಮೀನುಗಾರರೇ, ನಿಮ್ಮ ದೋಣಿಯನ್ನು ದಿಕ್ಸೂಚಿಯಲ್ಲಿ ${headingDeg} ಡಿಗ್ರಿ ${compassDir} ದಿಕ್ಕಿಗೆ ತಿರುಗಿಸಿ. ${distToNextNm} ನಾಟಿಕಲ್ ಮೈಲಿ ಚಲಿಸಿ.`;
+    } else if (selectedLang === 'tcy') {
+      text = `ಮೀನುಗಾರರೆ, ದಿಕ್ಸೂಚಿಡ್ ${headingDeg} ಡಿಗ್ರಿ ${compassDir} ದಿಕ್ಕ್ ಗ್ ಬೋಟ್ ತಿರ್ಗಾಲೆ. ${distToNextNm} ನಾಟಿಕಲ್ ಮೈಲ್ ಪೋಲೆ.`;
     } else if (selectedLang === 'ta') {
       text = `மீனவர்களே, உங்கள் படகை திசைகாட்டியில் ${headingDeg} டிகிரி ${compassDir} திசையில் செலுத்துங்கள். ${distToNextNm} கடல் மைல் செல்லவும்.`;
+    } else if (selectedLang === 'ml') {
+      text = `മത്സ്യത്തൊഴിലാളികളേ, കോമ്പസിൽ ${headingDeg} ഡിഗ്രി ${compassDir} ദിശയിലേക്ക് ബോട്ട് തിരിക്കുക. ${distToNextNm} നോട്ടിക്കൽ മൈൽ മുന്നോട്ട് പോവുക.`;
     } else if (selectedLang === 'hi') {
       text = `मछुआरों, अपनी नाव को कम्पास में ${headingDeg} डिग्री ${compassDir} दिशा में मोड़ें। ${distToNextNm} समुद्री मील चलें।`;
     } else {

@@ -8,14 +8,57 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
   const [showAgentsTrace, setShowAgentsTrace] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Suggested Prompts based on ISRO Problem Statement
-  const suggestedQueries = [
-    { label: '🐟 Nearest Fish Shoal (PFZ)', query: 'Where is the nearest Potential Fishing Zone today?' },
-    { label: '🌊 Sea Waves & Weather', query: 'Is it safe to venture into the sea tomorrow morning?' },
-    { label: '🧭 Low-Fuel Current Route', query: 'Calculate the lowest-fuel current-assisted route to the best Mackerel zone.' },
-    { label: '🛡️ IMBL Border Status', query: 'Check distance to international maritime boundary line.' },
-    { label: '🪸 Marine EcoSystem Shift', query: 'Why has fish productivity declined in this coastal region?' }
-  ];
+  // Dynamic Suggested Prompts per Selected Language
+  const getSuggestedQueries = (lang) => {
+    if (lang === 'tcy') {
+      return [
+        { label: '🐟 ಮುಟ್ಟದ ಮೀನ್ದ ಜಾಗೆ (PFZ)', query: 'ಇನಿ ಒಡೆ ಮಸ್ತ್ ಮೀನ್ ತಿಕ್ಕುಂಡು?' },
+        { label: '🌊 ಕಡಲ್ದ ಅಲೆ ಬೊಕ್ಕ ಹವಾಮಾನ', query: 'ಎಲ್ಲೆ ಕಾಂಡೆ ಕಡಲ್ ಗ್ ಪೋಯೆರೆ ಸುರಕ್ಷಿತ ಉಂಡಾ?' },
+        { label: '🧭 ಡೀಸೆಲ್ ಒರಿಪುನ ಸಾದಿ', query: 'ಕಮ್ಮಿ ಡೀಸೆಲ್ ಡ್ ಮೀನ್ದ ಜಾಗೆಗ್ ಪೋಪಿನ ಸಾದಿ ತೊಜಾವೊಲಿ?' },
+        { label: '🛡️ ಕಡಲ ಗಡಿ (IMBL) ಸ್ಥಿತಿ', query: 'ಅಂತಾರಾಷ್ಟ್ರೀಯ ಗಡಿತ ದೂರ ತೂಲೆ.' }
+      ];
+    }
+    if (lang === 'ml') {
+      return [
+        { label: '🐟 അടുത്തുള്ള മത്സ്യ മേഖല (PFZ)', query: 'ഇന്ന് ഏറ്റവും കൂടുതൽ മീൻ എവിടെ ലഭിക്കും?' },
+        { label: '🌊 കടൽ കാലാവസ്ഥയും തിരമാലയും', query: 'നാളെ രാവിലെ കടലിൽ പോകുന്നത് സുരക്ഷിതമാണോ?' },
+        { label: '🧭 കുറഞ്ഞ ഡീസൽ റൂട്ട്', query: 'ഡീസൽ ലാഭിക്കുന്ന എഐ റൂട്ട് കാണിക്കുക.' },
+        { label: '🛡️ അന്താരാഷ്ട്ര അതിർത്തി (IMBL)', query: 'അന്താരാഷ്ട്ര സമുദ്ര അതിർത്തിയിലേക്കുള്ള ദൂരം പരിശോധിക്കുക.' }
+      ];
+    }
+    if (lang === 'kn') {
+      return [
+        { label: '🐟 ಹತ್ತಿರದ ಮೀನಿನ ವಲಯ (PFZ)', query: 'ಇಂದು ಸಮೃದ್ಧ ಮೀನುಗಾರಿಕೆ ವಲಯ ಎಲ್ಲಿದೆ?' },
+        { label: '🌊 ಸಮುದ್ರ ಅಲೆ & ಹವಾಮಾನ', query: 'ನಾಳೆ ಬೆಳಿಗ್ಗೆ ಸಮುದ್ರಕ್ಕೆ ಇಳಿಯಲು ಸುರಕ್ಷಿತವೇ?' },
+        { label: '🧭 ಕಡಿಮೆ ಇಂಧನದ ಹಾದಿ', query: 'ಕಡಿಮೆ ಡೀಸೆಲ್ ಖರ್ಚಿನ ಪ್ರವಾಹ-ಮಾರ್ಗವನ್ನು ಲೆಕ್ಕಹಾಕಿ.' },
+        { label: '🛡️ ಕಡಲ ಗಡಿ (IMBL) ಸ್ಥಿತಿ', query: 'ಅಂತಾರಾಷ್ಟ್ರೀಯ ಗಡಿಯ ಅಂತರವನ್ನು ಪರಿಶೀಲಿಸಿ.' }
+      ];
+    }
+    if (lang === 'ta') {
+      return [
+        { label: '🐟 அருகிலுள்ள மீன்பிடி மண்டலம் (PFZ)', query: 'இன்று அதிக மீன் உள்ள பகுதி எங்குள்ளது?' },
+        { label: '🌊 கடல் அலை & வானிலை', query: 'நாளை காலை கடலுக்குச் செல்வது பாதுகாப்பானதா?' },
+        { label: '🧭 குறைந்த டீசல் வழி', query: 'குறைந்த எரிபொருள் பயன்படுத்தும் AI வழியைக் கணக்கிடுங்கள்.' },
+        { label: '🛡️ சர்வதேச எல்லை (IMBL)', query: 'சர்வதேச கடல் எல்லைக்கான தூரத்தை சரிபார்க்கவும்.' }
+      ];
+    }
+    if (lang === 'hi') {
+      return [
+        { label: '🐟 निकटतम मछली क्षेत्र (PFZ)', query: 'आज सबसे अच्छी मछली पकड़ने का क्षेत्र कहाँ है?' },
+        { label: '🌊 समुद्री मौसम और लहरें', query: 'क्या कल सुबह समुद्र में जाना सुरक्षित है?' },
+        { label: '🧭 कम डीजल वाला मार्ग', query: 'कम डीजल वाला सबसे तेज मार्ग बताएं।' },
+        { label: '🛡️ अंतरराष्ट्रीय सीमा (IMBL)', query: 'अंतरराष्ट्रीय समुद्री सीमा की दूरी जांचें।' }
+      ];
+    }
+    return [
+      { label: '🐟 Nearest Fish Shoal (PFZ)', query: 'Where is the nearest Potential Fishing Zone today?' },
+      { label: '🌊 Sea Waves & Weather', query: 'Is it safe to venture into the sea tomorrow morning?' },
+      { label: '🧭 Low-Fuel Current Route', query: 'Calculate the lowest-fuel current-assisted route to the best Mackerel zone.' },
+      { label: '🛡️ IMBL Border Status', query: 'Check distance to international maritime boundary line.' }
+    ];
+  };
+
+  const suggestedQueries = getSuggestedQueries(selectedLang);
 
   // Auto-scroll chat to bottom
   useEffect(() => {
@@ -52,7 +95,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
     const langMap = {
       'ta': { code: 'ta-IN', prefix: 'ta', name: 'tamil' },
       'kn': { code: 'kn-IN', prefix: 'kn', name: 'kannada' },
-      'tcy': { code: 'kn-IN', prefix: 'kn', name: 'kannada' },
+      'tcy': { code: 'kn-IN', prefix: 'kn', name: 'kannada' }, // Tulu uses Kannada phonetic synthesizer
       'te': { code: 'te-IN', prefix: 'te', name: 'telugu' },
       'hi': { code: 'hi-IN', prefix: 'hi', name: 'hindi' },
       'ml': { code: 'ml-IN', prefix: 'ml', name: 'malayalam' },
@@ -95,7 +138,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
     } else {
       textToSpeak = sanitizeText(msg.voiceScriptPhonetic || msg.voiceScript || msg.text);
       chosenVoice = indianFemaleVoice || generalFemaleVoice || availableVoices[0];
-      speechLang = 'en-IN';
+      speechLang = target.code === 'ml-IN' ? 'ml-IN' : 'en-IN';
     }
 
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
@@ -162,6 +205,15 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
     setInput('');
   };
 
+  const getPlaceholder = (lang) => {
+    if (lang === 'tcy') return 'ತುಳುಟು ಕೇನ್ಲೆ (Ask in Tulu or Kannada)...';
+    if (lang === 'ml') return 'മലയാളത്തിൽ ചോദിക്കുക (Ask in Malayalam)...';
+    if (lang === 'kn') return 'ಕನ್ನಡದಲ್ಲಿ ಕೇಳಿ (Ask in Kannada)...';
+    if (lang === 'ta') return 'தமிழில் கேளுங்கள் (Ask in Tamil)...';
+    if (lang === 'hi') return 'हिन्दी में पूछें (Ask in Hindi)...';
+    return 'Ask ORCA in Tulu, Malayalam, Kannada, Tamil, Hindi, or English...';
+  };
+
   return (
     <div className="glass-panel rounded-2xl sm:rounded-3xl flex flex-col h-[calc(100dvh-235px)] sm:h-[550px] lg:h-[610px] shadow-2xl overflow-hidden w-full border-2 border-white/15">
       
@@ -206,7 +258,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
         </div>
       )}
 
-      {/* Scrollable Messages Thread (flex-1 min-h-0 ensures it shrinks so input is NEVER pushed off-screen!) */}
+      {/* Scrollable Messages Thread */}
       <div className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-4 space-y-3">
         {messages.map((m, idx) => (
           <div
@@ -290,7 +342,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
               ? 'bg-rose-500/20 border-rose-500 text-rose-400 animate-pulse'
               : 'bg-white/[0.06] border-white/15 text-slate-300 hover:text-emerald-400'
           }`}
-          title="Speak in Kannada, Tamil, Telugu, Hindi, or English"
+          title="Speak in Tulu, Malayalam, Kannada, Tamil, Hindi, or English"
         >
           {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
         </button>
@@ -299,7 +351,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={`Ask ORCA in Kannada, Tamil, Hindi...`}
+          placeholder={getPlaceholder(selectedLang)}
           className="flex-1 bg-white/[0.05] border border-white/15 rounded-2xl px-3.5 py-2 text-xs text-white placeholder-slate-400 outline-none focus:border-emerald-400 font-medium transition shadow-inner"
         />
 

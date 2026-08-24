@@ -23,6 +23,21 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
       emergencySos: "ತುರ್ತು ಕೋಸ್ಟ್ ಗಾರ್ಡ್ ಸಹಾಯವಾಣಿ",
       printBtn: "ಪಾಸ್ ಪ್ರಿಂಟ್ / ಸೇವ್ ಮಾಡಿ 🖨️"
     },
+    tcy: {
+      barTitle: "ಆಳ ಕಡಲ್ದ ಆಫ್‌ಲೈನ್ ಪಾಸ್ (0-ನೆಟ್‌ವರ್ಕ್)",
+      barDesc: "ಕಡಲ್ ಗ್ ಪೋಪಿನ ದುಂಬು ಬೋಟ್ ದ ಪಾಸ್ ಬೊಕ್ಕ GPS ಸಾದಿನ್ ಡೌನ್‌ಲೋಡ್ ಮಲ್ಪುಲೆ.",
+      btnGetPass: "ಬೋಟ್ ಪಾಸ್ ದೆತೊನ್ಲೆ 🎫",
+      btnViewPass: "ಪಾಸ್ ತೂಲೆ 📄",
+      btnOfflineMode: "0-ಇಂಟರ್ನೆಟ್ ಸಿಮ್ಯುಲೇಟರ್",
+      passTitle: "ಮೀನುಗಾರರೆನ ಅಧಿಕೃತ ಯಾನ ಪಾಸ್",
+      passSub: "ISRO ಕಡಲ್ದ ಭದ್ರತಾ ಪ್ರಮಾಣಪತ್ರ • PS-26176",
+      targetShoal: "ಮೀನ್ ತಿಕ್ಕುನ ಜಾಗೆ (PFZ)",
+      dieselSaved: "ಒರಿಪುನ ಡೀಸೆಲ್",
+      borderSafety: "ಗಡಿದ ಭದ್ರತೆ (IMBL)",
+      steerGuide: "ದಿಕ್ಸೂಚಿ ಸಾದಿ (ಹಂತ ಹಂತವಾದ್)",
+      emergencySos: "ತುರ್ತು ಕೋಸ್ಟ್ ಗಾರ್ಡ್ ಸಹಾಯವಾಣಿ",
+      printBtn: "ಪಾಸ್ ಪ್ರಿಂಟ್ ಮಲ್ಪುಲೆ 🖨️"
+    },
     ta: {
       barTitle: "ஆழ்கடல் ஆஃப்லைன் பாஸ் (0-இணையம்)",
       barDesc: "கடலுக்குச் செல்லும் முன் படகு பாஸ் மற்றும் GPS வழிகளைப் பதிவிறக்கவும்.",
@@ -37,6 +52,21 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
       steerGuide: "திசைகாட்டி வழிகாட்டல் (படி படியாக)",
       emergencySos: "கடலோர காவல்படை அவசர உதவி",
       printBtn: "பாஸ் அச்சிட / சேமிக்க 🖨️"
+    },
+    ml: {
+      barTitle: "ആഴക്കടൽ ഓഫ്‌ലൈൻ പാസ് (0-നെറ്റ്‌വർക്ക്)",
+      barDesc: "കടലിലേക്ക് പോകുന്നതിന് മുൻപ് ബോട്ട് പാസും GPS പോയിന്റുകളും ഡൗൺലോഡ് ചെയ്യുക.",
+      btnGetPass: "ബോട്ട് പാസ് നേടുക 🎫",
+      btnViewPass: "പാസ് കാണുക 📄",
+      btnOfflineMode: "0-ഇന്റർനെറ്റ് സിമുലേറ്റർ",
+      passTitle: "മത്സ്യത്തൊഴിലാളി ഔദ്യോഗിക യാത്രാ പാസ്",
+      passSub: "ISRO സമുദ്ര സുരക്ഷാ സർട്ടിഫിക്കറ്റ് • PS-26176",
+      targetShoal: "ലക്ഷ്യ മത്സ്യ മേഖല (PFZ)",
+      dieselSaved: "ലാഭിച്ച ഡീസൽ",
+      borderSafety: "അതിർത്തി സുരക്ഷ (IMBL)",
+      steerGuide: "കോമ്പസ് സ്റ്റിയറിംഗ് ഗൈഡ്",
+      emergencySos: "കോസ്റ്റ് ഗാർഡ് അടിയന്തര ഹെൽപ്പ്‌ലൈൻ",
+      printBtn: "പാസ് പ്രിന്റ് ചെയ്യുക 🖨️"
     },
     hi: {
       barTitle: "गहरे समुद्र का ऑफलाइन पास (0-इंटरनेट)",
