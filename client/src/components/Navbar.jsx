@@ -79,20 +79,20 @@ export default function Navbar({
 
   return (
     <header className="sticky top-2 sm:top-3 z-50 px-2 sm:px-6">
-      <div className="max-w-7xl mx-auto rounded-2xl sm:rounded-3xl p-3 sm:p-5 shadow-[0_25px_60px_rgba(0,0,0,0.95)] border-2 border-white/20 relative flex flex-col justify-between overflow-hidden">
+      <div className="max-w-7xl mx-auto rounded-2xl sm:rounded-3xl p-3.5 sm:py-7 sm:px-6 shadow-[0_25px_60px_rgba(0,0,0,0.95)] border-2 border-white/20 relative flex flex-col justify-between overflow-hidden min-h-[110px] sm:min-h-[145px]">
         
-        {/* Master Panoramic Background Layer with High-Contrast Vignette */}
+        {/* Master Panoramic Background Layer - Tuned so Fishermen Faces & Straw Hats are 100% Crisp and Visible */}
         <div 
           className="absolute inset-0 rounded-2xl sm:rounded-3xl overflow-hidden pointer-events-none z-0"
           style={{
-            backgroundImage: "linear-gradient(90deg, rgba(2, 8, 20, 0.98) 0%, rgba(2, 8, 20, 0.88) 40%, rgba(2, 8, 20, 0.45) 75%, rgba(2, 8, 20, 0.15) 100%), url('/assets/marine_hero.png')",
+            backgroundImage: "linear-gradient(90deg, rgba(2, 8, 20, 0.98) 0%, rgba(2, 8, 20, 0.82) 38%, rgba(2, 8, 20, 0.30) 70%, rgba(2, 8, 20, 0.05) 100%), url('/assets/marine_hero.png')",
             backgroundSize: "cover",
-            backgroundPosition: "right 28%",
+            backgroundPosition: "right 0%",
             backgroundRepeat: "no-repeat"
           }}
         >
           {/* Subtle bottom shadow overlay to guarantee 100% text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#020712]/90 via-transparent to-black/30 pointer-events-none"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#020712]/90 via-transparent to-black/20 pointer-events-none"></div>
         </div>
 
         {/* ========================================================================= */}
@@ -120,7 +120,7 @@ export default function Navbar({
               </div>
             </div>
 
-            {/* Right: 3 Action Pills with High-Contrast Obsidian Background */}
+            {/* Right: 3 Action Pills */}
             <div className="flex items-center gap-1.5 shrink-0">
               
               {/* Vessel Pill */}
@@ -247,7 +247,7 @@ export default function Navbar({
               <img 
                 src="/assets/orca_logo.png" 
                 alt="Project ORCA Official Emblem" 
-                className="w-13 h-13 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-emerald-400 shadow-[0_0_25px_rgba(0,245,160,0.5)] shrink-0 transform transition hover:scale-105"
+                className="w-14 h-14 rounded-full object-cover border-2 border-emerald-400 shadow-[0_0_25px_rgba(0,245,160,0.5)] shrink-0 transform transition hover:scale-105"
               />
               <div>
                 <div className="flex items-center gap-2.5">
@@ -399,7 +399,7 @@ export default function Navbar({
           </div>
 
           {/* Desktop Bottom Context Banner */}
-          <div className="relative mt-2.5 pt-2.5 border-t border-white/15 flex items-center justify-between text-[11px] font-mono z-0">
+          <div className="relative mt-3 pt-3 border-t border-white/15 flex items-center justify-between text-[11px] font-mono z-0">
             <div className="flex items-center gap-3 text-slate-200 drop-shadow-[0_1px_4px_rgba(0,0,0,1)]">
               <span className="text-emerald-400 font-black">⚓ {currentHarbor.name.split('(')[0].trim()}</span>
               <span>&bull;</span>
