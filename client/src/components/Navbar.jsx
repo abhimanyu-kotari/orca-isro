@@ -79,9 +79,10 @@ export default function Navbar({
 
   return (
     <header className="sticky top-2 sm:top-3 z-50 px-2 sm:px-6">
-      <div className="max-w-7xl mx-auto rounded-2xl sm:rounded-3xl p-3.5 sm:py-7 sm:px-6 shadow-[0_25px_60px_rgba(0,0,0,0.95)] border-2 border-white/20 relative flex flex-col justify-between overflow-hidden min-h-[110px] sm:min-h-[145px]">
+      {/* Outer Container MUST NOT have overflow-hidden so popovers don't get sliced */}
+      <div className="max-w-7xl mx-auto rounded-2xl sm:rounded-3xl p-3.5 sm:py-7 sm:px-6 shadow-[0_25px_60px_rgba(0,0,0,0.95)] border-2 border-white/20 relative flex flex-col justify-between min-h-[110px] sm:min-h-[145px]">
         
-        {/* Master Panoramic Background Layer - Tuned so Fishermen Faces & Straw Hats are 100% Crisp and Visible */}
+        {/* Background Layer (overflow-hidden is strictly kept here so photo corners stay rounded) */}
         <div 
           className="absolute inset-0 rounded-2xl sm:rounded-3xl overflow-hidden pointer-events-none z-0"
           style={{
@@ -91,7 +92,7 @@ export default function Navbar({
             backgroundRepeat: "no-repeat"
           }}
         >
-          {/* Subtle bottom shadow overlay to guarantee 100% text readability */}
+          {/* Subtle bottom shadow overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#020712]/90 via-transparent to-black/20 pointer-events-none"></div>
         </div>
 
@@ -148,7 +149,7 @@ export default function Navbar({
                 </button>
 
                 {isHarborOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-64 bg-[#020b17] border border-emerald-500/60 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-[9999] overflow-hidden animate-fadeIn ring-2 ring-emerald-500/30">
+                  <div className="absolute right-0 top-full mt-2 w-64 bg-[#020b17] border-2 border-emerald-500/80 rounded-2xl shadow-[0_30px_70px_rgba(0,0,0,1)] z-[99999] overflow-hidden animate-fadeIn ring-2 ring-emerald-500/40">
                     <div className="px-3 py-2 text-[9px] font-mono font-bold uppercase text-emerald-400 bg-[#01060e] border-b border-white/10 tracking-wider flex items-center gap-1">
                       <Anchor className="w-3 h-3" /> Select Coastal Port
                     </div>
@@ -195,7 +196,7 @@ export default function Navbar({
                 </button>
 
                 {isLangOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-52 bg-[#020b17] border border-cyan-500/60 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-[9999] overflow-hidden animate-fadeIn ring-2 ring-cyan-500/30">
+                  <div className="absolute right-0 top-full mt-2 w-52 bg-[#020b17] border-2 border-cyan-500/80 rounded-2xl shadow-[0_30px_70px_rgba(0,0,0,1)] z-[99999] overflow-hidden animate-fadeIn ring-2 ring-cyan-500/40">
                     <div className="px-3 py-2 text-[9px] font-mono font-bold uppercase text-cyan-400 bg-[#01060e] border-b border-white/10 tracking-wider">
                       Select Language
                     </div>
@@ -238,9 +239,9 @@ export default function Navbar({
         {/* ========================================================================= */}
         {/* 2. DESKTOP & TABLET EXPANSIVE PANORAMIC HEADER (sm: & lg: screens) */}
         {/* ========================================================================= */}
-        <div className="hidden sm:block">
+        <div className="hidden sm:block relative z-40">
           
-          <div className="relative flex items-center justify-between gap-3 z-40 w-full">
+          <div className="flex items-center justify-between gap-3 w-full">
             
             {/* Official Circular Emblem Logo & Brand */}
             <div className="flex items-center gap-3.5">
@@ -301,8 +302,9 @@ export default function Navbar({
                   <ChevronDown className={`w-3.5 h-3.5 text-slate-300 transition-transform duration-200 shrink-0 ${isHarborOpen ? 'rotate-180' : ''}`} />
                 </button>
 
+                {/* Popover Menu with Ultra-High z-index to Float Over Map */}
                 {isHarborOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-[#020b17] border border-emerald-500/60 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-[9999] overflow-hidden animate-fadeIn ring-2 ring-emerald-500/30">
+                  <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-[#020b17] border-2 border-emerald-500/80 rounded-2xl shadow-[0_30px_70px_rgba(0,0,0,1)] z-[99999] overflow-hidden animate-fadeIn ring-2 ring-emerald-500/40">
                     <div className="px-4 py-2.5 text-[10px] font-mono font-bold uppercase text-emerald-400 bg-[#01060e] border-b border-white/10 tracking-wider flex items-center gap-1.5">
                       <Anchor className="w-3.5 h-3.5" /> Select Coastal Harbor
                     </div>
@@ -356,7 +358,7 @@ export default function Navbar({
                 </button>
 
                 {isLangOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-52 sm:w-60 bg-[#020b17] border border-cyan-500/60 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-[9999] overflow-hidden animate-fadeIn ring-2 ring-cyan-500/30">
+                  <div className="absolute right-0 top-full mt-2 w-52 sm:w-60 bg-[#020b17] border-2 border-cyan-500/80 rounded-2xl shadow-[0_30px_70px_rgba(0,0,0,1)] z-[99999] overflow-hidden animate-fadeIn ring-2 ring-cyan-500/40">
                     <div className="px-4 py-2.5 text-[10px] font-mono font-bold uppercase text-cyan-400 bg-[#01060e] border-b border-white/10 tracking-wider flex items-center gap-1.5">
                       <Globe2 className="w-3.5 h-3.5" /> Regional Language
                     </div>

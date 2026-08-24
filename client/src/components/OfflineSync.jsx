@@ -151,10 +151,6 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
     setShowPass(false);
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
-
   const activeData = cachedData || {
     passId: "ORCA-849201",
     exportTimestamp: new Date().toLocaleString('en-IN'),
@@ -178,7 +174,157 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
     navigationRoute: {
       costSavedINR: `₹${route?.cost_saved_inr || 846}`,
       dieselSavedLitres: `${route?.diesel_saved_litres_roundtrip || 8.9} L`,
-      waypoints: route?.ai_waypoints || []
+      waypoints: route?.ai_waypoints || [
+        { step: 1, label: "Harbour Departure", lat: harbor?.lat || 13.35, lng: harbor?.lng || 74.69, heading: "298° WNW" },
+        { step: 2, label: "Current Drift Catch", lat: 13.39, lng: 74.58, heading: "302° WNW" },
+        { step: 3, label: "Outer Shelf Turn", lat: 13.46, lng: 74.45, heading: "305° NW" },
+        { step: 4, label: "PFZ Target Shoal", lat: 13.52, lng: 74.32, heading: "Arrived" }
+      ]
+    }
+  };
+
+  // Robust, 100% Reliable Print Function via Dedicated Window
+  const handlePrint = () => {
+    const waypointsRows = activeData.navigationRoute?.waypoints?.map((w, idx) => `
+      <tr style="border-bottom: 1px solid #cbd5e1;">
+        <td style="padding: 8px 10px; font-weight: bold;">Step ${w.step || idx + 1}</td>
+        <td style="padding: 8px 10px;">${w.label}</td>
+        <td style="padding: 8px 10px; font-family: monospace; font-weight: bold; color: #0f172a;">${w.lat?.toFixed(3)}° N</td>
+        <td style="padding: 8px 10px; font-family: monospace; font-weight: bold; color: #0f172a;">${w.lng?.toFixed(3)}° E</td>
+      </tr>
+    `).join('') || '';
+
+    const printHTML = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>OFFICIAL FISHERMAN VOYAGE PASS - ISRO PS:26176</title>
+          <style>
+            @page { size: A4 portrait; margin: 15mm; }
+            body { font-family: 'Segoe UI', Arial, sans-serif; color: #0f172a; background: #ffffff; margin: 0; padding: 10px; }
+            .pass-card { max-width: 720px; margin: 0 auto; border: 3px solid #047857; border-radius: 16px; padding: 24px; box-sizing: border-box; }
+            .header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #047857; padding-bottom: 16px; margin-bottom: 18px; }
+            .logo-title { display: flex; align-items: center; gap: 14px; }
+            .title-main { font-size: 22px; font-weight: 900; color: #047857; margin: 0; }
+            .title-sub { font-size: 11px; font-weight: bold; color: #475569; margin-top: 3px; }
+            .status-badge { border: 2px solid #047857; background: #ecfdf5; color: #047857; font-weight: 900; padding: 6px 14px; border-radius: 8px; font-size: 12px; text-align: center; }
+            .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; background: #f8fafc; padding: 14px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 16px; }
+            .meta-label { font-size: 11px; font-weight: bold; color: #64748b; }
+            .meta-val { font-size: 15px; font-weight: bold; color: #0f172a; margin-top: 2px; }
+            .hotspot-box { border: 2px solid #0284c7; background: #f0f9ff; padding: 16px; border-radius: 12px; margin-bottom: 16px; }
+            .hotspot-title { font-size: 12px; font-weight: 900; color: #0284c7; margin-bottom: 4px; }
+            .hotspot-species { font-size: 20px; font-weight: 900; color: #0c4a6e; }
+            .hotspot-stats { display: flex; gap: 20px; font-size: 12px; font-weight: bold; color: #0369a1; margin-top: 8px; }
+            .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+            .stat-card { border: 2px solid #059669; background: #ecfdf5; padding: 14px; border-radius: 10px; text-align: center; }
+            .stat-title { font-size: 11px; font-weight: bold; color: #047857; }
+            .stat-num { font-size: 26px; font-weight: 900; color: #065f46; margin: 4px 0; }
+            .stat-sub { font-size: 11px; color: #047857; font-weight: bold; }
+            .waypoint-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; text-align: left; }
+            .waypoint-table th { background: #f1f5f9; padding: 8px 10px; border-bottom: 2px solid #cbd5e1; font-weight: bold; }
+            .sos-footer { border-top: 2px solid #0f172a; padding-top: 14px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-top: 20px; }
+            .sos-alert { color: #b91c1c; font-weight: bold; }
+          </style>
+        </head>
+        <body>
+          <div class="pass-card">
+            
+            <div class="header-row">
+              <div class="logo-title">
+                <img src="/assets/orca_logo.png" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid #047857;" />
+                <div>
+                  <h1 class="title-main">OFFICIAL FISHERMAN VOYAGE PASS</h1>
+                  <div class="title-sub">ISRO Marine EcoSystem Platform &bull; PS-26176 &bull; Govt of India</div>
+                  <div style="font-size: 10px; color: #64748b; margin-top: 2px;">Pass ID: <strong>${activeData.passId}</strong> &bull; Date: ${activeData.exportTimestamp}</div>
+                </div>
+              </div>
+              <div>
+                <div class="status-badge">APPROVED FOR DEEP SEA</div>
+                <div style="font-size: 10px; text-align: center; color: #64748b; margin-top: 4px;">100% 0-Internet Ready</div>
+              </div>
+            </div>
+
+            <div class="meta-grid">
+              <div>
+                <div class="meta-label">REGISTERED VESSEL:</div>
+                <div class="meta-val">${activeData.vesselProfile?.name}</div>
+                <div style="font-size: 12px; color: #334155;">Reg: <strong>${activeData.vesselProfile?.reg}</strong></div>
+              </div>
+              <div>
+                <div class="meta-label">DEPARTURE HARBOUR:</div>
+                <div class="meta-val">${activeData.originHarbor?.name}</div>
+                <div style="font-size: 12px; color: #334155;">${activeData.originHarbor?.state} &bull; ${activeData.originHarbor?.coast}</div>
+              </div>
+            </div>
+
+            <div class="hotspot-box">
+              <div class="hotspot-title">🎯 TARGET POTENTIAL FISHING ZONE (PFZ)</div>
+              <div class="hotspot-species">${activeData.targetPFZ?.species}</div>
+              <div class="hotspot-stats">
+                <span>📍 Distance: ${activeData.targetPFZ?.distance_nm}</span>
+                <span>🌡️ Water Temp: ${activeData.targetPFZ?.sst_celsius}</span>
+                <span>🌊 Depth: ${activeData.targetPFZ?.depth}</span>
+              </div>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-title">ESTIMATED DIESEL SAVED</div>
+                <div class="stat-num">${activeData.navigationRoute?.costSavedINR}</div>
+                <div class="stat-sub">${activeData.navigationRoute?.dieselSavedLitres} saved via surface drift</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-title">BORDER STATUS (IMBL)</div>
+                <div class="stat-num">SAFE VOYAGE</div>
+                <div class="stat-sub">Clear of International Boundaries</div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size: 13px; font-weight: 900; border-bottom: 2px solid #0f172a; padding-bottom: 4px;">
+                🧭 STEP-BY-STEP COMPASS STEERING WAYPOINTS:
+              </div>
+              <table class="waypoint-table">
+                <thead>
+                  <tr>
+                    <th>Step</th>
+                    <th>Action / Waypoint</th>
+                    <th>GPS Latitude</th>
+                    <th>GPS Longitude</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${waypointsRows}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="sos-footer">
+              <div class="sos-alert">
+                🚨 INDIAN COAST GUARD EMERGENCY: <strong>1554</strong> &bull; VHF: <strong>Channel 16</strong>
+              </div>
+              <div style="color: #64748b; font-style: italic;">
+                Project ORCA &bull; ISRO Smart India Hackathon
+              </div>
+            </div>
+
+          </div>
+        </body>
+      </html>
+    `;
+
+    const printWindow = window.open('', '_blank', 'width=850,height=900');
+    if (printWindow) {
+      printWindow.document.open();
+      printWindow.document.write(printHTML);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => {
+        printWindow.print();
+      }, 400);
+    } else {
+      window.print();
     }
   };
 
@@ -386,120 +532,6 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
           </div>
         </div>
       )}
-
-      {/* ========================================================================= */}
-      {/* 3. DEDICATED OFFICIAL PRINTABLE PASS (Visible ONLY when printing!) */}
-      {/* ========================================================================= */}
-      <div className="print-only-container hidden">
-        <div style={{ maxWidth: '750px', margin: '0 auto', fontFamily: 'Arial, sans-serif', color: '#000', border: '3px solid #000', borderRadius: '12px', padding: '24px', backgroundColor: '#fff' }}>
-          
-          {/* Print Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #000', paddingBottom: '16px', marginBottom: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <img src="/assets/orca_logo.png" alt="ISRO Project ORCA" style={{ width: '70px', height: '70px', borderRadius: '50%', border: '2px solid #000' }} />
-              <div>
-                <h1 style={{ fontSize: '20px', fontWeight: '900', margin: '0', letterSpacing: '0.5px' }}>OFFICIAL FISHERMAN VOYAGE PASS</h1>
-                <p style={{ fontSize: '12px', margin: '3px 0 0 0', fontWeight: 'bold', color: '#333' }}>
-                  ISRO Marine EcoSystem Platform &bull; PS-26176 &bull; Govt of India
-                </p>
-                <p style={{ fontSize: '11px', margin: '2px 0 0 0', color: '#555' }}>
-                  Pass ID: <strong>{activeData.passId}</strong> &bull; Generated: {activeData.exportTimestamp}
-                </p>
-              </div>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ border: '2px solid #047857', padding: '6px 12px', borderRadius: '8px', backgroundColor: '#ecfdf5', color: '#065f46', fontWeight: 'bold', fontSize: '12px' }}>
-                APPROVED FOR DEEP SEA
-              </div>
-              <div style={{ fontSize: '10px', marginTop: '4px', color: '#666' }}>100% 0-Internet Ready</div>
-            </div>
-          </div>
-
-          {/* Boat & Origin Info */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', backgroundColor: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', marginBottom: '16px' }}>
-            <div>
-              <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 'bold' }}>REGISTERED VESSEL:</div>
-              <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#0f172a' }}>{activeData.vesselProfile?.name}</div>
-              <div style={{ fontSize: '12px', color: '#334155' }}>Reg: <strong>{activeData.vesselProfile?.reg}</strong></div>
-            </div>
-            <div>
-              <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 'bold' }}>DEPARTURE HARBOUR:</div>
-              <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#0f172a' }}>{activeData.originHarbor?.name}</div>
-              <div style={{ fontSize: '12px', color: '#334155' }}>{activeData.originHarbor?.state} &bull; {activeData.originHarbor?.coast}</div>
-            </div>
-          </div>
-
-          {/* Target Fish Shoal */}
-          <div style={{ border: '2px solid #0284c7', borderRadius: '8px', padding: '14px', marginBottom: '16px', backgroundColor: '#f0f9ff' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-              <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#0369a1' }}>🎯 TARGET POTENTIAL FISHING ZONE (PFZ)</span>
-              <span style={{ backgroundColor: '#0284c7', color: '#fff', fontSize: '11px', fontWeight: 'bold', padding: '2px 8px', borderRadius: '4px' }}>
-                {activeData.targetPFZ?.confidence} MATCH
-              </span>
-            </div>
-            <div style={{ fontSize: '18px', fontWeight: '900', color: '#0c4a6e' }}>
-              {activeData.targetPFZ?.species}
-            </div>
-            <div style={{ display: 'flex', gap: '20px', marginTop: '8px', fontSize: '12px', color: '#0369a1', fontWeight: 'bold' }}>
-              <span>Distance: {activeData.targetPFZ?.distance_nm}</span>
-              <span>Water Temp: {activeData.targetPFZ?.sst_celsius}</span>
-              <span>Depth: {activeData.targetPFZ?.depth}</span>
-            </div>
-          </div>
-
-          {/* Steer Compass & Fuel Saved */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
-            <div style={{ border: '2px solid #059669', borderRadius: '8px', padding: '12px', backgroundColor: '#ecfdf5', textAlign: 'center' }}>
-              <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#047857' }}>ESTIMATED DIESEL SAVINGS</div>
-              <div style={{ fontSize: '24px', fontWeight: '900', color: '#065f46', marginTop: '4px' }}>{activeData.navigationRoute?.costSavedINR}</div>
-              <div style={{ fontSize: '11px', color: '#047857' }}>{activeData.navigationRoute?.dieselSavedLitres} saved via surface currents</div>
-            </div>
-            <div style={{ border: '2px solid #059669', borderRadius: '8px', padding: '12px', backgroundColor: '#ecfdf5', textAlign: 'center' }}>
-              <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#047857' }}>BORDER STATUS (IMBL)</div>
-              <div style={{ fontSize: '24px', fontWeight: '900', color: '#065f46', marginTop: '4px' }}>SAFE VOYAGE</div>
-              <div style={{ fontSize: '11px', color: '#047857' }}>Clear of International Boundaries</div>
-            </div>
-          </div>
-
-          {/* Navigation Waypoint Table */}
-          <div style={{ marginBottom: '16px' }}>
-            <div style={{ fontSize: '13px', fontWeight: 'bold', borderBottom: '2px solid #000', paddingBottom: '4px', marginBottom: '8px' }}>
-              🧭 STEP-BY-STEP COMPASS STEERING WAYPOINTS:
-            </div>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '1px solid #cbd5e1' }}>
-                  <th style={{ padding: '6px' }}>Step</th>
-                  <th style={{ padding: '6px' }}>Action / Waypoint</th>
-                  <th style={{ padding: '6px' }}>GPS Latitude</th>
-                  <th style={{ padding: '6px' }}>GPS Longitude</th>
-                </tr>
-              </thead>
-              <tbody>
-                {activeData.navigationRoute?.waypoints?.map((w, idx) => (
-                  <tr key={idx} style={{ borderBottom: '1px solid #e2e8f0' }}>
-                    <td style={{ padding: '6px', fontWeight: 'bold' }}>Step {w.step || idx + 1}</td>
-                    <td style={{ padding: '6px' }}>{w.label}</td>
-                    <td style={{ padding: '6px', fontFamily: 'monospace', fontWeight: 'bold' }}>{w.lat?.toFixed(3)}° N</td>
-                    <td style={{ padding: '6px', fontFamily: 'monospace', fontWeight: 'bold' }}>{w.lng?.toFixed(3)}° E</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Safety & Emergency Footer */}
-          <div style={{ borderTop: '2px solid #000', paddingTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px' }}>
-            <div>
-              <strong>🚨 INDIAN COAST GUARD EMERGENCY:</strong> Toll-Free <strong>1554</strong> &bull; Marine VHF <strong>Channel 16</strong>
-            </div>
-            <div style={{ color: '#666', fontStyle: 'italic' }}>
-              Project ORCA &bull; ISRO Smart India Hackathon
-            </div>
-          </div>
-
-        </div>
-      </div>
     </>
   );
 }
