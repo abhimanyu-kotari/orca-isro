@@ -5,7 +5,6 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
   const [input, setInput] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  // Default closed on mobile so messages have 100% full screen space
   const [showAgentsTrace, setShowAgentsTrace] = useState(false);
   const messagesEndRef = useRef(null);
 
@@ -164,28 +163,28 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
   };
 
   return (
-    <div className="glass-panel rounded-2xl sm:rounded-3xl flex flex-col h-[calc(100dvh-170px)] sm:h-[550px] lg:h-[610px] shadow-2xl overflow-hidden w-full border-2 border-white/15">
+    <div className="glass-panel rounded-2xl sm:rounded-3xl flex flex-col h-[calc(100dvh-235px)] sm:h-[550px] lg:h-[610px] shadow-2xl overflow-hidden w-full border-2 border-white/15">
       
-      {/* Header */}
-      <div className="bg-[#020b17]/90 border-b border-white/10 p-3 sm:p-4 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-2.5">
+      {/* Header (Pinned Top) */}
+      <div className="bg-[#020b17]/95 border-b border-white/10 p-2.5 sm:p-4 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-2">
           <img 
             src="/assets/orca_logo.png" 
             alt="Project ORCA Logo" 
-            className="w-9 h-9 rounded-full object-cover border border-emerald-400/60 shadow-[0_0_15px_rgba(0,245,160,0.4)]"
+            className="w-8 h-8 rounded-full object-cover border border-emerald-400/60 shadow-[0_0_15px_rgba(0,245,160,0.4)]"
           />
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <h2 className="text-xs font-black text-white tracking-wider uppercase">ORCA AI Co-Pilot</h2>
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
             </div>
-            <p className="text-[10px] text-emerald-400 font-mono">4 Collaborative Agents Active</p>
+            <p className="text-[9px] sm:text-[10px] text-emerald-400 font-mono">4 Collaborative Agents Active</p>
           </div>
         </div>
 
         <button
           onClick={() => setShowAgentsTrace(!showAgentsTrace)}
-          className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-300 hover:text-white transition bg-white/[0.06] hover:bg-white/[0.12] px-2.5 py-1.5 rounded-xl border border-white/10 font-mono"
+          className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-300 hover:text-white transition bg-white/[0.06] hover:bg-white/[0.12] px-2.5 py-1 rounded-xl border border-white/10 font-mono"
         >
           <Cpu className="w-3.5 h-3.5 text-cyan-400" />
           <span>Agents</span>
@@ -193,32 +192,32 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
         </button>
       </div>
 
-      {/* Subagents Activity Drawer (Collapsible) */}
+      {/* Subagents Activity Drawer */}
       {showAgentsTrace && collaboratingAgents && (
-        <div className="bg-slate-950/80 border-b border-white/[0.08] p-2.5 grid grid-cols-2 gap-2 text-[10px] font-mono animate-fadeIn shrink-0">
+        <div className="bg-slate-950/90 border-b border-white/[0.08] p-2 grid grid-cols-2 gap-1.5 text-[9px] font-mono animate-fadeIn shrink-0">
           {collaboratingAgents.map((ag, i) => (
-            <div key={i} className="bg-white/[0.04] border border-white/[0.08] px-2.5 py-1.5 rounded-xl flex items-center justify-between shadow-sm">
-              <span className="text-emerald-400 font-bold truncate max-w-[100px]">
+            <div key={i} className="bg-white/[0.04] border border-white/[0.08] px-2 py-1 rounded-lg flex items-center justify-between shadow-sm">
+              <span className="text-emerald-400 font-bold truncate max-w-[90px]">
                 {ag.name.includes('Ocean') ? '🐟 Matsya' : ag.name.includes('Weather') ? '🌊 Vayu' : ag.name.includes('Routing') ? '🧭 Setu' : '🪸 Raksha'}:
               </span>
-              <span className="text-slate-300 truncate max-w-[120px]">{ag.summary}</span>
+              <span className="text-slate-300 truncate max-w-[100px]">{ag.summary}</span>
             </div>
           ))}
         </div>
       )}
 
-      {/* Full-Height Messages Thread */}
-      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3.5">
+      {/* Scrollable Messages Thread (flex-1 min-h-0 ensures it shrinks so input is NEVER pushed off-screen!) */}
+      <div className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-4 space-y-3">
         {messages.map((m, idx) => (
           <div
             key={idx}
-            className={`flex items-start gap-2.5 ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`flex items-start gap-2 ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {m.sender === 'agent' && (
               <img 
                 src="/assets/orca_logo.png" 
                 alt="ORCA Assistant" 
-                className="w-7 h-7 rounded-full object-cover border border-emerald-500/50 shadow shrink-0 mt-0.5"
+                className="w-6 h-6 rounded-full object-cover border border-emerald-500/50 shadow shrink-0 mt-0.5"
               />
             )}
             
@@ -251,7 +250,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
             </div>
 
             {m.sender === 'user' && (
-              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-slate-950 font-black text-xs shrink-0 mt-0.5 shadow">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-slate-950 font-black text-xs shrink-0 mt-0.5 shadow">
                 👤
               </div>
             )}
@@ -259,7 +258,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
         ))}
 
         {isProcessing && (
-          <div className="flex items-center gap-2 text-xs text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 p-2.5 rounded-2xl w-fit font-mono shadow">
+          <div className="flex items-center gap-2 text-xs text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 p-2 rounded-2xl w-fit font-mono shadow">
             <span className="animate-spin text-sm">🌊</span>
             <span>Reasoning over satellite telemetry...</span>
           </div>
@@ -268,21 +267,21 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Suggested Quick Query Chips */}
-      <div className="px-3 py-2 bg-black/40 border-t border-white/[0.08] flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
+      {/* Suggested Quick Query Chips (Pinned above input) */}
+      <div className="px-3 py-1.5 bg-black/60 border-t border-white/[0.08] flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
         {suggestedQueries.map((s, i) => (
           <button
             key={i}
             onClick={() => onSendMessage(s.query)}
-            className="shrink-0 text-[10px] sm:text-[11px] font-semibold bg-white/[0.05] hover:bg-white/[0.12] text-slate-200 hover:text-emerald-400 px-3 py-1 rounded-full border border-white/[0.1] transition shadow-sm"
+            className="shrink-0 text-[10px] font-semibold bg-white/[0.06] hover:bg-white/[0.12] text-slate-200 hover:text-emerald-400 px-3 py-1 rounded-full border border-white/[0.1] transition shadow-sm whitespace-nowrap"
           >
             {s.label}
           </button>
         ))}
       </div>
 
-      {/* Input Box with Microphone */}
-      <form onSubmit={handleSend} className="p-2.5 sm:p-3 bg-[#020b17] border-t border-white/10 flex items-center gap-2 shrink-0">
+      {/* Input Box with Microphone (100% Pinned & Visible at the Bottom) */}
+      <form onSubmit={handleSend} className="p-2 sm:p-3 bg-[#020b17] border-t border-white/15 flex items-center gap-2 shrink-0">
         <button
           type="button"
           onClick={toggleListening}
@@ -300,8 +299,8 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={`Ask ORCA in Kannada, Tamil, Hindi, or English...`}
-          className="flex-1 bg-white/[0.05] border border-white/15 rounded-2xl px-3.5 py-2.5 text-xs text-white placeholder-slate-400 outline-none focus:border-emerald-400 font-medium transition shadow-inner"
+          placeholder={`Ask ORCA in Kannada, Tamil, Hindi...`}
+          className="flex-1 bg-white/[0.05] border border-white/15 rounded-2xl px-3.5 py-2 text-xs text-white placeholder-slate-400 outline-none focus:border-emerald-400 font-medium transition shadow-inner"
         />
 
         <button
