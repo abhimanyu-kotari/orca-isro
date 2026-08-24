@@ -79,19 +79,20 @@ export default function Navbar({
 
   return (
     <header className="sticky top-2 sm:top-3 z-50 px-2 sm:px-6">
-      <div className="max-w-7xl mx-auto rounded-2xl sm:rounded-3xl p-3 sm:p-5 shadow-[0_20px_50px_rgba(0,0,0,0.85)] border border-white/20 relative flex flex-col justify-between">
+      <div className="max-w-7xl mx-auto rounded-2xl sm:rounded-3xl p-3 sm:p-5 shadow-[0_25px_60px_rgba(0,0,0,0.95)] border-2 border-white/20 relative flex flex-col justify-between overflow-hidden">
         
-        {/* Dedicated Background Layer */}
+        {/* Master Panoramic Background Layer with High-Contrast Vignette */}
         <div 
           className="absolute inset-0 rounded-2xl sm:rounded-3xl overflow-hidden pointer-events-none z-0"
           style={{
-            backgroundImage: "linear-gradient(90deg, rgba(2, 7, 18, 0.96) 0%, rgba(2, 7, 18, 0.82) 42%, rgba(2, 7, 18, 0.35) 75%, rgba(2, 7, 18, 0.15) 100%), url('/assets/marine_hero.png')",
+            backgroundImage: "linear-gradient(90deg, rgba(2, 8, 20, 0.98) 0%, rgba(2, 8, 20, 0.88) 40%, rgba(2, 8, 20, 0.45) 75%, rgba(2, 8, 20, 0.15) 100%), url('/assets/marine_hero.png')",
             backgroundSize: "cover",
-            backgroundPosition: "center 48%",
+            backgroundPosition: "right 28%",
             backgroundRepeat: "no-repeat"
           }}
         >
-          <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-amber-500/10 via-transparent to-transparent pointer-events-none"></div>
+          {/* Subtle bottom shadow overlay to guarantee 100% text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#020712]/90 via-transparent to-black/30 pointer-events-none"></div>
         </div>
 
         {/* ========================================================================= */}
@@ -107,25 +108,25 @@ export default function Navbar({
               <img 
                 src="/assets/orca_logo.png" 
                 alt="Project ORCA Logo" 
-                className="w-9 h-9 rounded-full object-cover border border-emerald-400/50 shadow-[0_0_15px_rgba(0,245,160,0.4)]"
+                className="w-9 h-9 rounded-full object-cover border-2 border-emerald-400 shadow-[0_0_15px_rgba(0,245,160,0.5)]"
               />
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-black text-white tracking-tight">ORCA</span>
-                  <span className="text-[8px] font-extrabold px-1.5 py-0.5 rounded-full bg-emerald-500/25 text-emerald-300 border border-emerald-400/40">
+                  <span className="text-xs font-black text-white tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,1)]">ORCA</span>
+                  <span className="text-[8px] font-extrabold px-1.5 py-0.5 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-400/60 shadow">
                     ISRO
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Right: 3 Action Pills */}
+            {/* Right: 3 Action Pills with High-Contrast Obsidian Background */}
             <div className="flex items-center gap-1.5 shrink-0">
               
               {/* Vessel Pill */}
               <button
                 onClick={onOpenVesselModal}
-                className="flex items-center gap-1 bg-[#020a14] border border-emerald-500/40 active:scale-95 px-2 py-1.5 rounded-xl text-[10px] text-emerald-300 font-bold shadow"
+                className="flex items-center gap-1 bg-[#020b17]/95 border border-emerald-500/50 active:scale-95 px-2.5 py-1.5 rounded-xl text-[10px] text-emerald-300 font-black shadow-lg backdrop-blur-md"
               >
                 <span>⛵</span>
                 <span className="truncate max-w-[62px]">{currentVessel.short_name.split(' ')[0]}</span>
@@ -139,16 +140,15 @@ export default function Navbar({
                     setIsHarborOpen(!isHarborOpen);
                     setIsLangOpen(false);
                   }}
-                  className="flex items-center gap-1 bg-[#020a14] border border-white/20 active:scale-95 px-2 py-1.5 rounded-xl text-[10px] text-slate-100 font-bold shadow"
+                  className="flex items-center gap-1 bg-[#020b17]/95 border border-white/25 active:scale-95 px-2.5 py-1.5 rounded-xl text-[10px] text-slate-100 font-bold shadow-lg backdrop-blur-md"
                 >
                   <Anchor className="w-3 h-3 text-emerald-400" />
                   <span className="truncate max-w-[65px]">{currentHarbor.name.split(' ')[0]}</span>
                   <ChevronDown className="w-2.5 h-2.5 text-slate-400" />
                 </button>
 
-                {/* Mobile Harbor Popover with direct click & touch handlers */}
                 {isHarborOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-64 bg-[#020b17] border border-emerald-500/50 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-[9999] overflow-hidden animate-fadeIn ring-1 ring-emerald-500/30">
+                  <div className="absolute right-0 top-full mt-2 w-64 bg-[#020b17] border border-emerald-500/60 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-[9999] overflow-hidden animate-fadeIn ring-2 ring-emerald-500/30">
                     <div className="px-3 py-2 text-[9px] font-mono font-bold uppercase text-emerald-400 bg-[#01060e] border-b border-white/10 tracking-wider flex items-center gap-1">
                       <Anchor className="w-3 h-3" /> Select Coastal Port
                     </div>
@@ -187,16 +187,15 @@ export default function Navbar({
                     setIsLangOpen(!isLangOpen);
                     setIsHarborOpen(false);
                   }}
-                  className="flex items-center gap-1 bg-[#020a14] border border-white/20 active:scale-95 px-2 py-1.5 rounded-xl text-[10px] text-cyan-300 font-bold shadow"
+                  className="flex items-center gap-1 bg-[#020b17]/95 border border-white/25 active:scale-95 px-2.5 py-1.5 rounded-xl text-[10px] text-cyan-300 font-bold shadow-lg backdrop-blur-md"
                 >
                   <Globe2 className="w-3 h-3 text-cyan-400" />
                   <span>{currentLang.code.toUpperCase()}</span>
                   <ChevronDown className="w-2.5 h-2.5 text-slate-400" />
                 </button>
 
-                {/* Mobile Language Popover with direct click & touch handlers */}
                 {isLangOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-52 bg-[#020b17] border border-cyan-500/50 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-[9999] overflow-hidden animate-fadeIn ring-1 ring-cyan-500/30">
+                  <div className="absolute right-0 top-full mt-2 w-52 bg-[#020b17] border border-cyan-500/60 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-[9999] overflow-hidden animate-fadeIn ring-2 ring-cyan-500/30">
                     <div className="px-3 py-2 text-[9px] font-mono font-bold uppercase text-cyan-400 bg-[#01060e] border-b border-white/10 tracking-wider">
                       Select Language
                     </div>
@@ -229,9 +228,9 @@ export default function Navbar({
           </div>
 
           {/* Mini Context Strip on Mobile */}
-          <div className="flex items-center justify-between text-[10px] text-slate-300 font-mono pt-1.5 border-t border-white/10">
-            <span className="text-emerald-400 font-bold truncate">⚓ {currentHarbor.name.split('(')[0]}</span>
-            <span className="text-slate-400 truncate">{currentHarbor.coast}</span>
+          <div className="flex items-center justify-between text-[10px] text-slate-300 font-mono pt-1.5 border-t border-white/15">
+            <span className="text-emerald-400 font-bold truncate drop-shadow">⚓ {currentHarbor.name.split('(')[0]}</span>
+            <span className="text-slate-300 truncate drop-shadow">{currentHarbor.coast}</span>
           </div>
 
         </div>
@@ -244,22 +243,22 @@ export default function Navbar({
           <div className="relative flex items-center justify-between gap-3 z-40 w-full">
             
             {/* Official Circular Emblem Logo & Brand */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3.5">
               <img 
                 src="/assets/orca_logo.png" 
                 alt="Project ORCA Official Emblem" 
-                className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-emerald-400 shadow-[0_0_25px_rgba(0,245,160,0.5)] shrink-0 transform transition hover:scale-105"
+                className="w-13 h-13 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-emerald-400 shadow-[0_0_25px_rgba(0,245,160,0.5)] shrink-0 transform transition hover:scale-105"
               />
               <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-base sm:text-xl font-black tracking-tight text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+                <div className="flex items-center gap-2.5">
+                  <h1 className="text-base sm:text-xl font-black tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,1)]">
                     PROJECT ORCA
                   </h1>
-                  <span className="px-2 py-0.5 text-[9px] sm:text-[10px] font-extrabold tracking-wider uppercase rounded-full bg-emerald-500/25 text-emerald-300 border border-emerald-400/50 shadow-md backdrop-blur-md">
+                  <span className="px-2.5 py-0.5 text-[9px] sm:text-[10px] font-black tracking-wider uppercase rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-400/60 shadow-lg backdrop-blur-md">
                     ISRO PS-26176
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-200 font-medium flex items-center gap-1.5 mt-0.5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                <p className="text-[11px] text-slate-200 font-semibold flex items-center gap-1.5 mt-0.5 drop-shadow-[0_2px_8px_rgba(0,0,0,1)]">
                   <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
                   <span>Marine EcoSystem Reasoning with Collaborative Agents</span>
                 </p>
@@ -272,7 +271,7 @@ export default function Navbar({
               {/* Vessel Profile */}
               <button
                 onClick={onOpenVesselModal}
-                className="flex items-center gap-2 bg-[#020a14] hover:bg-[#04152a] border border-emerald-500/40 active:scale-95 rounded-2xl px-3 py-2 text-xs text-slate-100 transition shadow-xl group"
+                className="flex items-center gap-2 bg-[#020b17]/95 hover:bg-[#04152a] border border-emerald-500/50 active:scale-95 rounded-2xl px-3.5 py-2.5 text-xs text-slate-100 transition shadow-[0_10px_25px_rgba(0,0,0,0.8)] backdrop-blur-md group"
               >
                 <span className="text-base">⛵</span>
                 <div className="text-left">
@@ -291,11 +290,11 @@ export default function Navbar({
                     setIsHarborOpen(!isHarborOpen);
                     setIsLangOpen(false);
                   }}
-                  className="flex items-center justify-between gap-2 bg-[#020a14] hover:bg-[#041224] border border-white/20 active:scale-95 rounded-2xl px-3.5 py-2.5 text-xs text-slate-100 transition shadow-2xl"
+                  className="flex items-center justify-between gap-2 bg-[#020b17]/95 hover:bg-[#041224] border border-white/25 active:scale-95 rounded-2xl px-4 py-2.5 text-xs text-slate-100 transition shadow-[0_10px_25px_rgba(0,0,0,0.8)] backdrop-blur-md"
                 >
                   <div className="flex items-center gap-2 truncate">
-                    <Anchor className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span className="font-bold truncate max-w-[140px] text-white">
+                    <Anchor className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span className="font-black truncate max-w-[140px] text-white">
                       {currentHarbor?.name?.split('(')[0]?.trim() || 'Port'}
                     </span>
                   </div>
@@ -303,7 +302,7 @@ export default function Navbar({
                 </button>
 
                 {isHarborOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-[#020b17] border border-emerald-500/40 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-[9999] overflow-hidden animate-fadeIn ring-1 ring-emerald-500/20">
+                  <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-[#020b17] border border-emerald-500/60 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-[9999] overflow-hidden animate-fadeIn ring-2 ring-emerald-500/30">
                     <div className="px-4 py-2.5 text-[10px] font-mono font-bold uppercase text-emerald-400 bg-[#01060e] border-b border-white/10 tracking-wider flex items-center gap-1.5">
                       <Anchor className="w-3.5 h-3.5" /> Select Coastal Harbor
                     </div>
@@ -347,17 +346,17 @@ export default function Navbar({
                     setIsLangOpen(!isLangOpen);
                     setIsHarborOpen(false);
                   }}
-                  className="flex items-center justify-between gap-2 bg-[#020a14] hover:bg-[#041224] border border-white/20 active:scale-95 rounded-2xl px-3.5 py-2.5 text-xs text-slate-100 transition shadow-2xl"
+                  className="flex items-center justify-between gap-2 bg-[#020b17]/95 hover:bg-[#041224] border border-white/25 active:scale-95 rounded-2xl px-4 py-2.5 text-xs text-slate-100 transition shadow-[0_10px_25px_rgba(0,0,0,0.8)] backdrop-blur-md"
                 >
                   <div className="flex items-center gap-1.5">
-                    <Globe2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                    <span className="font-bold text-white">{currentLang.label.split(' ')[0]}</span>
+                    <Globe2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                    <span className="font-black text-white">{currentLang.label.split(' ')[0]}</span>
                   </div>
                   <ChevronDown className={`w-3.5 h-3.5 text-slate-300 transition-transform duration-200 shrink-0 ${isLangOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {isLangOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-52 sm:w-60 bg-[#020b17] border border-cyan-500/40 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-[9999] overflow-hidden animate-fadeIn ring-1 ring-cyan-500/20">
+                  <div className="absolute right-0 top-full mt-2 w-52 sm:w-60 bg-[#020b17] border border-cyan-500/60 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,1)] z-[9999] overflow-hidden animate-fadeIn ring-2 ring-cyan-500/30">
                     <div className="px-4 py-2.5 text-[10px] font-mono font-bold uppercase text-cyan-400 bg-[#01060e] border-b border-white/10 tracking-wider flex items-center gap-1.5">
                       <Globe2 className="w-3.5 h-3.5" /> Regional Language
                     </div>
@@ -386,12 +385,12 @@ export default function Navbar({
               </div>
 
               {/* Desktop Live Status */}
-              <div className={`hidden lg:flex items-center gap-2 px-3.5 py-2 rounded-2xl border text-xs font-bold shadow-xl backdrop-blur-xl ${
+              <div className={`hidden lg:flex items-center gap-2 px-3.5 py-2.5 rounded-2xl border text-xs font-black shadow-xl backdrop-blur-xl ${
                 isOffline 
-                  ? 'bg-amber-500/25 text-amber-300 border-amber-500/50'
-                  : 'bg-emerald-500/25 text-emerald-300 border-emerald-400/50 shadow-[0_0_20px_rgba(0,245,160,0.3)]'
+                  ? 'bg-amber-500/30 text-amber-300 border-amber-500/60'
+                  : 'bg-emerald-500/30 text-emerald-300 border-emerald-400/60 shadow-[0_0_25px_rgba(0,245,160,0.35)]'
               }`}>
-                <span className={`w-2 h-2 rounded-full ${isOffline ? 'bg-amber-400 animate-ping' : 'bg-emerald-400 animate-pulse'}`}></span>
+                <span className={`w-2.5 h-2.5 rounded-full ${isOffline ? 'bg-amber-400 animate-ping' : 'bg-emerald-400 animate-pulse'}`}></span>
                 <span className="tracking-wide">Live Feed</span>
               </div>
 
@@ -400,15 +399,15 @@ export default function Navbar({
           </div>
 
           {/* Desktop Bottom Context Banner */}
-          <div className="relative mt-2.5 pt-2.5 border-t border-white/10 flex items-center justify-between text-[11px] font-mono z-0">
-            <div className="flex items-center gap-3 text-slate-300">
-              <span className="text-emerald-400 font-bold">⚓ {currentHarbor.name.split('(')[0].trim()}</span>
+          <div className="relative mt-2.5 pt-2.5 border-t border-white/15 flex items-center justify-between text-[11px] font-mono z-0">
+            <div className="flex items-center gap-3 text-slate-200 drop-shadow-[0_1px_4px_rgba(0,0,0,1)]">
+              <span className="text-emerald-400 font-black">⚓ {currentHarbor.name.split('(')[0].trim()}</span>
               <span>&bull;</span>
-              <span>{currentHarbor.coast}</span>
+              <span className="font-semibold">{currentHarbor.coast}</span>
               <span>&bull;</span>
-              <span className="text-cyan-300">⛵ {currentVessel.name} ({currentVessel.burn_rate_lph} L/hr)</span>
+              <span className="text-cyan-300 font-bold">⛵ {currentVessel.name} ({currentVessel.burn_rate_lph} L/hr)</span>
             </div>
-            <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-slate-200 border border-white/15 text-[10px]">
+            <span className="px-3 py-0.5 rounded-full bg-black/60 text-slate-100 border border-white/20 text-[10px] font-bold backdrop-blur-md shadow">
               🇮🇳 ISRO Earth Observation
             </span>
           </div>
