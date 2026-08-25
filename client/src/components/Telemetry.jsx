@@ -1,14 +1,17 @@
 import React from 'react';
 import { Fuel, Clock, Shield, CheckCircle2, AlertTriangle, Sparkles, Navigation, Waves } from 'lucide-react';
+import { UI_TRANSLATIONS } from '../services/translations';
 
-export default function Telemetry({ route, hotspot, weather, geofence }) {
+export default function Telemetry({ route, hotspot, weather, geofence, selectedLang = 'en' }) {
+  const t = UI_TRANSLATIONS[selectedLang] || UI_TRANSLATIONS.en;
+
   const fuelSaved = route?.cost_saved_inr || 2400;
   const litresSaved = route?.diesel_saved_litres_roundtrip || 25.2;
   const savingsPct = route?.fuel_savings_percentage || 28.5;
   const timeSaved = route?.time_saved_minutes_roundtrip || 75;
   const co2Reduction = route?.co2_reduction_kg || 67.5;
   const imblDist = geofence?.nearest_imbl_distance_km || 18.4;
-  const imblStatus = geofence?.status || 'SAFE';
+  const imblStatus = geofence?.status || t.safeStatus;
 
   // Format species name cleanly
   const rawSpecies = hotspot?.primary_species || "Indian Mackerel (ಬಾಂಗ್ಡೆ)";
@@ -43,7 +46,7 @@ export default function Telemetry({ route, hotspot, weather, geofence }) {
         {/* Header */}
         <div className="relative z-10 flex items-center justify-between gap-1">
           <span className="text-[11px] sm:text-xs font-black text-emerald-300 flex items-center gap-1.5 drop-shadow">
-            <span>🐟</span> <span className="truncate">Marine Shoal</span>
+            <span>🐟</span> <span className="truncate">{t.targetShoal}</span>
           </span>
           <span className="bg-emerald-500/25 text-emerald-300 border border-emerald-400/50 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono font-black shadow">
             {hotspot?.confidence_score || 97}%
@@ -88,7 +91,7 @@ export default function Telemetry({ route, hotspot, weather, geofence }) {
         <div className="relative z-10 flex items-center justify-between gap-1">
           <span className="text-[11px] sm:text-xs font-black text-amber-300 flex items-center gap-1.5 drop-shadow">
             <Fuel className="w-3.5 h-3.5 text-amber-400 shrink-0 animate-bounce" />
-            <span className="truncate">Fuel Saved</span>
+            <span className="truncate">{t.dieselSaved}</span>
           </span>
           <span className="bg-amber-500/25 text-amber-300 border border-amber-400/50 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono font-black shadow">
             -{savingsPct}%
@@ -104,7 +107,7 @@ export default function Telemetry({ route, hotspot, weather, geofence }) {
 
         {/* Bottom Strip */}
         <div className="relative z-10 text-[10px] sm:text-[11px] text-slate-300 font-mono flex items-center justify-between border-t border-amber-500/20 pt-1.5 mt-auto">
-          <span className="text-amber-300 font-semibold truncate">+{weather?.ocean_current_knots || 1.35} kts assist</span>
+          <span className="text-amber-300 font-semibold truncate">+{weather?.ocean_current_knots || 1.35} kts {t.currentDrift}</span>
           <span className="text-amber-400 font-black shrink-0">{litresSaved} L</span>
         </div>
       </div>
@@ -134,7 +137,7 @@ export default function Telemetry({ route, hotspot, weather, geofence }) {
         <div className="relative z-10 flex items-center justify-between gap-1">
           <span className="text-[11px] sm:text-xs font-black text-cyan-300 flex items-center gap-1.5 drop-shadow">
             <Clock className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-            <span className="truncate">Time Saved</span>
+            <span className="truncate">{t.timeSaved}</span>
           </span>
           <span className="bg-cyan-500/25 text-cyan-300 border border-cyan-400/50 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono font-black shadow">
             🌿 {co2Reduction}kg
@@ -150,7 +153,7 @@ export default function Telemetry({ route, hotspot, weather, geofence }) {
 
         {/* Bottom Strip */}
         <div className="relative z-10 text-[10px] sm:text-[11px] text-slate-300 font-mono flex items-center justify-between border-t border-cyan-500/20 pt-1.5 mt-auto">
-          <span className="text-slate-300">Cruising:</span>
+          <span className="text-slate-300">{t.cruisingSpeed}:</span>
           <span className="text-cyan-300 font-black">{route?.effective_speed_knots || 10.4} kts</span>
         </div>
       </div>
@@ -178,7 +181,7 @@ export default function Telemetry({ route, hotspot, weather, geofence }) {
         <div className="relative z-10 flex items-center justify-between gap-1">
           <span className="text-[11px] sm:text-xs font-black text-rose-300 flex items-center gap-1.5 drop-shadow">
             <Shield className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-            <span className="truncate">IMBL Border</span>
+            <span className="truncate">{t.borderSafety}</span>
           </span>
           <span className="bg-rose-500/25 text-rose-300 border border-rose-400/50 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono font-black shadow">
             {imblStatus}
@@ -195,7 +198,7 @@ export default function Telemetry({ route, hotspot, weather, geofence }) {
         {/* Bottom Strip */}
         <div className="relative z-10 text-[10px] sm:text-[11px] text-slate-300 font-medium flex items-center gap-1 border-t border-rose-500/20 pt-1.5 mt-auto">
           <CheckCircle2 className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-          <span className="truncate font-sans font-bold text-rose-300">Safe territorial waters</span>
+          <span className="truncate font-sans font-bold text-rose-300">{t.bufferDistance}: &gt; 15 km</span>
         </div>
       </div>
 

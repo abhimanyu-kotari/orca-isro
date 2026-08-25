@@ -255,6 +255,7 @@ function App() {
             hotspot={selectedHotspot}
             weather={weather}
             geofence={geofence}
+            selectedLang={selectedLang}
           />
         </div>
 
@@ -297,6 +298,7 @@ function App() {
             <WeatherCard
               weather={weather}
               hotspot={selectedHotspot}
+              selectedLang={selectedLang}
             />
           </div>
 
@@ -323,6 +325,7 @@ function App() {
         onClose={() => setIsVesselModalOpen(false)}
         selectedVessel={selectedVessel}
         onSelectVessel={handleVesselChange}
+        selectedLang={selectedLang}
       />
 
       {/* Interactive Product Tour Walkthrough */}
@@ -338,6 +341,7 @@ function App() {
         activeTab={activeMobileTab}
         onTabChange={(tab) => setActiveMobileTab(tab)}
         hasUnreadMessages={false}
+        selectedLang={selectedLang}
       />
 
       {/* Desktop Footer */}

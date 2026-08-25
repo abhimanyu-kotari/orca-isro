@@ -1,15 +1,24 @@
 import React from 'react';
 import { Ship, Check, X, Shield, Fuel, Gauge, Award, Sparkles } from 'lucide-react';
 import { VESSEL_PROFILES } from '../services/marineEngine';
+import { UI_TRANSLATIONS } from '../services/translations';
 
-export default function VesselModal({ isOpen, onClose, selectedVessel, onSelectVessel }) {
+export default function VesselModal({ isOpen, onClose, selectedVessel, onSelectVessel, selectedLang = 'en' }) {
   if (!isOpen) return null;
+
+  const t = UI_TRANSLATIONS[selectedLang] || UI_TRANSLATIONS.en;
 
   // Vessel image mapping
   const vesselImages = {
     trawler: '/assets/vessel_trawler.png',
     fibre: '/assets/vessel_fibre.png',
     country: '/assets/vessel_country.png'
+  };
+
+  const getVesselTitle = (key) => {
+    if (key === 'trawler') return t.trawlerTitle;
+    if (key === 'fibre') return t.fibreTitle;
+    return t.countryTitle;
   };
 
   return (
@@ -26,9 +35,9 @@ export default function VesselModal({ isOpen, onClose, selectedVessel, onSelectV
             />
             <div>
               <h3 className="text-sm sm:text-base font-black text-white tracking-wide flex items-center gap-2">
-                Fisherman Vessel Profile Setup
+                {t.vesselModalTitle}
               </h3>
-              <p className="text-[11px] text-emerald-400 font-mono">Calibrates AI Fuel Burn, Speed & Safe Coastal Range</p>
+              <p className="text-[11px] text-emerald-400 font-mono">{t.vesselModalSub}</p>
             </div>
           </div>
           <button
@@ -71,11 +80,11 @@ export default function VesselModal({ isOpen, onClose, selectedVessel, onSelectV
                     <div className="flex items-center gap-2">
                       <span className="text-lg">{key === 'trawler' ? '🚢' : key === 'fibre' ? '🚤' : '🚣'}</span>
                       <h4 className="text-xs sm:text-sm font-black text-white drop-shadow-[0_2px_8px_rgba(0,0,0,1)]">
-                        {vessel.name}
+                        {getVesselTitle(key)}
                       </h4>
                       {isSelected && (
                         <span className="px-2 py-0.5 rounded-full bg-emerald-400 text-slate-950 text-[9px] font-black uppercase shadow">
-                          ACTIVE
+                          {t.activeProfile}
                         </span>
                       )}
                     </div>
@@ -98,21 +107,21 @@ export default function VesselModal({ isOpen, onClose, selectedVessel, onSelectV
                 <div className="grid grid-cols-3 gap-2 mt-3 pt-2.5 border-t border-white/15 text-[10px] font-mono relative z-10">
                   <div className="bg-black/80 backdrop-blur-md p-2 rounded-xl border border-white/15 shadow-sm">
                     <div className="text-slate-300 flex items-center gap-1 font-bold">
-                      <Fuel className="w-3 h-3 text-cyan-400" /> Fuel Burn
+                      <Fuel className="w-3 h-3 text-cyan-400" /> {t.burnRate}
                     </div>
                     <div className="text-xs font-black text-emerald-400 mt-0.5">{vessel.burn_rate_lph} L/hr</div>
                   </div>
 
                   <div className="bg-black/80 backdrop-blur-md p-2 rounded-xl border border-white/15 shadow-sm">
                     <div className="text-slate-300 flex items-center gap-1 font-bold">
-                      <Gauge className="w-3 h-3 text-amber-400" /> Speed
+                      <Gauge className="w-3 h-3 text-amber-400" /> {t.speed}
                     </div>
                     <div className="text-xs font-black text-white mt-0.5">{vessel.cruising_speed_knots} kts</div>
                   </div>
 
                   <div className="bg-black/80 backdrop-blur-md p-2 rounded-xl border border-white/15 shadow-sm">
                     <div className="text-slate-300 flex items-center gap-1 font-bold">
-                      <Shield className="w-3 h-3 text-rose-400" /> Safe Range
+                      <Shield className="w-3 h-3 text-rose-400" /> {t.safeRange}
                     </div>
                     <div className="text-xs font-black text-cyan-300 mt-0.5">{vessel.max_range_nm} NM</div>
                   </div>
@@ -132,7 +141,7 @@ export default function VesselModal({ isOpen, onClose, selectedVessel, onSelectV
             onClick={onClose}
             className="bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 hover:opacity-90 active:scale-95 text-slate-950 font-black text-xs px-6 py-2.5 rounded-2xl shadow-xl shadow-emerald-500/25 transition"
           >
-            Apply Vessel Calibration
+            {t.selectVesselBtn}
           </button>
         </div>
 

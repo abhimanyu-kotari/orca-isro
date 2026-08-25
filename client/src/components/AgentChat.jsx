@@ -10,12 +10,12 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
 
   // Dynamic Suggested Prompts per Selected Language
   const getSuggestedQueries = (lang) => {
-    if (lang === 'tcy') {
+    if (lang === 'te') {
       return [
-        { label: '🐟 ಮುಟ್ಟದ ಮೀನ್ದ ಜಾಗೆ (PFZ)', query: 'ಇನಿ ಒಡೆ ಮಸ್ತ್ ಮೀನ್ ತಿಕ್ಕುಂಡು?' },
-        { label: '🌊 ಕಡಲ್ದ ಅಲೆ ಬೊಕ್ಕ ಹವಾಮಾನ', query: 'ಎಲ್ಲೆ ಕಾಂಡೆ ಕಡಲ್ ಗ್ ಪೋಯೆರೆ ಸುರಕ್ಷಿತ ಉಂಡಾ?' },
-        { label: '🧭 ಡೀಸೆಲ್ ಒರಿಪುನ ಸಾದಿ', query: 'ಕಮ್ಮಿ ಡೀಸೆಲ್ ಡ್ ಮೀನ್ದ ಜಾಗೆಗ್ ಪೋಪಿನ ಸಾದಿ ತೊಜಾವೊಲಿ?' },
-        { label: '🛡️ ಕಡಲ ಗಡಿ (IMBL) ಸ್ಥಿತಿ', query: 'ಅಂತಾರಾಷ್ಟ್ರೀಯ ಗಡಿತ ದೂರ ತೂಲೆ.' }
+        { label: '🐟 దగ్గరలోని చేపల జోన్ (PFZ)', query: 'ఈ రోజు అత్యధికంగా చేపలు ఎక్కడ లభిస్తాయి?' },
+        { label: '🌊 సముద్ర వాతావరణం & అలలు', query: 'రేపు ఉదయం సముద్రంలోకి వెళ్లడం సురక్షితమేనా?' },
+        { label: '🧭 తక్కువ డీజిల్ మార్గం', query: 'తక్కువ డీజిల్ వినియోగించే సురక్షిత మార్గం చూపించండి.' },
+        { label: '🛡️ అంతర్జాతీయ సరిహద్దు (IMBL)', query: 'అంతర్జాతీయ సముద్ర సరిహద్దు దూరం ఎంత?' }
       ];
     }
     if (lang === 'ml') {
@@ -95,7 +95,6 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
     const langMap = {
       'ta': { code: 'ta-IN', prefix: 'ta', name: 'tamil' },
       'kn': { code: 'kn-IN', prefix: 'kn', name: 'kannada' },
-      'tcy': { code: 'kn-IN', prefix: 'kn', name: 'kannada' }, // Tulu uses Kannada phonetic synthesizer
       'te': { code: 'te-IN', prefix: 'te', name: 'telugu' },
       'hi': { code: 'hi-IN', prefix: 'hi', name: 'hindi' },
       'ml': { code: 'ml-IN', prefix: 'ml', name: 'malayalam' },
@@ -177,7 +176,6 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
     const langMap = {
       'ta': 'ta-IN',
       'kn': 'kn-IN',
-      'tcy': 'kn-IN',
       'te': 'te-IN',
       'hi': 'hi-IN',
       'ml': 'ml-IN',
@@ -206,12 +204,12 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
   };
 
   const getPlaceholder = (lang) => {
-    if (lang === 'tcy') return 'ತುಳುಟು ಕೇನ್ಲೆ (Ask in Tulu or Kannada)...';
+    if (lang === 'te') return 'తెలుగులో అడగండి (Ask in Telugu)...';
     if (lang === 'ml') return 'മലയാളത്തിൽ ചോദിക്കുക (Ask in Malayalam)...';
     if (lang === 'kn') return 'ಕನ್ನಡದಲ್ಲಿ ಕೇಳಿ (Ask in Kannada)...';
     if (lang === 'ta') return 'தமிழில் கேளுங்கள் (Ask in Tamil)...';
     if (lang === 'hi') return 'हिन्दी में पूछें (Ask in Hindi)...';
-    return 'Ask ORCA in Tulu, Malayalam, Kannada, Tamil, Hindi, or English...';
+    return 'Ask ORCA in English, Kannada, Tamil, Telugu, Hindi, or Malayalam...';
   };
 
   return (

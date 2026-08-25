@@ -348,10 +348,10 @@ export function processClientChat(userText, harborId, lang, vesselKey = 'trawler
       text = `🌊 **ಸಮುದ್ರ ಸುರಕ್ಷತಾ ಮಾಹಿತಿ (${hName})**:\n• ದೋಣಿ ಮಾದರಿ: **${vessel.name}**\n• ಸಮುದ್ರದ ಸ್ಥಿತಿ: **${weather.safety_status} (ಅಲೆಗಳ ಎತ್ತರ ${weather.wave_height_m} ಮೀ)**.\n• ಗಾಳಿಯ ವೇಗ: **${weather.wind_speed_knots} ನಾಟ್ಸ್**.\n• ಸಲಹೆ: ${weather.advisory_verdict}\n• ನಾಳೆ ಬೆಳಿಗ್ಗೆ ಮೀನುಗಾರಿಕೆಗೆ ತೆರಳಲು ಪರಿಸ್ಥಿತಿ ಅನುಕೂಲಕರವಾಗಿದೆ.`;
       voiceNative = `${hName} ಸಮುದ್ರದ ಸ್ಥಿತಿ ಸುರಕ್ಷಿತವಾಗಿದೆ. ಅಲೆಗಳ ಎತ್ತರ ${weather.wave_height_m} ಮೀಟರ್. ನಾಳೆ ಬೆಳಿಗ್ಗೆ ಮೀನುಗಾರಿಕೆಗೆ ತೆರಳಬಹುದು.`;
       voicePhonetic = `${hName} samudra sthithi surakshithavaagide. Alegalu ${weather.wave_height_m} meter. Naale beligge meenugaarikege therallabahudu.`;
-    } else if (lang === "tcy") {
-      text = `🌊 **ಕಡಲ್ದ ಸುರಕ್ಷತಾ ಮಾಹಿತಿ (${hName})**:\n• ಬೋಟ್: **${vessel.name}**\n• ಕಡಲ್ದ ಸ್ಥಿತಿ: **${weather.safety_status} (ಅಲೆತ್ತ ಎತ್ತರ ${weather.wave_height_m} ಮೀ)**.\n• ಕಾತ್ ದ ವೇಗ: **${weather.wind_speed_knots} ನಾಟ್ಸ್**.\n• ಸಲಹೆ: ${weather.advisory_verdict}\n• ಎಲ್ಲೆ ಕಾಂಡೆ ಮೀನ್ ಪತ್ತಿಯೆರೆ ಪೋಯೆರೆ ಎಡ್ಡೆ ಸಮಯ ಉಂಡು.`;
-      voiceNative = `${hName} ಕಡಲ್ದ ಸ್ಥಿತಿ ಸುರಕ್ಷಿತ ಉಂಡು. ಅಲೆತ್ತ ಎತ್ತರ ${weather.wave_height_m} ಮೀಟರ್. ಎಲ್ಲೆ ಕಾಂಡೆ ಮೀನ್ ಪತ್ತಿಯೆರೆ ಪೋವೊಲಿ.`;
-      voicePhonetic = `${hName} kadalda sthithi surakshitha undu. Alettha etthara ${weather.wave_height_m} meter. Elle kaande meen pattiyere povoli.`;
+    } else if (lang === "te") {
+      text = `🌊 **సముద్ర భద్రతా నివేదిక (${hName})**:\n• బోటు: **${vessel.name}**\n• సముద్ర స్థితి: **${weather.safety_status} (అలల ఎత్తు ${weather.wave_height_m} మీ)**.\n• గాలి వేగం: **${weather.wind_speed_knots} నాట్స్**.\n• సలహా: ${weather.advisory_verdict}\n• రేపు ఉదయం చేపల వేటకు వెళ్లడం సురక్షితం.`;
+      voiceNative = `${hName} సముద్ర స్థితి సురక్షితంగా ఉంది. అలల ఎత్తు ${weather.wave_height_m} మీటర్లు. రేపు ఉదయం వేటకు వెళ్లవచ్చు.`;
+      voicePhonetic = voiceNative;
     } else if (lang === "ta") {
       text = `🌊 **கடல் பாதுகாப்பு அறிக்கை (${hName})**:\n• படகு வகை: **${vessel.name}**\n• கடல் நிலை: **பாதுகாப்பானது (அலை உயரம் ${weather.wave_height_m} மீ)**.\n• காற்றின் வேகம்: **${weather.wind_speed_knots} நாட்ஸ்**.\n• நாளை காலை மீன்பிடிக்க செல்வது பாதுகாப்பானது.`;
       voiceNative = `கடல் நிலை பாதுகாப்பாக உள்ளது. அலை உயரம் ${weather.wave_height_m} மீட்டர். நாளை காலை கடலுக்கு செல்லலாம்.`;
@@ -377,10 +377,10 @@ export function processClientChat(userText, harborId, lang, vesselKey = 'trawler
       text = `🧭 **ISRO AI ಪ್ರವಾಹ-ಆಧಾರಿತ ಮಾರ್ಗ (${vessel.name})**:\n• ${hName} ನಿಂದ **${dist} ನಾಟಿಕಲ್ ಮೈಲಿ** ನೇರ ಹಾದಿಗಿಂತ AI ಮಾರ್ಗವು ಸಮುದ್ರ ಪ್ರವಾಹವನ್ನು (+${weather.ocean_current_knots} kts) ಬಳಸಿಕೊಳ್ಳುತ್ತದೆ.\n• **ದೋಣಿ ಇಂಧನ ಬಳಕೆ**: ${vessel.burn_rate_lph} ಲೀ/ಗಂಟೆ.\n• **ಡೀಸೆಲ್ ಉಳಿತಾಯ**: **₹${fuel}** (${route.fuel_savings_percentage}% ಉಳಿತಾಯ, ${route.diesel_saved_litres_roundtrip} ಲೀಟರ್).\n• ಪ್ರಯಾಣದ ಸಮಯ ಉಳಿತಾಯ: **${route.time_saved_minutes_roundtrip} ನಿಮಿಷಗಳು**.`;
       voiceNative = `AI ಮಾರ್ಗದಿಂದ ${fuel} ರೂಪಾಯಿ ಡೀಸೆಲ್ ಉಳಿತಾಯವಾಗುತ್ತದೆ ಮತ್ತು ${route.time_saved_minutes_roundtrip} ನಿಮಿಷ ಸಮಯ ಉಳಿಯುತ್ತದೆ.`;
       voicePhonetic = `AI route balasidaare ${fuel} roopaayi diesel ulithayavaaguthade matthu samaya uliyuthade.`;
-    } else if (lang === "tcy") {
-      text = `🧭 **ISRO AI ನೀರ್ದ ಓಟದ ಸಾದಿ (${vessel.name})**:\n• ${hName} ರ್ದ್ **${dist} ನಾಟಿಕಲ್ ಮೈಲ್** ಸಾದಿಡ್ ಕಡಲ್ದ ನೀರ್ದ ಓಟನ್ (+${weather.ocean_current_knots} kts) AI ಬಳಸಾವೊಡು.\n• **ಡೀಸೆಲ್ ಒರಿಪು**: **₹${fuel}** (${route.fuel_savings_percentage}% ಒರಿಪು, ${route.diesel_saved_litres_roundtrip} ಲೀಟರ್).\n• ಪ್ರಯಾಣದ ಪೊರ್ತು: **${route.time_saved_minutes_roundtrip} ನಿಮಿಷ ಒರಿಪುಂಡು**.`;
-      voiceNative = `AI ಸಾದಿರ್ದ್ ${fuel} ರುಪಾಯಿ ಡೀಸೆಲ್ ಒರಿಪುಂಡು ಬೊಕ್ಕ ${route.time_saved_minutes_roundtrip} ನಿಮಿಷ ಸಮಯ ಒರಿಪುಂಡು.`;
-      voicePhonetic = `AI saadhirda ${fuel} rupaayi diesel oripundu bokka ${route.time_saved_minutes_roundtrip} nimisha samaya oripundu.`;
+    } else if (lang === "te") {
+      text = `🧭 **ISRO AI ప్రవాహ ఆధారిత మార్గం (${vessel.name})**:\n• ${hName} నుండి **${dist} నాటికల్ మైళ్లు** దూరంలో సముద్ర ప్రవాహాన్ని (+${weather.ocean_current_knots} kts) AI ఉపయోగించుకుంటుంది.\n• **డీజిల్ ఆదా**: **₹${fuel}** (${route.fuel_savings_percentage}% ఆదా, ${route.diesel_saved_litres_roundtrip} లీటర్లు).\n• సమయం ఆదా: **${route.time_saved_minutes_roundtrip} నిమిషాలు**.`;
+      voiceNative = `AI మార్గం ద్వారా ${fuel} రూపాయల డీజిల్ మరియు ${route.time_saved_minutes_roundtrip} నిమిషాల సమయం ఆదా అవుతుంది.`;
+      voicePhonetic = voiceNative;
     } else if (lang === "ta") {
       text = `🧭 **AI எரிபொருள் சிக்கன வழித்தடம் (${vessel.name})**:\n• கடல் நீரோட்டத்தை (+${weather.ocean_current_knots} kts) பயன்படுத்தி செல்லும் AI வழித்தடம்.\n• **டீசல் சேமிப்பு**: **₹${fuel}** (${route.fuel_savings_percentage}% சேமிப்பு, ${route.diesel_saved_litres_roundtrip} லிட்டர்).\n• பயண நேரம் மிச்சம்: **${route.time_saved_minutes_roundtrip} நிமிடங்கள்**.`;
       voiceNative = `AI வழியை பயன்படுத்தினால் ${fuel} ரூபாய் டீசல் மிச்சமாகும்.`;
@@ -406,10 +406,10 @@ export function processClientChat(userText, harborId, lang, vesselKey = 'trawler
       text = `🛡️ **ಅಂತಾರಾಷ್ಟ್ರೀಯ ಕಡಲ ಗಡಿ (IMBL) ಮಾಹಿತಿ**:\n• ಆಯ್ದ ವಲಯದಿಂದ ಗಡಿಗೆ ಇರುವ ಅಂತರ: **${imbl} ಕಿ.ಮೀ**.\n• ಸ್ಥಿತಿ: **${geofence.status}** (ಭಾರತೀಯ ಜಲಪ್ರದೇಶದಲ್ಲಿ ಸುರಕ್ಷಿತ).\n• ಎಚ್ಚರಿಕೆ: ಗಡಿಯ ಸಮೀಪಕ್ಕೆ ಹೋಗಬೇಡಿ. ನಕ್ಷೆಯಲ್ಲಿ ಕೆಂಪು ಗೆರೆಯನ್ನು ದಾಟದಂತೆ ಮುನ್ನೆಚ್ಚರಿಕೆ ವಹಿಸಿ.`;
       voiceNative = `ನೀವು ಅಂತಾರಾಷ್ಟ್ರೀಯ ಗಡಿಯಿಂದ ${imbl} ಕಿಲೋಮೀಟರ್ ದೂರದಲ್ಲಿದ್ದೀರಿ. ಗಡಿ ಸುರಕ್ಷಿತವಾಗಿದೆ.`;
       voicePhonetic = `Neevu antharaashtriya gadhiyinda ${imbl} kilometer dooradallidhdheeri. Gadi surakshithavaagide.`;
-    } else if (lang === "tcy") {
-      text = `🛡️ **ಅಂತಾರಾಷ್ಟ್ರೀಯ ಕಡಲ ಗಡಿ (IMBL) ಮಾಹಿತಿ**:\n• ಗಡಿತ ದೂರ: **${imbl} ಕಿ.ಮೀ**.\n• ಸ್ಥಿತಿ: **${geofence.status}** (ಭಾರತದ ಜಲಪ್ರದೇಶೊಡು ಸುರಕ್ಷಿತ ಉಂಡು).\n• ಎಚ್ಚರಿಕೆ: ನಕ್ಷೆಡ್ ಕೆಂಪು ಗೆರೆನ್ ದಾಂಟೊಡ್ಚಿ.`;
-      voiceNative = `ಈರ್ ಅಂತಾರಾಷ್ಟ್ರೀಯ ಗಡಿರ್ದ್ ${imbl} ಕಿಲೋಮೀಟರ್ ದೂರೊಡು ಉಲ್ಲರ್. ಗಡಿ ಸುರಕ್ಷಿತ ಉಂಡು.`;
-      voicePhonetic = `Eer antharaashtriya gadirda ${imbl} kilometer doorodu ullar. Gadi surakshitha undu.`;
+    } else if (lang === "te") {
+      text = `🛡️ **అంతర్జాతీయ సముద్ర సరిహద్దు (IMBL) సమాచారం**:\n• సరిహద్దు దూరం: **${imbl} కి.మీ**.\n• స్థితి: **${geofence.status}** (భారతీయ జలాల్లో సురక్షితం).\n• హెచ్చరిక: మ్యాప్‌లోని ఎరుపు గీతను దాటవద్దు.`;
+      voiceNative = `మీరు అంతర్జాతీయ సరిహద్దు నుండి ${imbl} కిలోమీటర్ల దూరంలో ఉన్నారు. సరిహద్దు సురక్షితంగా ఉంది.`;
+      voicePhonetic = voiceNative;
     } else if (lang === "ml") {
       text = `🛡️ **അന്താരാഷ്ട്ര സമുദ്ര അതിർത്തി (IMBL)**:\n• അതിർത്തിയിലേക്കുള്ള ദൂരം: **${imbl} കി.മീ**.\n• അവസ്ഥ: **${geofence.status}** (ഇന്ത്യൻ ജലാതിർത്തിയിൽ സുരക്ഷിതം).\n• മുന്നറിയിപ്പ്: മാപ്പിലെ ചുവന്ന വര മറികടക്കരുത്.`;
       voiceNative = `നിങ്ങൾ അന്താരാഷ്ട്ര അതിർത്തിയിൽ നിന്ന് ${imbl} കിലോമീറ്റർ അകലെയാണ്. സുരക്ഷിത ജലാതിർത്തിയിലാണ്.`;
@@ -427,10 +427,10 @@ export function processClientChat(userText, harborId, lang, vesselKey = 'trawler
       text = `🔬 **ಕರಾವಳಿ ಮೀನು ಉತ್ಪಾದಕತೆ ವಿಶ್ಲೇಷಣೆ (ISRO ಉಪಗ್ರಹ ವರದಿ)**:\n• **ಉಷ್ಣತೆಯ ಬದಲಾವಣೆ**: ಸಮುದ್ರದ ತಾಪಮಾನ 1.4°C ಹೆಚ್ಚಾಗಿರುವುದರಿಂದ ಬಾಂಗ್ಡೆ ಮತ್ತು ಭೂತಾಯಿ ಮೀನುಗಳು ತಂಪಾದ ಆಳದ ನೀರಿಗೆ (40-60 ಮೀ ಆಳ) ಸ್ಥಳಾಂತರಗೊಂಡಿವೆ.\n• **ಕ್ಲೋರೊಫಿಲ್ ಪ್ರಮಾಣ**: ಕರಾವಳಿ ನೀರಿನಲ್ಲಿ ಕ್ಲೋರೊಫಿಲ್ ಸಾಂದ್ರತೆ ಕಡಿಮೆಯಾಗಿದೆ.\n• **ಪರಿಹಾರ**: ತೀರದಿಂದ 20 ನಾಟಿಕಲ್ ಮೈಲಿ ದೂರದ ಆಳ ಸಮುದ್ರ ವಲಯವನ್ನು (PFZ) ಆಯ್ದುಕೊಳ್ಳಿ.`;
       voiceNative = `ಸಮುದ್ರದ ತಾಪಮಾನ ಹೆಚ್ಚಿರುವುದರಿಂದ ಮೀನುಗಳು ಆಳದ ನೀರಿಗೆ ಸ್ಥಳಾಂತರಗೊಂಡಿವೆ. ತೀರದಿಂದ 20 ಮೈಲಿ ದೂರದಲ್ಲಿ ಮೀನುಗಳು ಸಿಗುತ್ತವೆ.`;
       voicePhonetic = `Samudra thaapamaana hechhiruvudarinda meenugalu aalada neerige sthalantharagondive. Theeradinda 20 mile dooradalli meenugalu siguthave.`;
-    } else if (lang === "tcy") {
-      text = `🔬 **ಕರಾವಳಿಡ್ ಮೀನ್ ಕಮ್ಮಿ ಆಯಿನೆಕ್ಕ್ ಕಾರಣ (ISRO ಉಪಗ್ರಹ ವರದಿ)**:\n• **ಉಷ್ಣತೆ ಹೆಚ್ಚಾಯಿನಿ**: ಕಡಲ್ದ ನೀರ್ದ ಬೆಚ್ಚ 1.4°C ಹೆಚ್ಚಾದ್ ಬಾಂಗ್ಡೆ ಬೊಕ್ಕ ಭೂತಾಯಿ ಮೀನ್ ಲು ಆಳದ ನೀರ್ ಗ್ ಪೋತುಂಡು.\n• **ಪರಿಹಾರ**: ತೀರರ್ದ್ 20 ನಾಟಿಕಲ್ ಮೈಲ್ ದೂರದ ಆಳ ಕಡಲ್ದ ಜಾಗೆನ್ (PFZ) ಆಯ್ಕೆ ಮಲ್ಪುಲೆ.`;
-      voiceNative = `ಕಡಲ್ದ ಬೆಚ್ಚ ಹೆಚ್ಚಾದ್ ಮೀನ್ ಲು ಆಳದ ನೀರ್ ಗ್ ಪೋತುಂಡು. ತೀರರ್ದ್ 20 ಮೈಲ್ ದೂರೊಡು ಮೀನ್ ತಿಕ್ಕುಂಡು.`;
-      voicePhonetic = `Kadalda beccha hecchaadh meenlu aalada neerig pothundu. Theerardha 20 mile doorodu meen thikkundu.`;
+    } else if (lang === "te") {
+      text = `🔬 **తీరప్రాంత చేపల ఉత్పత్తి తగ్గుదల విశ్లేషణ (ISRO నివేదిక)**:\n• **ఉష్ణోగ్రత పెరుగుదల**: సముద్ర ఉపరితల ఉష్ణోగ్రత 1.4°C పెరగడం వల్ల చేపలు లోతైన చల్లని నీటిలోకి వలస వెళ్లాయి.\n• **పరిష్కారం**: తీరం నుండి 20 నాటికల్ మైళ్ల దూరంలో ఉన్న లోతైన సముద్ర జోన్ (PFZ) ఎంచుకోండి.`;
+      voiceNative = `సముద్ర ఉష్ణోగ్రత పెరగడం వల్ల చేపలు లోతైన నీటిలోకి వెళ్లాయి. తీరం నుండి 20 మైళ్ల దూరంలో చేపలు లభిస్తాయి.`;
+      voicePhonetic = voiceNative;
     } else if (lang === "ml") {
       text = `🔬 **തീരദേശ മത്സ്യ ഉൽപാദന കുറവ് (ഐഎസ്ആർഒ ഉപഗ്രഹ റിപ്പോർട്ട്)**:\n• **താപനില വ്യതിയാനം**: കടൽ താപനില 1.4°C ഉയർന്നതിനാൽ അയലയും മത്തിയും തണുത്ത ആഴക്കടലിലേക്ക് (40-60 മീറ്റർ) മാറി.\n• **പരിഹാരം**: തീരത്ത് നിന്ന് 20 നോട്ടിക്കൽ മൈൽ അകലെയുള്ള ആഴക്കടൽ മേഖല (PFZ) തിരഞ്ഞെടുക്കുക.`;
       voiceNative = `കടൽ താപനില ഉയർന്നതിനാൽ മീനുകൾ ആഴക്കടലിലേക്ക് മാറി. തീരത്ത് നിന്ന് 20 മൈൽ അകലെ മീനുകൾ ലഭ്യമാണ്.`;
@@ -448,10 +448,10 @@ export function processClientChat(userText, harborId, lang, vesselKey = 'trawler
       text = `🐟 **ಶಿಫಾರಸು ಮಾಡಿದ ಮೀನುಗಾರಿಕೆ ವಲಯ (${top.id})**:\n• ದೋಣಿ: **${vessel.name}** (${vessel.vessel_reg})\n• ${hName} ಬಂದರಿನಿಂದ **${dist} ನಾಟಿಕಲ್ ಮೈಲಿ** ದೂರದಲ್ಲಿ **${species}** ಸಮೃದ್ಧವಾಗಿ ಲಭ್ಯವಿದೆ.\n• ISRO AI ಪ್ರವಾಹ-ಮಾರ್ಗದಿಂದ **₹${fuel} ಡೀಸೆಲ್ ಉಳಿತಾಯ** (${route.fuel_savings_percentage}% ಉಳಿತಾಯ, ${route.diesel_saved_litres_roundtrip}L).\n• ಸಮುದ್ರದ ಸ್ಥಿತಿ: **ಸುರಕ್ಷಿತ (ಅಲೆಗಳ ಎತ್ತರ ${weather.wave_height_m} ಮೀ)**.`;
       voiceNative = `${hName} ಬಂದರಿನಿಂದ ${dist} ನಾಟಿಕಲ್ ಮೈಲಿ ದೂರದಲ್ಲಿ ${species} ಮೀನುಗಳು ಲಭ್ಯವಿವೆ. ${vessel.short_name} ದೋಣಿಗೆ ${fuel} ರೂಪಾಯಿ ಉಳಿತಾಯವಾಗುತ್ತದೆ.`;
       voicePhonetic = `${hName} bandarininda ${dist} nautical mile dooradalli ${speciesPhon} meenugalu labhyavive. ${fuel} roopaayi diesel ulithayavaaguthade.`;
-    } else if (lang === "tcy") {
-      text = `🐟 **ಮೀನ್ ತಿಕ್ಕುನ ಜಾಗೆ (${top.id})**:\n• ಬೋಟ್: **${vessel.name}** (${vessel.vessel_reg})\n• ${hName} ಬಂದರ್ದ್ **${dist} ನಾಟಿಕಲ್ ಮೈಲ್** ದೂರೊಡು **${species}** ಮಸ್ತ್ ಉಂಡು.\n• ISRO AI ಸಾದಿರ್ದ್ **₹${fuel} ಡೀಸೆಲ್ ಒರಿಪು** (${route.fuel_savings_percentage}% ಒರಿಪು).\n• ಕಡಲ್ದ ಸ್ಥಿತಿ: **ಸುರಕ್ಷಿತ (ಅಲೆ ${weather.wave_height_m} ಮೀ)**.`;
-      voiceNative = `${hName} ಬಂದರ್ದ್ ${dist} ನಾಟಿಕಲ್ ಮೈಲ್ ದೂರೊಡು ${species} ಮೀನ್ ಮಸ್ತ್ ಉಂಡು. ${vessel.short_name} ಬೋಟ್ ಗ್ ${fuel} ರುಪಾಯಿ ಡೀಸೆಲ್ ಒರಿಪುಂಡು.`;
-      voicePhonetic = `${hName} bandardha ${dist} nautical mile doorodu ${speciesPhon} meen masth undu. ${fuel} rupaayi diesel oripundu.`;
+    } else if (lang === "te") {
+      text = `🐟 **సిఫార్సు చేయబడిన చేపల వేట జోన్ (${top.id})**:\n• బోటు: **${vessel.name}** (${vessel.vessel_reg})\n• ${hName} హార్బర్ నుండి **${dist} నాటికల్ మైళ్లు** దూరంలో **${species}** సమృద్ధిగా లభిస్తాయి.\n• ISRO AI రూట్ ద్వారా **₹${fuel} డీజిల్ ఆదా** (${route.fuel_savings_percentage}% ఆదా).\n• సముద్ర స్థితి: **సురక్షితం (అలలు ${weather.wave_height_m} మీ)**.`;
+      voiceNative = `${hName} హార్బర్ నుండి ${dist} నాటికల్ మైళ్ల దూరంలో ${species} లభిస్తాయి. మీ బోటుకు ${fuel} రూపాయల డీజిల్ ఆదా అవుతుంది.`;
+      voicePhonetic = voiceNative;
     } else if (lang === "ta") {
       text = `🐟 **பரிந்துரைக்கப்பட்ட மீன்பிடி மண்டலம் (${top.id})**:\n• படகு: **${vessel.name}**\n• ${hName} துறைமுகத்திலிருந்து **${dist} கடல் மைல்** தொலைவில் **${species}** கூட்டம் உள்ளது.\n• AI வழித்தடத்தைப் பயன்படுத்தினால் **₹${fuel} டீசல் சேமிக்கலாம்**.\n• கடல் நிலை பாதுகாப்பாக உள்ளது (அலை உயரம் ${weather.wave_height_m} மீ).`;
       voiceNative = `${hName} துறைமுகத்திலிருந்து ${dist} கடல் மைல் தொலைவில் ${species} மீன்கள் உள்ளன. AI வழியை பயன்படுத்தினால் ${fuel} ரூபாய் சேமிக்கலாம்.`;

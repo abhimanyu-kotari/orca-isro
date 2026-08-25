@@ -1,12 +1,15 @@
 import React from 'react';
 import { Compass, MessageSquare, Waves, FileText } from 'lucide-react';
+import { UI_TRANSLATIONS } from '../services/translations';
 
-export default function MobileBottomNav({ activeTab, onTabChange, hasUnreadMessages }) {
+export default function MobileBottomNav({ activeTab, onTabChange, hasUnreadMessages, selectedLang = 'en' }) {
+  const t = UI_TRANSLATIONS[selectedLang] || UI_TRANSLATIONS.en;
+
   const navItems = [
-    { id: 'map', label: 'Map & Route', icon: Compass },
-    { id: 'chat', label: 'AI Co-Pilot', icon: MessageSquare, badge: true },
-    { id: 'weather', label: 'Sea Weather', icon: Waves },
-    { id: 'pass', label: 'Voyage Pass', icon: FileText }
+    { id: 'map', label: t.navMap, icon: Compass },
+    { id: 'chat', label: t.navChat, icon: MessageSquare, badge: true },
+    { id: 'weather', label: t.navWeather, icon: Waves },
+    { id: 'pass', label: t.navPass, icon: FileText }
   ];
 
   return (

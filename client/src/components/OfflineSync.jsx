@@ -23,20 +23,20 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
       emergencySos: "ತುರ್ತು ಕೋಸ್ಟ್ ಗಾರ್ಡ್ ಸಹಾಯವಾಣಿ",
       printBtn: "ಪಾಸ್ ಪ್ರಿಂಟ್ / ಸೇವ್ ಮಾಡಿ 🖨️"
     },
-    tcy: {
-      barTitle: "ಆಳ ಕಡಲ್ದ ಆಫ್‌ಲೈನ್ ಪಾಸ್ (0-ನೆಟ್‌ವರ್ಕ್)",
-      barDesc: "ಕಡಲ್ ಗ್ ಪೋಪಿನ ದುಂಬು ಬೋಟ್ ದ ಪಾಸ್ ಬೊಕ್ಕ GPS ಸಾದಿನ್ ಡೌನ್‌ಲೋಡ್ ಮಲ್ಪುಲೆ.",
-      btnGetPass: "ಬೋಟ್ ಪಾಸ್ ದೆತೊನ್ಲೆ 🎫",
-      btnViewPass: "ಪಾಸ್ ತೂಲೆ 📄",
-      btnOfflineMode: "0-ಇಂಟರ್ನೆಟ್ ಸಿಮ್ಯುಲೇಟರ್",
-      passTitle: "ಮೀನುಗಾರರೆನ ಅಧಿಕೃತ ಯಾನ ಪಾಸ್",
-      passSub: "ISRO ಕಡಲ್ದ ಭದ್ರತಾ ಪ್ರಮಾಣಪತ್ರ • PS-26176",
-      targetShoal: "ಮೀನ್ ತಿಕ್ಕುನ ಜಾಗೆ (PFZ)",
-      dieselSaved: "ಒರಿಪುನ ಡೀಸೆಲ್",
-      borderSafety: "ಗಡಿದ ಭದ್ರತೆ (IMBL)",
-      steerGuide: "ದಿಕ್ಸೂಚಿ ಸಾದಿ (ಹಂತ ಹಂತವಾದ್)",
-      emergencySos: "ತುರ್ತು ಕೋಸ್ಟ್ ಗಾರ್ಡ್ ಸಹಾಯವಾಣಿ",
-      printBtn: "ಪಾಸ್ ಪ್ರಿಂಟ್ ಮಲ್ಪುಲೆ 🖨️"
+    te: {
+      barTitle: "లోతైన సముద్ర ఆఫ్ లైన్ పాస్ (0-నెట్‌వర్క్)",
+      barDesc: "సముద్రంలోకి వెళ్లే ముందు బోట్ పాస్ మరియు GPS పాయింట్లను డౌన్‌లోడ్ చేసుకోండి.",
+      btnGetPass: "బోట్ పాస్ పొందండి 🎫",
+      btnViewPass: "పాస్ చూడండి 📄",
+      btnOfflineMode: "0-ఇంటర్నెట్ సిమ్యులేటర్",
+      passTitle: "మత్స్యకారుల అధికారిక ప్రయాణ పాస్",
+      passSub: "ISRO సముద్ర నావిగేషన్ భద్రతా ధృవీకరణ పత్రం • PS-26176",
+      targetShoal: "లక్ష్యిత చేపల జోన్ (PFZ)",
+      dieselSaved: "ఆదా అయ్యే డీజిల్",
+      borderSafety: "సరిహద్దు భద్రత (IMBL)",
+      steerGuide: "కంపాస్ మార్గదర్శకత్వం (దశల వారీగా)",
+      emergencySos: "కోస్ట్ గార్డ్ అత్యవసర హెల్ప్‌లైన్",
+      printBtn: "పాస్ ప్రింట్ / సేవ్ చేయండి 🖨️"
     },
     ta: {
       barTitle: "ஆழ்கடல் ஆஃப்லைன் பாஸ் (0-இணையம்)",

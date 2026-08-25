@@ -133,55 +133,55 @@ export default function ProductTour({ isOpen, onClose, selectedLang = 'en', onNa
         }
       ]
     },
-    tcy: {
+    te: {
       steps: [
         {
-          badge: "ಹಂತ 1 / 7 • ಪರಿಚಯ",
-          title: "ಪ್ರಾಜೆಕ್ಟ್ ಒರ್ಕಾ (ORCA) ಗ್ ಸ್ವಾಗತ 🇮🇳",
-          desc: "ಇದು ISRO ಉಪಗ್ರಹ ತಂತ್ರಜ್ಞಾನ ಆಧಾರಿತ ಸಮುದ್ರ AI ಸಿಸ್ಟಮ್. ಕರಾವಳಿದ ಮೀನುಗಾರರೆಗ್ ಮೀನ್ ತಿಕ್ಕುನ ಜಾಗೆ, ಡೀಸೆಲ್ ಒರಿಪುನ ಸಾದಿ ಬೊಕ್ಕ ಗಡಿದ ರಕ್ಷಣೆ ಕೊರ್ಪುಂಡು.",
-          hint: "4 ಸಹಯೋಗಿ AI ಏಜೆಂಟ್ ಲು • 0-ಇಂಟರ್ನೆಟ್ ಸೌಲಭ್ಯ",
+          badge: "దశ 1 / 7 • పరిచయం",
+          title: "ప్రాజెక్ట్ ఓర్కా (ORCA) కు స్వాగతం 🇮🇳",
+          desc: "ఇది ISRO ఉపగ్రహ సాంకేతికత (SST మరియు క్లోరోఫిల్) ఆధారిత సముద్ర AI వేదిక. మత్స్యకారులకు సమృద్ధిగా చేపలు లభించే ప్రాంతాలు, డీజిల్ ఆదా మరియు సరిహద్దు భద్రతను అందిస్తుంది.",
+          hint: "4 సహకార AI ఏజెంట్లు • 0-ఇంటర్నెట్ సదుపాయం",
           tab: "map"
         },
         {
-          badge: "ಹಂತ 2 / 7 • ಬಂದರ್ ಬೊಕ್ಕ ಭಾಷೆ",
-          title: "ಕರಾವಳಿದ ಬಂದರ್ ಬೊಕ್ಕ ತುಳು ಭಾಷೆ ಆಯ್ಕೆ ಮಲ್ಪುಲೆ",
-          desc: "ಮಲ್ಪೆ, ಮಂಗಳೂರು ಬಂದರ್ ಆಯ್ಕೆ ಮಲ್ಪುಲೆ ಬೊಕ್ಕ ತುಳು ಭಾಷೆನ್ ಆರಿಸಲೆ. AI ಮಾತಾ ಮಾಹಿತಿನ್ ತುಳುಟೇ ಕೊರ್ಪುಂಡು.",
-          hint: "ತುಳು ಕರಾವಳಿ ಭಾಷೆಡ್ ಲಭ್ಯ ಉಂಡು.",
+          badge: "దశ 2 / 7 • హార్బర్ & భాష",
+          title: "తీరప్రాంత హార్బర్ మరియు భాషను ఎంచుకోండి",
+          desc: "విశాఖపట్నం, మల్పే, చెన్నై మొదలైన 8 హార్బర్లు మరియు తెలుగు, కన్నడ, తమిళం, హిందీ వంటి 6 భాషలను ఎంచుకోండి. AI తక్షణమే సమాధానం ఇస్తుంది.",
+          hint: "స్థానిక భాషా మద్దతుతో సులభమైన ఉపయోగం.",
           tab: "map"
         },
         {
-          badge: "ಹಂತ 3 / 7 • ಬೋಟ್ ಸೆಟಪ್",
-          title: "ಈರೆನ ಬೋಟ್ ಮಾದರಿ ಸೆಟ್ ಮಲ್ಪುಲೆ",
-          desc: "ಟ್ರಾಲ್ ಬೋಟ್, ಫೈಬರ್ ಬೋಟ್ ಅತ್ತ್ಂಡ ನಾಡ್ದೋಣಿ ಆರಿಸಲೆ. ಐತ ಪ್ರಕಾರ ಡೀಸೆಲ್ ಒರಿಪುನ ಲೆಕ್ಕ ಮಲ್ಪುವ.",
-          hint: "ಬೋಟ್ ದ ವೇಗ ಬೊಕ್ಕ ರೇಂಜ್ ಲೆಕ್ಕಚಾರ.",
+          badge: "దశ 3 / 7 • బోటు సెటప్",
+          title: "మీ బోటు రకాన్ని ఎంచుకోండి",
+          desc: "మెకనైజ్డ్ ట్రావ్‌లర్ (20 లీ/గం), ఫైబర్ బోట్ (6.5 లీ/గం) లేదా సాంప్రదాయ పడవ (3.2 లీ/గం) ఎంచుకోండి. దీని ద్వారా డీజిల్ ఆదా ఖచ్చితంగా లెక్కించబడుతుంది.",
+          hint: "బోటు వేగం మరియు సురక్షిత పరిధి లెక్కలు.",
           tab: "map"
         },
         {
-          badge: "ಹಂತ 4 / 7 • ಲೈವ್ ಮಾಹಿತಿ",
-          title: "ಡೀಸೆಲ್ ಒರಿಪು ಬೊಕ್ಕ ಗಡಿದ ದೂರ",
-          desc: "ಒರಿಪುನ ರುಪಾಯಿ (₹), ಪ್ರಯಾಣದ ಸಮಯ ಬೊಕ್ಕ ಅಂತಾರಾಷ್ಟ್ರೀಯ ಗಡಿರ್ದ್ ಸುರಕ್ಷಿತ ದೂರನ್ ಮುಲ್ಪ ತೂವೊಲಿ.",
-          hint: "ಹೈ-ಕಾಂಟ್ರಾಸ್ಟ್ ಕಾರ್ಡ್ ಲು.",
+          badge: "దశ 4 / 7 • లైవ్ వివరాలు",
+          title: "డీజిల్ ఆదా & సరిహద్దు భద్రత",
+          desc: "ఆదా అయ్యే రూపాయలు (₹), ప్రయాణ సమయం మరియు అంతర్జాతీయ సముద్ర సరిహద్దు (IMBL) సురక్షిత దూరాన్ని 4 రంగుల కార్డులలో చూడండి.",
+          hint: "మత్స్యకారులకు స్పష్టమైన డెక్ కొలతలు.",
           tab: "map"
         },
         {
-          badge: "ಹಂತ 5 / 7 • ನಕ್ಷೆ ಬೊಕ್ಕ ದಿಕ್ಸೂಚಿ",
-          title: "ISRO ನಕ್ಷೆ ಬೊಕ್ಕ ದಿಕ್ಸೂಚಿ ಗೈಡೆನ್ಸ್",
-          desc: "ನಕ್ಷೆಡ್ 🐟 ಮೀನ್ದ ಗುರುತು ಕ್ಲಿಕ್ ಮಲ್ಪುಲೆ. 'Plot & Steer Route ⚡' ಒತ್ತಿಂಡ ಲೈವ್ ದಿಕ್ಸೂಚಿ ಡಿಗ್ರಿ (288° WNW) ಬೊಕ್ಕ ಧ್ವನಿ ಕೇನೊಲಿ!",
-          hint: "ಪಚ್ಚೆ ಗೆರೆ = ಡೀಸೆಲ್ ಒರಿಪುನ AI ಸಾದಿ (-28% ಡೀಸೆಲ್).",
+          badge: "దశ 5 / 7 • మ్యాప్ & కంపాస్",
+          title: "ISRO మ్యాప్ & లైవ్ కంపాస్ స్టీరింగ్",
+          desc: "మ్యాప్‌లో 🐟 చేపల గుర్తును తాకండి. 'Plot & Steer Route ⚡' నొక్కి లైవ్ కంపాస్ కోణం (288° WNW) మరియు వాయిస్ మార్గదర్శకత్వం పొందండి!",
+          hint: "ఆకుపచ్చ గీత = AI ప్రవాహ ఆధారిత ఆదా మార్గం (-28% డీజిల్).",
           tab: "map"
         },
         {
-          badge: "ಹಂತ 6 / 7 • AI ಕೋ-ಪೈಲಟ್",
-          title: "ORCA AI ಕೋ-ಪೈಲಟ್ (ತುಳು ಧ್ವನಿ)",
-          desc: "ತುಳುಟೇ ಪಾತೆರ್ಲೆ ಅತ್ತ್ಂಡ ಟೈಪ್ ಮಲ್ಪುಲೆ. ಹವಾಮಾನ, ಮೀನ್ದ ಮಾಹಿತಿ ಬೊಕ್ಕ ಗಡಿದ ಬಗ್ಗೆ AI ವಿವರ ಕೊರ್ಪುಂಡು.",
-          hint: "ಧ್ವನಿ ಕೇನೆರೆ 🔊 ಬಟನ್ ಒತ್ತಿಲೆ.",
+          badge: "దశ 6 / 7 • AI కో-పైలట్",
+          title: "ORCA AI కో-పైలట్ (వాయిస్ & చాట్)",
+          desc: "తెలుగులో మాట్లాడండి లేదా టైప్ చేయండి. వాతావరణం, చేపల సమాచారం మరియు సరిహద్దు భద్రత గురించి 4 AI ఏజెంట్లు వివరిస్తారు.",
+          hint: "వాయిస్ వినడానికి 🔊 బటన్ నొక్కండి.",
           tab: "chat"
         },
         {
-          badge: "ಹಂತ 7 / 7 • ಆಫ್‌ಲೈನ್ ಪಾಸ್",
-          title: "0-ನೆಟ್‌ವರ್ಕ್ ಆಫ್‌ಲೈನ್ ಬೋಟ್ ಪಾಸ್",
-          desc: "ಕಡಲ್ ಗ್ ಪೋಪಿನ ದುಂಬು GPS ಪಾಯಿಂಟ್ಸ್ ಬೊಕ್ಕ ಕೋಸ್ಟ್ ಗಾರ್ಡ್ ನಂಬರ್ (1554) ಉಪ್ಪುನ ಅಧಿಕೃತ A4 ಪಾಸ್ ಪ್ರಿಂಟ್ ಮಲ್ತೊನ್ಲೆ.",
-          hint: "ಆಳ ಕಡಲ್ಡ್ ಇಂಟರ್ನೆಟ್ ದಾಂತೆ ಕೆಲಸ ಮಲ್ಪುಂಡು!",
+          badge: "దశ 7 / 7 • ఆఫ్ లైన్ పాస్",
+          title: "0-నెట్‌వర్క్ ఆఫ్ లైన్ ప్రయాణ పాస్",
+          desc: "సముద్రంలోకి వెళ్లే ముందు GPS పాయింట్లు మరియు కోస్ట్ గార్డ్ నంబర్ (1554) కలిగిన అధికారిక A4 పాస్‌ను ప్రింట్ చేయండి.",
+          hint: "లోతైన సముద్రంలో ఇంటర్నెట్ లేకుండా 100% పనిచేస్తుంది!",
           tab: "pass"
         }
       ]
@@ -417,7 +417,7 @@ export default function ProductTour({ isOpen, onClose, selectedLang = 'en', onNa
           <div className="bg-[#010814] rounded-2xl p-3.5 border border-cyan-500/30 space-y-2 shadow-inner">
             <div className="flex items-center justify-between text-[11px] text-slate-300 font-mono">
               <span className="text-emerald-400 font-bold flex items-center gap-1"><Anchor className="w-3.5 h-3.5" /> 8 Coastal Harbors</span>
-              <span className="text-cyan-400 font-bold flex items-center gap-1"><Globe2 className="w-3.5 h-3.5" /> 7 Regional Languages</span>
+              <span className="text-cyan-400 font-bold flex items-center gap-1"><Globe2 className="w-3.5 h-3.5" /> 6 Regional Languages</span>
             </div>
             <div className="flex flex-wrap gap-1.5 text-[10px] font-bold">
               <span className="px-2.5 py-1 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">⚓ Malpe (Udupi)</span>
@@ -425,9 +425,10 @@ export default function ProductTour({ isOpen, onClose, selectedLang = 'en', onNa
               <span className="px-2.5 py-1 rounded-xl bg-white/10 text-slate-300">⚓ Chennai</span>
               <span className="px-2.5 py-1 rounded-xl bg-white/10 text-slate-300">⚓ Veraval</span>
               <span className="px-2.5 py-1 rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-400/40">🌐 ಕನ್ನಡ</span>
-              <span className="px-2.5 py-1 rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-400/40">🌐 ತುಳು</span>
               <span className="px-2.5 py-1 rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-400/40">🌐 தமிழ்</span>
+              <span className="px-2.5 py-1 rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-400/40">🌐 తెలుగు</span>
               <span className="px-2.5 py-1 rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-400/40">🌐 മലയാളം</span>
+              <span className="px-2.5 py-1 rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-400/40">🌐 हिन्दी</span>
             </div>
           </div>
         );
