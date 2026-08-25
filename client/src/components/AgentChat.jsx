@@ -215,7 +215,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
   };
 
   return (
-    <div className="glass-panel rounded-2xl sm:rounded-3xl flex flex-col h-[calc(100dvh-235px)] sm:h-[550px] lg:h-[610px] shadow-2xl overflow-hidden w-full border-2 border-white/15">
+    <div id="tour-chat" className="glass-panel rounded-2xl sm:rounded-3xl flex flex-col h-[calc(100dvh-235px)] sm:h-[550px] lg:h-[610px] shadow-2xl overflow-hidden w-full border-2 border-white/15">
       
       {/* Header (Pinned Top) */}
       <div className="bg-[#020b17]/95 border-b border-white/10 p-2.5 sm:p-4 flex items-center justify-between shrink-0">

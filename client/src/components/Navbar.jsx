@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Anchor, Globe2, ChevronDown, Check, Ship } from 'lucide-react';
+import { Anchor, Globe2, ChevronDown, Check, Ship, Sparkles, HelpCircle } from 'lucide-react';
 import { VESSEL_PROFILES } from '../services/marineEngine';
 
 export default function Navbar({ 
@@ -9,6 +9,7 @@ export default function Navbar({
   onLangChange, 
   selectedVessel,
   onOpenVesselModal,
+  onStartTour,
   harbors, 
   isOffline 
 }) {
@@ -80,7 +81,7 @@ export default function Navbar({
   return (
     <header className="relative sm:sticky sm:top-3 z-30 px-2 sm:px-6">
       {/* Outer Container without overflow-hidden so popovers don't get sliced */}
-      <div className="max-w-7xl mx-auto rounded-2xl sm:rounded-3xl p-3 sm:py-7 sm:px-6 shadow-[0_20px_50px_rgba(0,0,0,0.95)] border-2 border-white/20 relative flex flex-col justify-between min-h-[90px] sm:min-h-[145px]">
+      <div className="max-w-7xl mx-auto rounded-2xl sm:rounded-3xl p-3 sm:py-6 sm:px-6 shadow-[0_20px_50px_rgba(0,0,0,0.95)] border-2 border-white/20 relative flex flex-col justify-between min-h-[90px] sm:min-h-[145px]">
         
         {/* Background Layer */}
         <div 
@@ -104,123 +105,137 @@ export default function Navbar({
           <div className="flex items-center justify-between gap-1.5 w-full">
             
             {/* Left: Official Emblem Logo & Brand */}
-            <div className="flex items-center gap-2 shrink-0">
+            <div id="tour-brand" className="flex items-center gap-1.5 shrink-0">
               <img 
                 src="/assets/orca_logo.png" 
                 alt="Project ORCA Logo" 
-                className="w-9 h-9 rounded-full object-cover border-2 border-emerald-400 shadow-[0_0_15px_rgba(0,245,160,0.5)]"
+                className="w-8 h-8 rounded-full object-cover border-2 border-emerald-400 shadow-[0_0_15px_rgba(0,245,160,0.5)]"
               />
               <div>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-black text-white tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,1)]">ORCA</span>
-                  <span className="text-[8px] font-extrabold px-1.5 py-0.5 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-400/60 shadow">
+                <div className="flex items-center gap-1">
+                  <span className="text-xs font-black text-white tracking-tight drop-shadow">ORCA</span>
+                  <span className="text-[8px] font-black px-1 py-0.2 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-400/60 shadow">
                     ISRO
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Right: 3 Action Pills */}
-            <div className="flex items-center gap-1.5 shrink-0">
+            {/* Right: 4 Action Pills */}
+            <div className="flex items-center gap-1 shrink-0">
               
-              {/* Vessel Pill */}
+              {/* Tour Guide Button Mobile */}
               <button
-                onClick={onOpenVesselModal}
-                className="flex items-center gap-1 bg-[#020b17]/95 border border-emerald-500/50 active:scale-95 px-2.5 py-1.5 rounded-xl text-[10px] text-emerald-300 font-black shadow-lg backdrop-blur-md"
+                onClick={onStartTour}
+                className="flex items-center gap-1 bg-amber-500/25 border border-amber-400/60 active:scale-95 px-2 py-1.5 rounded-xl text-[10px] text-amber-300 font-black shadow backdrop-blur-md"
+                title="Start Product Walkthrough"
               >
-                <span>⛵</span>
-                <span className="truncate max-w-[62px]">{currentVessel.short_name.split(' ')[0]}</span>
+                <span>💡</span>
+                <span>Tour</span>
               </button>
 
-              {/* Mobile Harbor Pill */}
-              <div className="relative" ref={mobileHarborRef}>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsHarborOpen(!isHarborOpen);
-                    setIsLangOpen(false);
-                  }}
-                  className="flex items-center gap-1 bg-[#020b17]/95 border border-white/25 active:scale-95 px-2.5 py-1.5 rounded-xl text-[10px] text-slate-100 font-bold shadow-lg backdrop-blur-md"
-                >
-                  <Anchor className="w-3 h-3 text-emerald-400" />
-                  <span className="truncate max-w-[65px]">{currentHarbor.name.split(' ')[0]}</span>
-                  <ChevronDown className="w-2.5 h-2.5 text-slate-400" />
-                </button>
+              {/* Vessel Pill */}
+              <button
+                id="tour-vessel"
+                onClick={onOpenVesselModal}
+                className="flex items-center gap-1 bg-[#020b17]/95 border border-emerald-500/50 active:scale-95 px-2 py-1.5 rounded-xl text-[10px] text-emerald-300 font-black shadow-lg backdrop-blur-md"
+              >
+                <span>⛵</span>
+                <span className="truncate max-w-[55px]">{currentVessel.short_name.split(' ')[0]}</span>
+              </button>
 
-                {isHarborOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-64 bg-[#020b17] border-2 border-emerald-500/80 rounded-2xl shadow-[0_30px_70px_rgba(0,0,0,1)] z-[99999] overflow-hidden animate-fadeIn ring-2 ring-emerald-500/40">
-                    <div className="px-3 py-2 text-[9px] font-mono font-bold uppercase text-emerald-400 bg-[#01060e] border-b border-white/10 tracking-wider flex items-center gap-1">
-                      <Anchor className="w-3 h-3" /> Select Coastal Port
-                    </div>
-                    <div className="max-h-64 overflow-y-auto py-1 divide-y divide-white/[0.06]">
-                      {Object.entries(harbors).map(([key, h]) => {
-                        const isSelected = selectedHarbor === key;
-                        return (
-                          <button
-                            key={key}
-                            type="button"
-                            onClick={(e) => handleSelectHarbor(key, e)}
-                            className={`w-full text-left px-3.5 py-2.5 text-xs flex items-center justify-between active:bg-emerald-500/30 transition ${
-                              isSelected
+              {/* Mobile Harbor & Lang Combined Container for Tour */}
+              <div id="tour-harbor-lang" className="flex items-center gap-1">
+                {/* Mobile Harbor Pill */}
+                <div className="relative" ref={mobileHarborRef}>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsHarborOpen(!isHarborOpen);
+                      setIsLangOpen(false);
+                    }}
+                    className="flex items-center gap-1 bg-[#020b17]/95 border border-white/25 active:scale-95 px-2 py-1.5 rounded-xl text-[10px] text-slate-100 font-bold shadow-lg backdrop-blur-md"
+                  >
+                    <Anchor className="w-3 h-3 text-emerald-400" />
+                    <span className="truncate max-w-[55px]">{currentHarbor.name.split(' ')[0]}</span>
+                    <ChevronDown className="w-2.5 h-2.5 text-slate-400" />
+                  </button>
+
+                  {isHarborOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-64 bg-[#020b17] border-2 border-emerald-500/80 rounded-2xl shadow-[0_30px_70px_rgba(0,0,0,1)] z-[99999] overflow-hidden animate-fadeIn ring-2 ring-emerald-500/40">
+                      <div className="px-3 py-2 text-[9px] font-mono font-bold uppercase text-emerald-400 bg-[#01060e] border-b border-white/10 tracking-wider flex items-center gap-1">
+                        <Anchor className="w-3 h-3" /> Select Coastal Port
+                      </div>
+                      <div className="max-h-64 overflow-y-auto py-1 divide-y divide-white/[0.06]">
+                        {Object.entries(harbors).map(([key, h]) => {
+                          const isSelected = selectedHarbor === key;
+                          return (
+                            <button
+                              key={key}
+                              type="button"
+                              onClick={(e) => handleSelectHarbor(key, e)}
+                              className={`w-full text-left px-3.5 py-2.5 text-xs flex items-center justify-between active:bg-emerald-500/30 transition ${
+                                isSelected
                                 ? 'bg-emerald-500/20 text-emerald-300 font-bold border-l-4 border-emerald-400'
                                 : 'text-slate-200 hover:bg-white/10'
-                            }`}
-                          >
-                            <div>
-                              <div className="font-bold text-white text-[11px]">{h.name.split('(')[0].trim()}</div>
-                              <div className="text-[9px] text-slate-400 font-mono">{h.state} &bull; {h.coast}</div>
-                            </div>
-                            {isSelected && <Check className="w-4 h-4 text-emerald-400 shrink-0" />}
-                          </button>
-                        );
-                      })}
+                              }`}
+                            >
+                              <div>
+                                <div className="font-bold text-white text-[11px]">{h.name.split('(')[0].trim()}</div>
+                                <div className="text-[9px] text-slate-400 font-mono">{h.state} &bull; {h.coast}</div>
+                              </div>
+                              {isSelected && <Check className="w-4 h-4 text-emerald-400 shrink-0" />}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
 
-              {/* Mobile Language Pill */}
-              <div className="relative" ref={mobileLangRef}>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsLangOpen(!isLangOpen);
-                    setIsHarborOpen(false);
-                  }}
-                  className="flex items-center gap-1 bg-[#020b17]/95 border border-white/25 active:scale-95 px-2.5 py-1.5 rounded-xl text-[10px] text-cyan-300 font-bold shadow-lg backdrop-blur-md"
-                >
-                  <Globe2 className="w-3 h-3 text-cyan-400" />
-                  <span>{currentLang.code.toUpperCase()}</span>
-                  <ChevronDown className="w-2.5 h-2.5 text-slate-400" />
-                </button>
+                {/* Mobile Language Pill */}
+                <div className="relative" ref={mobileLangRef}>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsLangOpen(!isLangOpen);
+                      setIsHarborOpen(false);
+                    }}
+                    className="flex items-center gap-1 bg-[#020b17]/95 border border-white/25 active:scale-95 px-2 py-1.5 rounded-xl text-[10px] text-cyan-300 font-bold shadow-lg backdrop-blur-md"
+                  >
+                    <Globe2 className="w-3 h-3 text-cyan-400" />
+                    <span>{currentLang.code.toUpperCase()}</span>
+                    <ChevronDown className="w-2.5 h-2.5 text-slate-400" />
+                  </button>
 
-                {isLangOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-52 bg-[#020b17] border-2 border-cyan-500/80 rounded-2xl shadow-[0_30px_70px_rgba(0,0,0,1)] z-[99999] overflow-hidden animate-fadeIn ring-2 ring-cyan-500/40">
-                    <div className="px-3 py-2 text-[9px] font-mono font-bold uppercase text-cyan-400 bg-[#01060e] border-b border-white/10 tracking-wider">
-                      Select Language
-                    </div>
-                    <div className="max-h-64 overflow-y-auto py-1 divide-y divide-white/[0.06]">
-                      {languages.map((l) => {
-                        const isSelected = selectedLang === l.code;
-                        return (
-                          <button
-                            key={l.code}
-                            type="button"
-                            onClick={(e) => handleSelectLang(l.code, e)}
-                            className={`w-full text-left px-3.5 py-2.5 text-xs flex items-center justify-between active:bg-cyan-500/30 transition ${
-                              isSelected
+                  {isLangOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-52 bg-[#020b17] border-2 border-cyan-500/80 rounded-2xl shadow-[0_30px_70px_rgba(0,0,0,1)] z-[99999] overflow-hidden animate-fadeIn ring-2 ring-cyan-500/40">
+                      <div className="px-3 py-2 text-[9px] font-mono font-bold uppercase text-cyan-400 bg-[#01060e] border-b border-white/10 tracking-wider">
+                        Select Language
+                      </div>
+                      <div className="max-h-64 overflow-y-auto py-1 divide-y divide-white/[0.06]">
+                        {languages.map((l) => {
+                          const isSelected = selectedLang === l.code;
+                          return (
+                            <button
+                              key={l.code}
+                              type="button"
+                              onClick={(e) => handleSelectLang(l.code, e)}
+                              className={`w-full text-left px-3.5 py-2.5 text-xs flex items-center justify-between active:bg-cyan-500/30 transition ${
+                                isSelected
                                 ? 'bg-cyan-500/20 text-cyan-300 font-bold border-l-4 border-cyan-400'
                                 : 'text-slate-200 hover:bg-white/10'
-                            }`}
-                          >
-                            <span className="font-medium text-white">{l.label}</span>
-                            {isSelected && <Check className="w-4 h-4 text-cyan-400 shrink-0" />}
-                          </button>
-                        );
-                      })}
+                              }`}
+                            >
+                              <span className="font-medium text-white">{l.label}</span>
+                              {isSelected && <Check className="w-4 h-4 text-cyan-400 shrink-0" />}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
 
             </div>
@@ -243,7 +258,7 @@ export default function Navbar({
           <div className="flex items-center justify-between gap-3 w-full">
             
             {/* Official Circular Emblem Logo & Brand */}
-            <div className="flex items-center gap-3.5">
+            <div id="tour-brand" className="flex items-center gap-3.5">
               <img 
                 src="/assets/orca_logo.png" 
                 alt="Project ORCA Official Emblem" 
@@ -268,8 +283,19 @@ export default function Navbar({
             {/* Desktop Controls Row */}
             <div className="flex items-center gap-2.5">
               
+              {/* Product Tour Guide Button */}
+              <button
+                onClick={onStartTour}
+                className="flex items-center gap-1.5 bg-gradient-to-r from-amber-400/20 to-emerald-400/20 hover:from-amber-400/30 hover:to-emerald-400/30 border border-amber-400/60 active:scale-95 rounded-2xl px-3.5 py-2.5 text-xs text-amber-300 transition shadow-[0_0_20px_rgba(245,158,11,0.25)] backdrop-blur-md group"
+                title="Start Interactive Product Tour"
+              >
+                <Sparkles className="w-4 h-4 text-amber-400 animate-spin" style={{ animationDuration: '10s' }} />
+                <span className="font-black">Tour Guide</span>
+              </button>
+
               {/* Vessel Profile */}
               <button
+                id="tour-vessel"
                 onClick={onOpenVesselModal}
                 className="flex items-center gap-2 bg-[#020b17]/95 hover:bg-[#04152a] border border-emerald-500/50 active:scale-95 rounded-2xl px-3.5 py-2.5 text-xs text-slate-100 transition shadow-[0_10px_25px_rgba(0,0,0,0.8)] backdrop-blur-md group"
               >
@@ -282,106 +308,109 @@ export default function Navbar({
                 </div>
               </button>
 
-              {/* Desktop Harbor Selector */}
-              <div className="relative" ref={desktopHarborRef}>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsHarborOpen(!isHarborOpen);
-                    setIsLangOpen(false);
-                  }}
-                  className="flex items-center justify-between gap-2 bg-[#020b17]/95 hover:bg-[#041224] border border-white/25 active:scale-95 rounded-2xl px-4 py-2.5 text-xs text-slate-100 transition shadow-[0_10px_25px_rgba(0,0,0,0.8)] backdrop-blur-md"
-                >
-                  <div className="flex items-center gap-2 truncate">
-                    <Anchor className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span className="font-black truncate max-w-[140px] text-white">
-                      {currentHarbor?.name?.split('(')[0]?.trim() || 'Port'}
-                    </span>
-                  </div>
-                  <ChevronDown className={`w-3.5 h-3.5 text-slate-300 transition-transform duration-200 shrink-0 ${isHarborOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {isHarborOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-[#020b17] border-2 border-emerald-500/80 rounded-2xl shadow-[0_30px_70px_rgba(0,0,0,1)] z-[99999] overflow-hidden animate-fadeIn ring-2 ring-emerald-500/40">
-                    <div className="px-4 py-2.5 text-[10px] font-mono font-bold uppercase text-emerald-400 bg-[#01060e] border-b border-white/10 tracking-wider flex items-center gap-1.5">
-                      <Anchor className="w-3.5 h-3.5" /> Select Coastal Harbor
+              {/* Desktop Harbor & Language Combined Anchor */}
+              <div id="tour-harbor-lang" className="flex items-center gap-2.5">
+                {/* Desktop Harbor Selector */}
+                <div className="relative" ref={desktopHarborRef}>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsHarborOpen(!isHarborOpen);
+                      setIsLangOpen(false);
+                    }}
+                    className="flex items-center justify-between gap-2 bg-[#020b17]/95 hover:bg-[#041224] border border-white/25 active:scale-95 rounded-2xl px-4 py-2.5 text-xs text-slate-100 transition shadow-[0_10px_25px_rgba(0,0,0,0.8)] backdrop-blur-md"
+                  >
+                    <div className="flex items-center gap-2 truncate">
+                      <Anchor className="w-4 h-4 text-emerald-400 shrink-0" />
+                      <span className="font-black truncate max-w-[140px] text-white">
+                        {currentHarbor?.name?.split('(')[0]?.trim() || 'Port'}
+                      </span>
                     </div>
-                    <div className="max-h-72 overflow-y-auto py-1 divide-y divide-white/[0.04]">
-                      {Object.entries(harbors).map(([key, h]) => {
-                        const isSelected = selectedHarbor === key;
-                        return (
-                          <button
-                            key={key}
-                            type="button"
-                            onClick={(e) => handleSelectHarbor(key, e)}
-                            className={`w-full text-left px-4 py-2.5 text-xs flex items-center justify-between transition ${
-                              isSelected 
+                    <ChevronDown className={`w-3.5 h-3.5 text-slate-300 transition-transform duration-200 shrink-0 ${isHarborOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {isHarborOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-[#020b17] border-2 border-emerald-500/80 rounded-2xl shadow-[0_30px_70px_rgba(0,0,0,1)] z-[99999] overflow-hidden animate-fadeIn ring-2 ring-emerald-500/40">
+                      <div className="px-4 py-2.5 text-[10px] font-mono font-bold uppercase text-emerald-400 bg-[#01060e] border-b border-white/10 tracking-wider flex items-center gap-1.5">
+                        <Anchor className="w-3.5 h-3.5" /> Select Coastal Harbor
+                      </div>
+                      <div className="max-h-72 overflow-y-auto py-1 divide-y divide-white/[0.04]">
+                        {Object.entries(harbors).map(([key, h]) => {
+                          const isSelected = selectedHarbor === key;
+                          return (
+                            <button
+                              key={key}
+                              type="button"
+                              onClick={(e) => handleSelectHarbor(key, e)}
+                              className={`w-full text-left px-4 py-2.5 text-xs flex items-center justify-between transition ${
+                                isSelected 
                                 ? 'bg-emerald-500/20 text-emerald-300 font-bold border-l-4 border-emerald-400' 
                                 : 'text-slate-200 hover:bg-white/[0.08]'
-                            }`}
-                          >
-                            <div>
-                              <div className="flex items-center gap-1.5">
-                                <span>⚓</span>
-                                <span className="text-white font-medium">{h.name.split('(')[0].trim()}</span>
+                              }`}
+                            >
+                              <div>
+                                <div className="flex items-center gap-1.5">
+                                  <span>⚓</span>
+                                  <span className="text-white font-medium">{h.name.split('(')[0].trim()}</span>
+                                </div>
+                                <div className="text-[10px] text-slate-400 font-mono pl-4 mt-0.5">
+                                  {h.state} &bull; {h.coast}
+                                </div>
                               </div>
-                              <div className="text-[10px] text-slate-400 font-mono pl-4 mt-0.5">
-                                {h.state} &bull; {h.coast}
-                              </div>
-                            </div>
-                            {isSelected && <Check className="w-4 h-4 text-emerald-400 shrink-0" />}
-                          </button>
-                        );
-                      })}
+                              {isSelected && <Check className="w-4 h-4 text-emerald-400 shrink-0" />}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
 
-              {/* Desktop Language Selector */}
-              <div className="relative" ref={desktopLangRef}>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsLangOpen(!isLangOpen);
-                    setIsHarborOpen(false);
-                  }}
-                  className="flex items-center justify-between gap-2 bg-[#020b17]/95 hover:bg-[#041224] border border-white/25 active:scale-95 rounded-2xl px-4 py-2.5 text-xs text-slate-100 transition shadow-[0_10px_25px_rgba(0,0,0,0.8)] backdrop-blur-md"
-                >
-                  <div className="flex items-center gap-1.5">
-                    <Globe2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                    <span className="font-black text-white">{currentLang.label.split(' ')[0]}</span>
-                  </div>
-                  <ChevronDown className={`w-3.5 h-3.5 text-slate-300 transition-transform duration-200 shrink-0 ${isLangOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {isLangOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-52 sm:w-60 bg-[#020b17] border-2 border-cyan-500/80 rounded-2xl shadow-[0_30px_70px_rgba(0,0,0,1)] z-[99999] overflow-hidden animate-fadeIn ring-2 ring-cyan-500/40">
-                    <div className="px-4 py-2.5 text-[10px] font-mono font-bold uppercase text-cyan-400 bg-[#01060e] border-b border-white/10 tracking-wider flex items-center gap-1.5">
-                      <Globe2 className="w-3.5 h-3.5" /> Regional Language
+                {/* Desktop Language Selector */}
+                <div className="relative" ref={desktopLangRef}>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsLangOpen(!isLangOpen);
+                      setIsHarborOpen(false);
+                    }}
+                    className="flex items-center justify-between gap-2 bg-[#020b17]/95 hover:bg-[#041224] border border-white/25 active:scale-95 rounded-2xl px-4 py-2.5 text-xs text-slate-100 transition shadow-[0_10px_25px_rgba(0,0,0,0.8)] backdrop-blur-md"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <Globe2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                      <span className="font-black text-white">{currentLang.label.split(' ')[0]}</span>
                     </div>
-                    <div className="max-h-72 overflow-y-auto py-1 divide-y divide-white/[0.04]">
-                      {languages.map((l) => {
-                        const isSelected = selectedLang === l.code;
-                        return (
-                          <button
-                            key={l.code}
-                            type="button"
-                            onClick={(e) => handleSelectLang(l.code, e)}
-                            className={`w-full text-left px-4 py-2.5 text-xs flex items-center justify-between transition ${
-                              isSelected 
+                    <ChevronDown className={`w-3.5 h-3.5 text-slate-300 transition-transform duration-200 shrink-0 ${isLangOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {isLangOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-52 sm:w-60 bg-[#020b17] border-2 border-cyan-500/80 rounded-2xl shadow-[0_30px_70px_rgba(0,0,0,1)] z-[99999] overflow-hidden animate-fadeIn ring-2 ring-cyan-500/40">
+                      <div className="px-4 py-2.5 text-[10px] font-mono font-bold uppercase text-cyan-400 bg-[#01060e] border-b border-white/10 tracking-wider flex items-center gap-1.5">
+                        <Globe2 className="w-3.5 h-3.5" /> Regional Language
+                      </div>
+                      <div className="max-h-72 overflow-y-auto py-1 divide-y divide-white/[0.04]">
+                        {languages.map((l) => {
+                          const isSelected = selectedLang === l.code;
+                          return (
+                            <button
+                              key={l.code}
+                              type="button"
+                              onClick={(e) => handleSelectLang(l.code, e)}
+                              className={`w-full text-left px-4 py-2.5 text-xs flex items-center justify-between transition ${
+                                isSelected 
                                 ? 'bg-cyan-500/20 text-cyan-300 font-bold border-l-4 border-cyan-400' 
                                 : 'text-slate-200 hover:bg-white/[0.08]'
-                            }`}
-                          >
-                            <span className="text-white font-medium">{l.label}</span>
-                            {isSelected && <Check className="w-4 h-4 text-cyan-400 shrink-0" />}
-                          </button>
-                        );
-                      })}
+                              }`}
+                            >
+                              <span className="text-white font-medium">{l.label}</span>
+                              {isSelected && <Check className="w-4 h-4 text-cyan-400 shrink-0" />}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
 
               {/* Desktop Live Status */}

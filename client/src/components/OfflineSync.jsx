@@ -363,7 +363,7 @@ export default function OfflineSync({ harbor, selectedHotspot, route, weather, i
       {/* ========================================================================= */}
       {/* 1. ON-SCREEN OFFSCREEN SYNC STRIP (Clean & High-Contrast for Fishermen) */}
       {/* ========================================================================= */}
-      <div className="glass-panel rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 border border-white/15">
+      <div id="tour-pass" className="glass-panel rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 border border-white/15">
         
         <div className="flex items-center gap-3.5">
           <img 

@@ -161,7 +161,7 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
   };
 
   return (
-    <div className="relative w-full h-[440px] sm:h-[520px] lg:h-[620px] rounded-3xl overflow-hidden glass-panel shadow-2xl border-2 border-white/20">
+    <div id="tour-map" className="relative w-full h-[440px] sm:h-[520px] lg:h-[620px] rounded-3xl overflow-hidden glass-panel shadow-2xl border-2 border-white/20">
       
       {/* 1. LEAFLET MAP CONTAINER (Rendered First so Overlays Sit on Top) */}
       <MapContainer

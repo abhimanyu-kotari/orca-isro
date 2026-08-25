@@ -7,6 +7,7 @@ import AgentChat from './components/AgentChat';
 import OfflineSync from './components/OfflineSync';
 import MobileBottomNav from './components/MobileBottomNav';
 import VesselModal from './components/VesselModal';
+import ProductTour from './components/ProductTour';
 
 import {
   HARBORS,
@@ -27,6 +28,7 @@ function App() {
   const [selectedLang, setSelectedLang] = useState('en');
   const [selectedVessel, setSelectedVessel] = useState('trawler'); // 'trawler' | 'fibre' | 'canoe'
   const [isVesselModalOpen, setIsVesselModalOpen] = useState(false);
+  const [isTourOpen, setIsTourOpen] = useState(false);
   const [activeMobileTab, setActiveMobileTab] = useState('map'); // 'map' | 'chat' | 'weather' | 'pass'
   const [harbors, setHarbors] = useState(HARBORS);
   const [hotspots, setHotspots] = useState(() => generateHotspots('malpe'));
@@ -52,6 +54,17 @@ function App() {
     { name: 'Nava Setu Agent', status: 'Active', summary: 'A* fuel-optimal pathfinding' },
     { name: 'Samudra Raksha Agent', status: 'Active', summary: 'IMBL boundary monitoring' }
   ]);
+
+  // Check first-time user tour trigger
+  useEffect(() => {
+    try {
+      const hasSeenTour = localStorage.getItem('orca_tour_seen');
+      if (!hasSeenTour) {
+        const timer = setTimeout(() => setIsTourOpen(true), 1200);
+        return () => clearTimeout(timer);
+      }
+    } catch (e) {}
+  }, []);
 
   // Update harbor & vessel data on selection change
   const updateHarborData = async (harborKey, vesselKey = selectedVessel) => {
@@ -227,6 +240,7 @@ function App() {
         onLangChange={(l) => setSelectedLang(l)}
         selectedVessel={selectedVessel}
         onOpenVesselModal={() => setIsVesselModalOpen(true)}
+        onStartTour={() => setIsTourOpen(true)}
         harbors={safeHarbors}
         isOffline={isOffline}
       />
@@ -309,6 +323,14 @@ function App() {
         onClose={() => setIsVesselModalOpen(false)}
         selectedVessel={selectedVessel}
         onSelectVessel={handleVesselChange}
+      />
+
+      {/* Interactive Product Tour Walkthrough */}
+      <ProductTour
+        isOpen={isTourOpen}
+        onClose={() => setIsTourOpen(false)}
+        selectedLang={selectedLang}
+        onNavigateTab={(tab) => setActiveMobileTab(tab)}
       />
 
       {/* Native Mobile Bottom Tab Bar */}

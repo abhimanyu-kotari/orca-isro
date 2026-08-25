@@ -17,7 +17,7 @@ export default function Telemetry({ route, hotspot, weather, geofence }) {
     : rawSpecies;
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+    <div id="tour-telemetry" className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       
       {/* ========================================================================= */}
       {/* 1. TARGET FISH SHOAL CAPSULE (Ocean Green & Bioluminescent Cyan) */}
