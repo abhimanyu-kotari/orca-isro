@@ -1,7 +1,7 @@
 """
 Master Agentic Orchestrator & Conversational Planner
 Decomposes user queries into discrete subagent tasks, coordinates multi-agent reasoning,
-and synthesizes evidence-based recommendations in Indian regional languages.
+and synthesizes evidence-based recommendations in Indian regional languages (including Kannada and Tulu).
 """
 
 from typing import Dict, Any, List
@@ -14,6 +14,8 @@ class MasterOrchestratorAgent:
     def __init__(self):
         self.supported_languages = {
             "en": "English",
+            "kn": "Kannada (ಕನ್ನಡ)",
+            "tcy": "Tulu (ತುಳು - ಕರಾವಳಿ)",
             "ta": "Tamil (தமிழ்)",
             "te": "Telugu (తెలుగు)",
             "ml": "Malayalam (മലയാളം)",
@@ -30,13 +32,13 @@ class MasterOrchestratorAgent:
         harbor = harbors.get(harbor_id.lower(), harbors["chennai"])
         
         # 1. Intent Detection
-        if any(k in msg_lower for k in ["pfz", "fish", "hotspot", "catch", "mackerel", "sardine", "tuna", "nearest zone", "where"]):
+        if any(k in msg_lower for k in ["pfz", "fish", "hotspot", "catch", "mackerel", "sardine", "tuna", "nearest zone", "where", "ಮೀನು", "ಮೀನ್"]):
             intent = "FIND_PFZ"
-        elif any(k in msg_lower for k in ["safe", "weather", "wave", "cyclone", "storm", "wind", "venture", "tomorrow", "rain"]):
+        elif any(k in msg_lower for k in ["safe", "weather", "wave", "cyclone", "storm", "wind", "venture", "tomorrow", "rain", "ಸುರಕ್ಷಿತ", "ಕಡಲ್"]):
             intent = "CHECK_SAFETY"
-        elif any(k in msg_lower for k in ["route", "fuel", "diesel", "navigate", "path", "cost", "save", "distance"]):
+        elif any(k in msg_lower for k in ["route", "fuel", "diesel", "navigate", "path", "cost", "save", "distance", "ಡೀಸೆಲ್"]):
             intent = "OPTIMIZE_ROUTE"
-        elif any(k in msg_lower for k in ["border", "imbl", "sri lanka", "pakistan", "arrest", "restriction", "prohibited", "avoid"]):
+        elif any(k in msg_lower for k in ["border", "imbl", "sri lanka", "pakistan", "arrest", "restriction", "prohibited", "avoid", "ಗಡಿ"]):
             intent = "CHECK_BOUNDARIES"
         elif any(k in msg_lower for k in ["productivity", "decline", "why", "temperature", "chlorophyll", "ecosystem"]):
             intent = "EXPLAIN_PRODUCTIVITY"
@@ -90,71 +92,53 @@ class MasterOrchestratorAgent:
         }
 
     def _generate_vernacular_text(self, intent, harbor, hotspot, weather, route, geofence, lang="en"):
-        # English base summary
         h_name = harbor['name'].split()[0]
         species = hotspot['primary_species'].split('(')[0].strip()
         fuel_saved = route['cost_saved_inr']
         dist_nm = hotspot['distance_nm']
         imbl_km = geofence['nearest_imbl_distance_km']
 
-        if lang == "ta": # Tamil
+        if lang == "kn": # Kannada
             if intent == "CHECK_SAFETY":
-                txt = f"🌊 **கடல் பாதுகாப்பு நிலை ({h_name})**: கடல் தற்போது **{weather['safety_status']}**. அலை உயரம் {weather['wave_height_m']} மீ, காற்று {weather['wind_speed_knots']} நாட்ஸ். {weather['advisory_verdict']}"
-                voice = f"கடல் நிலை தற்போது பாதுகாப்பாக உள்ளது. அலை உயரம் {weather['wave_height_m']} மீட்டர். மீன்பிடிக்க செல்லலாம்."
+                txt = f"🌊 **ಸಮುದ್ರ ಸುರಕ್ಷತಾ ಮಾಹಿತಿ ({h_name})**: ಸಮುದ್ರದ ಸ್ಥಿತಿ ಪ್ರಸ್ತುತ **{weather['safety_status']}** ಆಗಿದೆ. ಅಲೆಗಳ ಎತ್ತರ **{weather['wave_height_m']} ಮೀಟರ್**, ಗಾಳಿಯ ವೇಗ {weather['wind_speed_knots']} ನಾಟ್ಸ್. {weather['advisory_verdict']}"
+                voice = f"ಸಮುದ್ರದ ಸ್ಥಿತಿ ಪ್ರಸ್ತುತ ಸುರಕ್ಷಿತವಾಗಿದೆ. ಅಲೆಗಳ ಎತ್ತರ {weather['wave_height_m']} ಮೀಟರ್. ಮೀನುಗಾರಿಕೆಗೆ ತೆರಳಬಹುದು."
             elif intent == "CHECK_BOUNDARIES":
-                txt = f"🛡️ **எல்லை பாதுகாப்பு எச்சரிக்கை**: தேர்ந்தெடுக்கப்பட்ட மீன்பிடி மண்டலம் சர்வதேச கடல் எல்லைக்கு (IMBL) **{imbl_km} கி.மீ** தொலைவில் உள்ளது. நிலை: **{geofence['status']}**."
-                voice = f"எச்சரிக்கை: நீங்கள் சர்வதேச கடல் எல்லைக்கு {imbl_km} கிலோமீட்டர் தொலைவில் உள்ளீர்கள். எல்லை தாண்ட வேண்டாம்."
+                txt = f"🛡️ **ಅಂತಾರಾಷ್ಟ್ರೀಯ ಗಡಿ ಎಚ್ಚರಿಕೆ**: ಆಯ್ದ ಮೀನುಗಾರಿಕಾ ವಲಯವು ಅಂತಾರಾಷ್ಟ್ರೀಯ ಗಡಿಯಿಂದ (IMBL) **{imbl_km} ಕಿ.ಮೀ** ದೂರದಲ್ಲಿದೆ. ಸ್ಥಿತಿ: **{geofence['status']}**."
+                voice = f"ಎಚ್ಚರಿಕೆ: ನೀವು ಅಂತಾರಾಷ್ಟ್ರೀಯ ಗಡಿಯಿಂದ {imbl_km} ಕಿಲೋಮೀಟರ್ ದೂರದಲ್ಲಿದ್ದೀರಿ. ಗಡಿ ದಾಟಬೇಡಿ."
             else:
-                txt = f"🐟 **பரிந்துரைக்கப்பட்ட மீன்பிடி மண்டலம் ({hotspot['id']})**: {dist_nm} கடல் மைல் தொலைவில் **{species}** மீன் கூட்டம் கண்டறியப்பட்டுள்ளது. AI வழித்தடத்தை பின்பற்றுவதன் மூலம் **₹{fuel_saved} டீசல் செலவை சேமிக்கலாம்**. கடல் எல்லை {imbl_km} கி.மீ தொலைவில் பாதுகாப்பாக உள்ளது."
-                voice = f"{h_name} துறைமுகத்திலிருந்து {dist_nm} கடல் மைல் தொலைவில் {species} மீன்கள் உள்ளன. AI வழியை பயன்படுத்தினால் {fuel_saved} ரூபாய் சேமிக்கலாம்."
+                txt = f"🐟 **ಶಿಫಾರಸು ಮಾಡಿದ ಸಂಭಾವ್ಯ ಮೀನುಗಾರಿಕೆ ವಲಯ ({hotspot['id']})**:\n• {h_name} ಬಂದರಿನಿಂದ **{dist_nm} ನಾಟಿಕಲ್ ಮೈಲಿ** ದೂರದಲ್ಲಿ **{species}** ಸಮೃದ್ಧವಾಗಿ ಲಭ್ಯವಿದೆ.\n• ISRO AI ಪ್ರವಾಹ-ಮಾರ್ಗ ಬಳಸುವುದರಿಂದ **₹{fuel_saved} ಡೀಸೆಲ್ ಉಳಿತಾಯವಾಗುತ್ತದೆ** ({route['fuel_savings_percentage']}% ಉಳಿತಾಯ).\n• ಸಮುದ್ರದ ಸ್ಥಿತಿ: **ಸುರಕ್ಷಿತ (ಅಲೆಗಳ ಎತ್ತರ {weather['wave_height_m']} ಮೀ)**. ಗಡಿಯಿಂದ ಸುರಕ್ಷಿತ ಅಂತರ: {imbl_km} ಕಿ.ಮೀ."
+                voice = f"{h_name} ಬಂದರಿನಿಂದ {dist_nm} ನಾಟಿಕಲ್ ಮೈಲಿ ದೂರದಲ್ಲಿ {species} ಮೀನುಗಳು ಲಭ್ಯವಿವೆ. AI ಮಾರ್ಗದಿಂದ {fuel_saved} ರೂಪಾಯಿ ಡೀಸೆಲ್ ಉಳಿತಾಯವಾಗುತ್ತದೆ."
+
+        elif lang == "tcy": # Tulu (Tulunadu Coastal Dialect)
+            if intent == "CHECK_SAFETY":
+                txt = f"🌊 **ಕಡಲ್ದ ಪರಿಸ್ಥಿತಿ ({h_name})**: ಕಡಲ್ ಇತ್ತೆ **{weather['safety_status']}** ಉಂಡು. ಅಲೆತ್ತ ಎತ್ತರ **{weather['wave_height_m']} ಮೀಟರ್**. {weather['advisory_verdict']}"
+                voice = f"ಕಡಲ್ದ ಪರಿಸ್ಥಿತಿ ಎಡ್ಡ ಉಂಡು. ಅಲೆತ್ತ ಎತ್ತರ {weather['wave_height_m']} ಮೀಟರ್. ಮೀನ್ ಪತ್ತೆರೆ ಪೋವೊಲಿ."
+            elif intent == "CHECK_BOUNDARIES":
+                txt = f"🛡️ **ಕಡಲ್ದ ಗಡಿ ಎಚ್ಚರಿಕೆ**: ಈರ್ ಆಯ್ದ ಮಲ್ದಿನ ಜಾಗೆ ಅಂತಾರಾಷ್ಟ್ರೀಯ ಗಡಿದ್ **{imbl_km} ಕಿ.ಮೀ** ದೂರೊಡು ಉಂಡು. ಸ್ಥಿತಿ: **{geofence['status']}**."
+                voice = f"ಎಚ್ಚರಿಕೆ: ಅಂತಾರಾಷ್ಟ್ರೀಯ ಗಡಿದ್ {imbl_km} ಕಿಲೋಮೀಟರ್ ದೂರೊಡು ಉಲ್ಲರ್."
+            else:
+                txt = f"🐟 **ಮೀನ್ ಪತ್ತುನ ಎಡ್ಡ ಜಾಗೆ ({hotspot['id']})**:\n• {h_name} ಬಂದರ್ದ್ **{dist_nm} ನಾಟಿಕಲ್ ಮೈಲ್** ದೂರೊಡು **{species}** ಮೀನ್ ಮಸ್ತ್ ತಿಕ್ಕುಂಡು.\n• ISRO AI ಮಾರ್ಗ ಗಲಸುಂಡ **₹{fuel_saved} ಡೀಸೆಲ್ ಒರಿಪುಂಡು** ({route['fuel_savings_percentage']}% ಡೀಸೆಲ್ ಉಳಿತಾಯ).\n• ಕಡಲ್ ಪರಿಸ್ಥಿತಿ: **ಎಡ್ಡ ಉಂಡು (ಅಲೆತ್ತ ಎತ್ತರ {weather['wave_height_m']} ಮೀ)**. ಬಾರ್ಡರ್ ದೂರ: {imbl_km} ಕಿ.ಮೀ."
+                voice = f"{dist_nm} ನಾಟಿಕಲ್ ಮೈಲ್ ದೂರೊಡು {species} ಮೀನ್ ಉಂಡು. AI ರೂಟ್ ಗಲಸುಂಡ {fuel_saved} ರೂಪಾಯಿ ಒರಿಪುಂಡು."
+
+        elif lang == "ta": # Tamil
+            txt = f"🐟 **பரிந்துரைக்கப்பட்ட மீன்பிடி மண்டலம் ({hotspot['id']})**: {dist_nm} கடல் மைல் தொலைவில் **{species}** மீன் கூட்டம் உள்ளது. AI வழித்தடத்தை பயன்படுத்தினால் **₹{fuel_saved} டீசல் சேமிக்கலாம்**."
+            voice = f"{dist_nm} கடல் மைல் தொலைவில் {species} மீன்கள் உள்ளன. AI வழியை பயன்படுத்தினால் {fuel_saved} ரூபாய் சேமிக்கலாம்."
 
         elif lang == "te": # Telugu
-            if intent == "CHECK_SAFETY":
-                txt = f"🌊 **సముద్ర భద్రతా సమాచారం ({h_name})**: సముద్రం ప్రస్తుతం **{weather['safety_status']}**. అలల ఎత్తు {weather['wave_height_m']} మీటర్లు. {weather['advisory_verdict']}"
-                voice = f"సముద్ర వాతావరణం ప్రస్తుతం అనుకూలంగా ఉంది. అలల ఎత్తు {weather['wave_height_m']} మీటర్లు."
-            elif intent == "CHECK_BOUNDARIES":
-                txt = f"🛡️ **సరిహద్దు హెచ్చరిక**: మీ ఎంపిక చేసిన చేపల జోన్ అంతర్జాతీయ సరిహద్దుకు (IMBL) **{imbl_km} కి.మీ** దూరంలో ఉంది."
-                voice = f"హెచ్చరిక: అంతర్జాతీయ సముద్ర సరిహద్దుకు {imbl_km} కిలోమీటర్ల దూరంలో ఉన్నారు. జాగ్రత్తగా ఉండండి."
-            else:
-                txt = f"🐟 **చేపల సంపద జోన్ ({hotspot['id']})**: {dist_nm} నాటికల్ మైళ్ళ దూరంలో **{species}** సమృద్ధిగా ఉన్నాయి. AI రూట్ ద్వారా **₹{fuel_saved} డీజిల్ ఆదా చేయవచ్చు**."
-                voice = f"{dist_nm} నాటికల్ మైళ్ల దూరంలో {species} చేపలు ఉన్నాయి. AI మార్గాన్ని ఉపయోగిస్తే {fuel_saved} రూపాయలు ఆదా అవుతాయి."
+            txt = f"🐟 **చేపల సంపద జోన్ ({hotspot['id']})**: {dist_nm} నాటికల్ మైళ్ళ దూరంలో **{species}** చేపలు ఉన్నాయి. AI రూట్ ద్వారా **₹{fuel_saved} డೀజిల్ ఆదా** అవుతుంది."
+            voice = f"{dist_nm} నాటికల్ మైళ్ల దూరంలో {species} చేపలు ఉన్నాయి. AI రూట్ ద్వారా {fuel_saved} రూపాయలు ఆదా అవుతాయి."
 
         elif lang == "hi": # Hindi
-            if intent == "CHECK_SAFETY":
-                txt = f"🌊 **समुद्री सुरक्षा रिपोर्ट ({h_name})**: समुद्र वर्तमान में **{weather['safety_status']}** है। लहरों की ऊंचाई {weather['wave_height_m']} मीटर है। {weather['advisory_verdict']}"
-                voice = f"समुद्र की स्थिति सुरक्षित है। लहरों की ऊंचाई {weather['wave_height_m']} मीटर है।"
-            elif intent == "CHECK_BOUNDARIES":
-                txt = f"🛡️ **अंतर्राष्ट्रीय सीमा चेतावनी**: चयनित मछली पकड़ने का क्षेत्र अंतरराष्ट्रीय समुद्री सीमा (IMBL) से **{imbl_km} किमी** दूर है। स्थिति: **{geofence['status']}**."
-                voice = f"सावधान! आप अंतरराष्ट्रीय समुद्री सीमा से {imbl_km} किलोमीटर दूर हैं। सीमा पार न करें।"
-            else:
-                txt = f"🐟 **संभावित मछली पकड़ने का क्षेत्र ({hotspot['id']})**: {dist_nm} नॉटिकल मील पर **{species}** की उच्च संभावना है। AI मार्ग से जाने पर **₹{fuel_saved} का डीजल बचेगा**। सीमा से दूरी {imbl_km} किमी सुरक्षित है।"
-                voice = f"{h_name} से {dist_nm} नॉटिकल मील दूर {species} की संभावना है। AI रूट से {fuel_saved} रुपये की बचत होगी।"
+            txt = f"🐟 **संभावित मछली पकड़ने का क्षेत्र ({hotspot['id']})**: {dist_nm} नॉटिकल मील पर **{species}** की संभावना है। AI मार्ग से **₹{fuel_saved} का डीजल बचेगा**।"
+            voice = f"{dist_nm} नॉटिकल मील दूर {species} की संभावना है। AI रूट से {fuel_saved} रुपये की बचत होगी।"
 
         elif lang == "ml": # Malayalam
-            txt = f"🐟 **മത്സ്യബന്ധന മേഖല ({hotspot['id']})**: {dist_nm} നോട്ടിക്കൽ മൈൽ അകലെ **{species}** കൂട്ടങ്ങൾ ലഭ്യമാണ്. AI റൂട്ട് ഉപയോഗിച്ചാൽ **₹{fuel_saved} ഡീസൽ ലാഭിക്കാം**. അതിർത്തിയിലേക്ക് {imbl_km} കി.മീ ദൂരമുണ്ട്."
-            voice = f"{dist_nm} നോട്ടിക്കൽ മൈൽ അകലെ {species} മീനുകൾ ലഭ്യമാണ്. AI റൂട്ട് ഉപയോഗിച്ചാൽ {fuel_saved} രൂപ ലാഭിക്കാം."
+            txt = f"🐟 **മത്സ്യബന്ധന മേഖല ({hotspot['id']})**: {dist_nm} നോട്ടിക്കൽ മൈൽ അകലെ **{species}** ലഭ്യമാണ്. AI റൂട്ട് വഴി **₹{fuel_saved} ഡീസಲ್ ലാഭിക്കാം**."
+            voice = f"{dist_nm} നോട്ടിക്കൽ മൈൽ അകലെ {species} മീനുകൾ ലഭ്യമാണ്. AI റൂട്ട് വഴി {fuel_saved} രൂപ ലാಭിക്കാം."
 
         else: # Default English
-            if intent == "CHECK_SAFETY":
-                txt = f"🌊 **Sea Safety Advisory for {harbor['name']}**: Sea condition is **{weather['safety_status']}** (Safety Score: {weather['safety_score']}/100). Significant wave height is **{weather['wave_height_m']}m** with a period of {weather['wave_period_sec']}s. Ocean surface current is **{weather['ocean_current_knots']} knots** heading {weather['ocean_current_compass']}. {weather['advisory_verdict']}"
-                voice = f"Sea conditions are currently {weather['safety_status']}. Wave height is {weather['wave_height_m']} meters. Normal operations permitted."
-            elif intent == "CHECK_BOUNDARIES":
-                txt = f"🛡️ **Border & Geofence Intelligence**: Selected zone is **{imbl_km} km ({round(imbl_km/1.852, 1)} NM)** from the {geofence['boundary_name']}. Vessel Status: **{geofence['status']}**.\n\n{geofence['warning_message']}"
-                voice = f"Border alert: Nearest international boundary is {imbl_km} kilometers away. Vessel status is {geofence['status']}."
-            elif intent == "OPTIMIZE_ROUTE":
-                txt = f"🧭 **Fuel-Optimal Routing Analysis**: Direct line is {route['straight_distance_nm']} NM, but our A* algorithm computed an optimized current-assisted route. \n\n• **Diesel Saved**: {route['diesel_saved_litres_roundtrip']} Litres (₹{fuel_saved} saved)\n• **Fuel Reduction**: **{route['fuel_savings_percentage']}%**\n• **Time Saved**: {route['time_saved_minutes_roundtrip']} minutes\n• **Reasoning**: {route['reasoning']}"
-                voice = f"Optimized route found. You will save {route['fuel_savings_percentage']} percent diesel, saving approximately {fuel_saved} rupees round trip."
-            elif intent == "EXPLAIN_PRODUCTIVITY":
-                prod = ocean_agent.explain_productivity_change(harbor['name'])
-                txt = f"🔬 **Marine Ecological Productivity Analysis for {harbor['name']}**:\n\n" + "\n".join([f"• {f}" for f in prod['findings']]) + f"\n\n**Actionable Advice**: {prod['recommendation']}"
-                voice = f"Productivity shifted due to thermal warming fronts moving shoals further offshore into deeper thermoclines."
-            else:
-                txt = f"🛰️ **ORCA Multi-Agent Recommendation for {harbor['name']}**:\n\n" \
-                      f"1. **Nearest High-Yield PFZ**: **{hotspot['id']}** located **{dist_nm} NM** offshore (Confidence: **{hotspot['confidence_score']}%**).\n" \
-                      f"2. **Target Biomass**: High concentration of **{species}** (SST: {hotspot['sst_celsius']}°C, Chl-a: {hotspot['chlorophyll_mg_m3']} mg/m³).\n" \
-                      f"3. **Fuel Optimization**: A* current-assisted navigation cuts fuel burn by **{route['fuel_savings_percentage']}%**, saving **₹{fuel_saved}** ({route['diesel_saved_litres_roundtrip']}L).\n" \
-                      f"4. **Safety & Border Status**: Wave height **{weather['wave_height_m']}m** ({weather['safety_status']}). Safe distance of **{imbl_km} km** from the international border."
-                voice = f"Nearest fish hotspot is {dist_nm} nautical miles offshore for {species}. You will save {fuel_saved} rupees in fuel. Sea conditions are safe."
+            txt = f"🛰️ **ORCA Multi-Agent Recommendation for {harbor['name']}**:\n\n1. **Nearest High-Yield PFZ**: **{hotspot['id']}** ({dist_nm} NM offshore, Confidence: **{hotspot['confidence_score']}%**).\n2. **Target Biomass**: Dense shoals of **{species}** (SST: {hotspot['sst_celsius']}°C, Chl-a: {hotspot['chlorophyll_mg_m3']} mg/m³).\n3. **Fuel Savings**: Current-assisted route cuts fuel burn by **{route['fuel_savings_percentage']}%**, saving **₹{fuel_saved}** ({route['diesel_saved_litres_roundtrip']}L).\n4. **Safety & Border Status**: Wave height **{weather['wave_height_m']}m** ({weather['safety_status']}). Distance to IMBL: **{imbl_km} km** ({geofence['status']})."
+            voice = f"Nearest fish hotspot is {dist_nm} nautical miles offshore for {species}. You will save {fuel_saved} rupees in fuel. Sea conditions are safe."
 
         return txt, voice
 

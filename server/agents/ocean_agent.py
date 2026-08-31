@@ -19,6 +19,20 @@ class OceanAnalyticsAgent:
                 "lng": 80.298,
                 "coast": "Bay of Bengal"
             },
+            "malpe": {
+                "name": "Malpe Fishing Harbour (Udupi)",
+                "state": "Karnataka",
+                "lat": 13.350,
+                "lng": 74.698,
+                "coast": "Arabian Sea (Karavali Coast)"
+            },
+            "mangalore": {
+                "name": "Mangalore Old Port (Dakke / Bunder)",
+                "state": "Karnataka",
+                "lat": 12.860,
+                "lng": 74.835,
+                "coast": "Arabian Sea (Karavali Coast)"
+            },
             "rameswaram": {
                 "name": "Rameswaram Fishing Port",
                 "state": "Tamil Nadu",
@@ -40,13 +54,6 @@ class OceanAnalyticsAgent:
                 "lng": 83.300,
                 "coast": "Bay of Bengal"
             },
-            "mangalore": {
-                "name": "Mangalore Old Port (Bunder)",
-                "state": "Karnataka",
-                "lat": 12.860,
-                "lng": 74.835,
-                "coast": "Arabian Sea"
-            },
             "veraval": {
                 "name": "Veraval Fishing Port",
                 "state": "Gujarat",
@@ -63,31 +70,24 @@ class OceanAnalyticsAgent:
             }
         }
 
-        # Indian commercial fish species definitions with biological preferences
+        # Indian commercial fish species catalog with regional names
         self.species_catalog = [
-            {"species": "Indian Mackerel (Rastrelliger kanagurta)", "temp_min": 26.5, "temp_max": 28.8, "chl_min": 0.8, "value_per_kg": 240},
-            {"species": "Oil Sardines (Sardinella longiceps)", "temp_min": 26.0, "temp_max": 28.5, "chl_min": 1.2, "value_per_kg": 180},
-            {"species": "Yellowfin Tuna (Thunnus albacares)", "temp_min": 27.5, "temp_max": 29.5, "chl_min": 0.4, "value_per_kg": 450},
-            {"species": "Silver Pomfret (Pampus argenteus)", "temp_min": 26.8, "temp_max": 28.6, "chl_min": 0.9, "value_per_kg": 680},
-            {"species": "King Seer Fish (Scomberomorus commerson)", "temp_min": 27.0, "temp_max": 29.2, "chl_min": 0.6, "value_per_kg": 600},
-            {"species": "Tiger Prawns (Penaeus monodon)", "temp_min": 26.5, "temp_max": 29.0, "chl_min": 1.0, "value_per_kg": 550}
+            {"species": "Indian Mackerel (ಬಾಂಗ್ಡೆ / Rastrelliger kanagurta)", "temp_min": 26.5, "temp_max": 28.8, "chl_min": 0.8, "value_per_kg": 240},
+            {"species": "Oil Sardines (ಭೂತಾಯಿ / Sardinella longiceps)", "temp_min": 26.0, "temp_max": 28.5, "chl_min": 1.2, "value_per_kg": 180},
+            {"species": "Kingfish / Surmai (ಅಂಜಲ್ / Scomberomorus commerson)", "temp_min": 27.0, "temp_max": 29.2, "chl_min": 0.6, "value_per_kg": 680},
+            {"species": "Silver Pomfret (ಮಾಣಂಜಿ / Pampus argenteus)", "temp_min": 26.8, "temp_max": 28.6, "chl_min": 0.9, "value_per_kg": 750},
+            {"species": "Yellowfin Tuna (ಕುಪ್ಪೆ / Thunnus albacares)", "temp_min": 27.5, "temp_max": 29.5, "chl_min": 0.4, "value_per_kg": 450}
         ]
 
     def get_all_harbors(self) -> Dict[str, Any]:
         return self.harbors
 
     def detect_pfz_hotspots(self, harbor_id: str = "chennai", count: int = 4) -> List[Dict[str, Any]]:
-        """
-        Synthesizes satellite SST gradients and Chlorophyll concentrations
-        to identify Potential Fishing Zones (PFZs) within 15 to 45 nautical miles of a harbor.
-        """
         harbor = self.harbors.get(harbor_id.lower(), self.harbors["chennai"])
         base_lat, base_lng = harbor["lat"], harbor["lng"]
         is_east_coast = "Bengal" in harbor["coast"] or "Palk" in harbor["coast"]
 
         hotspots = []
-        
-        # Predefined plausible directional offsets into open sea
         offsets = [
             {"dlat": 0.18, "dlng": 0.28, "depth_m": 42},
             {"dlat": -0.12, "dlng": 0.35, "depth_m": 58},
@@ -95,7 +95,6 @@ class OceanAnalyticsAgent:
             {"dlat": -0.28, "dlng": 0.25, "depth_m": 35}
         ]
         
-        # If on west coast (Arabian sea), open water is to the West (negative dlng)
         if not is_east_coast:
             for o in offsets:
                 o["dlng"] = -abs(o["dlng"])
@@ -103,19 +102,13 @@ class OceanAnalyticsAgent:
         for idx, offset in enumerate(offsets[:count]):
             hotspot_lat = round(base_lat + offset["dlat"], 4)
             hotspot_lng = round(base_lng + offset["dlng"], 4)
-            
-            # Distance in Nautical Miles (1 deg approx 60 NM)
             dist_nm = round(math.sqrt((offset["dlat"] * 60)**2 + (offset["dlng"] * 60)**2), 1)
             
-            # Satellite biophysical telemetry
-            sst = round(27.4 + (idx * 0.35) - 0.2, 1) # Sea Surface Temp (°C)
-            chlorophyll = round(1.45 + (0.3 * (3 - idx)), 2) # mg/m^3
-            thermal_gradient = round(0.45 + (idx * 0.12), 2) # °C / km front
-            
-            # Calculate PFZ Confidence Score (0 - 100)
+            sst = round(27.4 + (idx * 0.35) - 0.2, 1)
+            chlorophyll = round(1.45 + (0.3 * (3 - idx)), 2)
+            thermal_gradient = round(0.45 + (idx * 0.12), 2)
             score = int(min(98, max(65, (chlorophyll * 28) + (thermal_gradient * 35) + random.randint(10, 18))))
             
-            # Matched species
             matched_species = [
                 s["species"] for s in self.species_catalog 
                 if s["temp_min"] <= sst <= s["temp_max"] and chlorophyll >= s["chl_min"]
@@ -140,12 +133,10 @@ class OceanAnalyticsAgent:
                 "recommended": idx == 0 or score > 88
             })
 
-        # Sort by confidence score descending
         hotspots.sort(key=lambda x: x["confidence_score"], reverse=True)
         return hotspots
 
     def explain_productivity_change(self, region_name: str) -> Dict[str, Any]:
-        """Explains why fish productivity may have shifted in a given coastal region."""
         return {
             "region": region_name,
             "status": "Anomaly Detected",
