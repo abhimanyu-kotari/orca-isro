@@ -133,20 +133,40 @@ export const BOUNDARIES = {
   },
   protected_areas: [
     {
-      id: "MPA-GAHIRMATHA",
-      name: "Gahirmatha Marine Sanctuary (Olive Ridley Turtle Sanctuary)",
-      center_lat: 20.71,
-      center_lng: 87.05,
-      radius_km: 25.0,
-      type: "Turtle Breeding Ground - Seasonal Trawling Ban"
+      id: "MPA-NETRANI",
+      name: "Netrani Island Coral Reef Sanctuary (Murudeshwar, Karnataka)",
+      center_lat: 14.016,
+      center_lng: 74.330,
+      radius_km: 14.0,
+      type: "Ecologically Sensitive Coral Reef & Dive Marine Reserve - Mechanized Trawling Prohibited",
+      jurisdiction: "Karnataka Forest & Coastal Police Department"
     },
     {
       id: "MPA-GULF-OF-MANNAR",
-      name: "Gulf of Mannar Marine National Park (Coral Reef Biosphere)",
+      name: "Gulf of Mannar Biosphere Reserve (Tamil Nadu)",
       center_lat: 9.15,
       center_lng: 79.10,
-      radius_km: 18.0,
-      type: "Coral Reef & Dugong Habitat"
+      radius_km: 24.0,
+      type: "Dugong & Coral Reef Biosphere Reserve - Strict No-Take Zone",
+      jurisdiction: "Tamil Nadu Marine National Park Authority"
+    },
+    {
+      id: "MPA-GAHIRMATHA",
+      name: "Gahirmatha Marine Sanctuary (Odisha)",
+      center_lat: 20.71,
+      center_lng: 87.05,
+      radius_km: 28.0,
+      type: "Olive Ridley Sea Turtle Mass Nesting - Mechanized Fishing Prohibited",
+      jurisdiction: "Odisha Coastal Wildlife Division"
+    },
+    {
+      id: "MPA-KUTCH",
+      name: "Marine National Park (Gulf of Kutch, Gujarat)",
+      center_lat: 22.45,
+      center_lng: 69.60,
+      radius_km: 30.0,
+      type: "Intertidal Mangrove & Fringing Coral Reefs - Restricted Ecological Zone",
+      jurisdiction: "Gujarat Marine Protected Area Authority"
     }
   ]
 };
@@ -305,7 +325,44 @@ export function generateWeather(lat, lng) {
     sea_state: "Moderate (Safe Swell)",
     safety_score: 88,
     safety_status: "SAFE",
-    advisory_verdict: "Normal fishing operations permitted. Favorable surface current drift."
+    advisory_verdict: "Normal fishing operations permitted. Favorable surface current drift.",
+    barometric_pressure_hpa: 1012.4,
+    visibility_km: 14.5,
+    tide: {
+      high_tide_time: "10:45 AM",
+      high_tide_m: 1.54,
+      low_tide_time: "04:30 PM",
+      low_tide_m: 0.38,
+      current_phase: "Flood Tide (Incoming)",
+      water_level_m: 1.28
+    },
+    lightning_radar: {
+      cape_index_j_kg: 420,
+      risk_level: "LOW / SAFE",
+      cyclone_alert: "NO ACTIVE DEPRESSION",
+      storm_distance_km: 180,
+      incois_bulletin: "INCOIS-IMD Bulletin: No squally weather warning along coastal shelf for next 36 hours."
+    }
+  };
+}
+
+export function generateResearcherAnalytics(harborId) {
+  const harbor = HARBORS[harborId] || HARBORS.malpe;
+  const isWest = harbor.lng < 78.0;
+  return {
+    harbor_id: harborId,
+    thermocline_depth_m: isWest ? 48 : 36,
+    thermocline_gradient: "0.82 °C / 10m",
+    upwelling_index_bakun: "+52 m³/s per 100m coastline",
+    sst_chlorophyll_correlation: -0.76,
+    dissolved_oxygen_profile: [
+      { depth_m: 10, do_mg_l: 6.4 },
+      { depth_m: 30, do_mg_l: 5.8 },
+      { depth_m: 50, do_mg_l: 4.2 },
+      { depth_m: 80, do_mg_l: 2.1 }
+    ],
+    trophic_cascade_health: "Optimal Upwelling Active",
+    productivity_shift_verdict: "High pelagic concentration along 50m shelf break. Inshore thermal stratification suppressed."
   };
 }
 
@@ -328,7 +385,15 @@ export function processClientChat(userText, harborId, lang, vesselKey = 'trawler
   const msgLower = (userText || "").toLowerCase();
 
   let intent = "FIND_PFZ";
-  if (msgLower.includes("safe") || msgLower.includes("weather") || msgLower.includes("wave") || msgLower.includes("storm") || msgLower.includes("venture") || msgLower.includes("tomorrow") || msgLower.includes("ಸುರಕ್ಷಿತ") || msgLower.includes("பாதுகாப்பு") || msgLower.includes("സുരക്ഷിതം") || msgLower.includes("സുരക്ഷ")) {
+  if (msgLower.includes("tide") || msgLower.includes("ಉಬ್ಬರವಿಳಿತ") || msgLower.includes("ஓதம்") || msgLower.includes("भरती") || msgLower.includes("വേലിയേറ്റം") || (msgLower.includes("sea") && msgLower.includes("condition"))) {
+    intent = "CHECK_TIDE";
+  } else if (msgLower.includes("lightning") || msgLower.includes("cyclone") || msgLower.includes("storm") || msgLower.includes("depression") || msgLower.includes("cape") || msgLower.includes("ಮಿಂಚು") || msgLower.includes("ಚಂಡಮಾರುತ") || msgLower.includes("சூறாவளி") || msgLower.includes("മിന്നൽ") || msgLower.includes("तूफान")) {
+    intent = "CHECK_LIGHTNING";
+  } else if (msgLower.includes("avoid") || msgLower.includes("prohibit") || msgLower.includes("restrict") || msgLower.includes("mpa") || msgLower.includes("coral") || msgLower.includes("turtle") || msgLower.includes("ನಿಷೇಧಿತ") || msgLower.includes("விலக்க") || msgLower.includes("నిషిద్ధ") || msgLower.includes("വിലക്ക്")) {
+    intent = "AVOID_RESTRICTED";
+  } else if (msgLower.includes("research") || msgLower.includes("correlation") || msgLower.includes("thermocline") || msgLower.includes("upwelling") || msgLower.includes("scatter") || msgLower.includes("ಆರாய்ச்சி") || msgLower.includes("పరిశోధన") || msgLower.includes("ഗവേഷണം")) {
+    intent = "RESEARCHER_ANALYTICS";
+  } else if (msgLower.includes("safe") || msgLower.includes("weather") || msgLower.includes("wave") || msgLower.includes("venture") || msgLower.includes("tomorrow") || msgLower.includes("ಸುರಕ್ಷಿತ") || msgLower.includes("பாதுகாப்பு") || msgLower.includes("സുരക്ഷിതം") || msgLower.includes("സുരക്ഷ")) {
     intent = "CHECK_SAFETY";
   } else if (msgLower.includes("route") || msgLower.includes("fuel") || msgLower.includes("diesel") || msgLower.includes("lowest") || msgLower.includes("mackerel zone") || msgLower.includes("ಡೀಸೆಲ್") || msgLower.includes("வழி") || msgLower.includes("ഡീസൽ") || msgLower.includes("റൂട്ട്")) {
     intent = "OPTIMIZE_ROUTE";
@@ -342,8 +407,56 @@ export function processClientChat(userText, harborId, lang, vesselKey = 'trawler
   let voiceNative = "";
   let voicePhonetic = "";
 
-  // 1. SAFETY QUERY
-  if (intent === "CHECK_SAFETY") {
+  // 1. TIDE QUERY
+  if (intent === "CHECK_TIDE") {
+    if (lang === "kn") {
+      text = `🌊 **ಉಬ್ಬರವಿಳಿತ ಮತ್ತು ಕರಾವಳಿ ಹವಾಮಾನ (${hName})**:\n• **ಪ್ರಸ್ತುತ ಸ್ಥಿತಿ**: **${weather.tide.current_phase}** (ನೀರಿನ ಮಟ್ಟ ${weather.tide.water_level_m} ಮೀ).\n• **ಮುಂದಿನ ಹೈ ಟೈಡ್ (ಏರಿಳಿತ)**: **${weather.tide.high_tide_time}** (+${weather.tide.high_tide_m} ಮೀ).\n• **ಮುಂದಿನ ಲೋ ಟೈಡ್ (ಇಳಿಮುಖ)**: **${weather.tide.low_tide_time}** (+${weather.tide.low_tide_m} ಮೀ).\n• **ವಾಯುಭಾರ ಒತ್ತಡ**: ${weather.barometric_pressure_hpa} hPa (ಸ್ಥಿರ).\n• **ಸಲಹೆ**: ದೋಣಿ ತೀರದಿಂದ ಹೊರಡಲು ಏರಿಳಿತದ ಸಮಯ ಅತ್ಯಂತ ಸುರಕ್ಷಿತವಾಗಿದೆ.`;
+      voiceNative = `${hName} ಬಂದರಿನಲ್ಲಿ ಪ್ರಸ್ತುತ ಏರಿಳಿತದ ಸಮಯ. ಮುಂದಿನ ಹೈ ಟೈಡ್ ${weather.tide.high_tide_time} ಗಂಟೆಗೆ ಇರುತ್ತದೆ.`;
+      voicePhonetic = voiceNative;
+    } else {
+      text = `🌊 **Tidal Cycles & Coastal Marine Conditions for ${hName}**:\n\n• **Current Tidal Phase**: **${weather.tide.current_phase}** (Water Height: **${weather.tide.water_level_m}m**).\n• **Next High Tide**: **${weather.tide.high_tide_time}** (+${weather.tide.high_tide_m}m chart datum).\n• **Next Low Tide**: **${weather.tide.low_tide_time}** (+${weather.tide.low_tide_m}m chart datum).\n• **Barometric Pressure**: **${weather.barometric_pressure_hpa} hPa** (Atmospheric stability high).\n• **Operational Verdict**: Favorable draft clearance across sandbars during incoming flood tide.`;
+      voiceNative = `Current tide is ${weather.tide.current_phase} with high tide at ${weather.tide.high_tide_time}.`;
+      voicePhonetic = voiceNative;
+    }
+  }
+
+  // 2. LIGHTNING & CYCLONE RADAR
+  else if (intent === "CHECK_LIGHTNING") {
+    if (lang === "kn") {
+      text = `⚡ **ಮಿಂಚು ಮತ್ತು ಚಂಡಮಾರುತ ರಾಡಾರ್ ವರದಿ (${hName})**:\n• **ಮಿಂಚಿನ ಅಪಾಯ**: **${weather.lightning_radar.risk_level}** (ಸುರಕ್ಷಿತ).\n• **CAPE ಸೂಚ್ಯಂಕ**: **${weather.lightning_radar.cape_index_j_kg} J/kg** (1000 J/kg ಗಿಂತ ಕಡಿಮೆ ಇರುವುದು ಸುರಕ್ಷಿತ).\n• **ಚಂಡಮಾರುತ ಎಚ್ಚರಿಕೆ**: **${weather.lightning_radar.cyclone_alert}**.\n• **ಸಮೀಪದ ಬಿರುಗಾಳಿ ಅಂತರ**: >${weather.lightning_radar.storm_distance_km} ಕಿ.ಮೀ ದೂರದಲ್ಲಿದೆ.\n• **ಬುಲೆಟಿನ್**: ಮುಂದಿನ 36 ಗಂಟೆಗಳಲ್ಲಿ ಯಾವುದೇ ಅಪಾಯಕಾರಿ ಬಿರುಗಾಳಿ ಅಥವಾ ಚಂಡಮಾರುತ ಇರುವುದಿಲ್ಲ.`;
+      voiceNative = `${hName} ಕರಾವಳಿಯಲ್ಲಿ ಯಾವುದೇ ಮಿಂಚು ಅಥವಾ ಚಂಡಮಾರುತದ ಅಪಾಯವಿಲ್ಲ. ಹವಾಮಾನ ಸುರಕ್ಷಿತವಾಗಿದೆ.`;
+      voicePhonetic = voiceNative;
+    } else {
+      text = `⚡ **Atmospheric Convection, Lightning & Cyclone Radar (${hName})**:\n\n• **Lightning Risk Level**: **${weather.lightning_radar.risk_level}**.\n• **Convective Available Potential Energy (CAPE)**: **${weather.lightning_radar.cape_index_j_kg} J/kg** (Well below severe squall threshold of 1200 J/kg).\n• **IMD / INCOIS Cyclone Watch**: **${weather.lightning_radar.cyclone_alert}**.\n• **Atmospheric Pressure**: **${weather.barometric_pressure_hpa} hPa** (Normal gradient).\n• **Official Advisory**: ${weather.lightning_radar.incois_bulletin}`;
+      voiceNative = `Lightning risk is low and there are no active cyclone warnings in your sector.`;
+      voicePhonetic = voiceNative;
+    }
+  }
+
+  // 3. RESTRICTED & AVOIDANCE ZONES (MPA)
+  else if (intent === "AVOID_RESTRICTED") {
+    const mpa = BOUNDARIES.protected_areas[0];
+    if (lang === "kn") {
+      text = `🚫 **ನಿಷೇಧಿತ & ಪರಿಸರ ಸೂಕ್ಷ್ಮ ವಲಯಗಳು (MPA)**:\n• **ಅಂತಾರಾಷ್ಟ್ರೀಯ ಗಡಿ (IMBL)**: ಗಡಿಯಿಂದ **${imbl} ಕಿ.ಮೀ** ದೂರದಲ್ಲಿದ್ದೀರಿ (${geofence.status}). ಕನಿಷ್ಠ 12 NM ಸುರಕ್ಷಿತ ಅಂತರ ಕಾಪಾಡಿ.\n• **ಸಂರಕ್ಷಿತ ವಲಯ (MPA)**: **${mpa.name}**.\n• **ನಿಯಮ**: ${mpa.type}.\n• **ಸಲಹೆ**: ನಕ್ಷೆಯಲ್ಲಿ ಗುರುತಿಸಲಾದ ಕೆಂಪು/ಕಿತ್ತಳೆ ಬಣ್ಣದ ವಲಯದಲ್ಲಿ ಮೀನುಗಾರಿಕೆ ನಿಷೇಧಿಸಲಾಗಿದೆ.`;
+      voiceNative = `ಅಂತಾರಾಷ್ಟ್ರೀಯ ಗಡಿ ಮತ್ತು ಹವಳದ ದಿಬ್ಬ ಸಂರಕ್ಷಿತ ವಲಯಗಳನ್ನು ತಪ್ಪಿಸಿ. ನಕ್ಷೆಯ ಕೆಂಪು ಗಡಿಯನ್ನು ದಾಟಬೇಡಿ.`;
+      voicePhonetic = voiceNative;
+    } else {
+      text = `🚫 **Geofenced Avoidance Zones & Marine Protected Areas (MPAs)**:\n\n• **Sovereign Border (IMBL)**: Nearest perimeter is **${imbl} km** (${geofence.nearest_imbl_distance_nm} NM) offshore (${geofence.status}).\n• **Marine Protected Area**: **${mpa.name}**.\n• **Statutory Classification**: ${mpa.type}.\n• **Enforcement**: ${mpa.jurisdiction}.\n• **Navigation Warning**: Mechanized trawling and bottom gillnetting are strictly prohibited inside the designated MPA circle to safeguard endangered marine biodiversity.`;
+      voiceNative = `Maintain clearance from the ${imbl} kilometer international boundary and the ${mpa.name}.`;
+      voicePhonetic = voiceNative;
+    }
+  }
+
+  // 4. RESEARCHER ANALYTICS
+  else if (intent === "RESEARCHER_ANALYTICS") {
+    const res = generateResearcherAnalytics(harborId);
+    text = `🔬 **Satellite Oceanographic & Ecosystem Analytics (${hName})**:\n\n• **SST vs Chlorophyll-a Correlation**: **r = ${res.sst_chlorophyll_correlation}** (Strong inverse upwelling front correlation).\n• **Thermocline Depth**: **${res.thermocline_depth_m}m** (Vertical thermal gradient: ${res.thermocline_gradient}).\n• **Bakun Coastal Upwelling Index**: **${res.upwelling_index_bakun}**.\n• **Surface Chlorophyll Front**: Peak **${top.chlorophyll_mg_m3} mg/m³** at shelf break.\n• **Trophic Health Verdict**: ${res.productivity_shift_verdict}`;
+    voiceNative = `Ecosystem analysis confirms active upwelling with strong SST chlorophyll correlation.`;
+    voicePhonetic = voiceNative;
+  }
+
+  // 5. SAFETY QUERY
+  else if (intent === "CHECK_SAFETY") {
     if (lang === "kn") {
       text = `🌊 **ಸಮುದ್ರ ಸುರಕ್ಷತಾ ಮಾಹಿತಿ (${hName})**:\n• ದೋಣಿ ಮಾದರಿ: **${vessel.name}**\n• ಸಮುದ್ರದ ಸ್ಥಿತಿ: **${weather.safety_status} (ಅಲೆಗಳ ಎತ್ತರ ${weather.wave_height_m} ಮೀ)**.\n• ಗಾಳಿಯ ವೇಗ: **${weather.wind_speed_knots} ನಾಟ್ಸ್**.\n• ಸಲಹೆ: ${weather.advisory_verdict}\n• ನಾಳೆ ಬೆಳಿಗ್ಗೆ ಮೀನುಗಾರಿಕೆಗೆ ತೆರಳಲು ಪರಿಸ್ಥಿತಿ ಅನುಕೂಲಕರವಾಗಿದೆ.`;
       voiceNative = `${hName} ಸಮುದ್ರದ ಸ್ಥಿತಿ ಸುರಕ್ಷಿತವಾಗಿದೆ. ಅಲೆಗಳ ಎತ್ತರ ${weather.wave_height_m} ಮೀಟರ್. ನಾಳೆ ಬೆಳಿಗ್ಗೆ ಮೀನುಗಾರಿಕೆಗೆ ತೆರಳಬಹುದು.`;
@@ -477,10 +590,17 @@ export function processClientChat(userText, harborId, lang, vesselKey = 'trawler
     voice_script: voiceNative,
     voice_script_phonetic: voicePhonetic,
     collaborating_agents: [
-      { name: "Matsya Drishti Agent", status: "Active", summary: `Detected ${hotspots.length} PFZ clusters (Top: ${species})` },
-      { name: "Sagara Vayu Agent", status: "Active", summary: `Sea State: ${weather.sea_state} (Waves ${weather.wave_height_m}m)` },
-      { name: "Nava Setu Agent", status: "Active", summary: `A* route for ${vessel.short_name}: ₹${fuel} saved` },
-      { name: "Samudra Raksha Agent", status: "Active", summary: `IMBL distance: ${imbl} km (${geofence.status})` }
+      { name: "Planning Agent", icon: "🧠", status: "Active", summary: `Decomposed query into spatial-temporal analytical subtasks` },
+      { name: "Marine Data Discovery Agent", icon: "🛰️", status: "Active", summary: `ISRO Oceansat-3 OCM & INSAT-3D SST retrieved (${top.sst_celsius}°C, ${top.chlorophyll_mg_m3} mg/m³)` },
+      { name: "Sagara Vayu Weather Agent", icon: "🌊", status: "Active", summary: `Waves: ${weather.wave_height_m}m, Tide: ${weather.tide.current_phase}, Lightning: ${weather.lightning_radar.risk_level}` },
+      { name: "Hydrodynamic Routing Agent", icon: "🧭", status: "Active", summary: `A* vector drift calculated for ${vessel.short_name} (-₹${fuel} diesel saved)` },
+      { name: "Samudra Raksha Geofence Agent", icon: "🛡️", status: "Active", summary: `IMBL distance: ${imbl} km (${geofence.status}), MPAs checked` }
+    ],
+    agentic_steps: [
+      { step: 1, agent: "Planning Agent", icon: "🧠", title: "Task Decomposition", desc: `Decomposed "${(userText || "Marine Query").slice(0, 42)}..." into executable multi-domain tasks.` },
+      { step: 2, agent: "Data Discovery Agent", icon: "🛰️", title: "Dataset Retrieval", desc: `Retrieved ISRO Oceansat-3 OCM Chlorophyll (${top.chlorophyll_mg_m3} mg/m³), INSAT-3D SST (${top.sst_celsius}°C), and INCOIS wave telemetry.` },
+      { step: 3, agent: "Risk Assessment Agent", icon: "🛡️", title: "Environmental & Geofence Safety", desc: `Evaluated wave height (${weather.wave_height_m}m), lightning index (${weather.lightning_radar.risk_level}), and distance to IMBL (${imbl} km).` },
+      { step: 4, agent: "Vernacular Advisory Agent", icon: "💬", title: "Evidence Synthesis", desc: `Synthesized explainable recommendation with vessel calibration (${vessel.short_name}) in ${lang.toUpperCase()}.` }
     ],
     evidence: {
       vessel,
@@ -488,7 +608,8 @@ export function processClientChat(userText, harborId, lang, vesselKey = 'trawler
       all_pfz_hotspots: hotspots,
       weather,
       route,
-      geofence
+      geofence,
+      protected_areas: BOUNDARIES.protected_areas
     }
   };
 }

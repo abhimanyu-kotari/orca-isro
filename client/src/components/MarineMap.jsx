@@ -86,11 +86,18 @@ function getCompassDirection(deg) {
   return directions[Math.round(deg / 22.5) % 16];
 }
 
-export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectHotspot, route, boundaries, onOpenChat, selectedLang = 'en' }) {
+export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectHotspot, route, boundaries, onOpenChat, selectedLang = 'en', selectedPersona = 'fisherman' }) {
   const [isNavigating, setIsNavigating] = useState(false);
   const [currentStepIdx, setCurrentStepIdx] = useState(0);
   const [isSpeakingSteer, setIsSpeakingSteer] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [activeLayers, setActiveLayers] = useState({
+    pfz: true,
+    sst: false,
+    chl: false,
+    mpa: true,
+    hazard: false
+  });
   const mapRef = useRef(null);
 
   const t = UI_TRANSLATIONS[selectedLang] || UI_TRANSLATIONS.en;
@@ -200,7 +207,7 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
         )}
 
         {/* Potential Fishing Zone (PFZ) Hotspots */}
-        {hotspots?.map((h) => {
+        {activeLayers.pfz && hotspots?.map((h) => {
           const isSelected = selectedHotspot?.id === h.id;
           return (
             <Marker
@@ -239,6 +246,76 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
           );
         })}
 
+        {/* SST Thermal Isotherms Layer */}
+        {activeLayers.sst && hotspots?.map((h) => (
+          <Circle
+            key={`sst-${h.id}`}
+            center={[h.lat, h.lng]}
+            radius={9000}
+            pathOptions={{
+              color: '#f97316',
+              fillColor: '#ea580c',
+              fillOpacity: 0.22,
+              weight: 2
+            }}
+          >
+            <Popup>
+              <div className="p-1.5 text-xs text-amber-200">
+                <p className="font-bold">🌡️ SST Thermal Isotherm ({h.id})</p>
+                <p className="text-[10px] text-slate-300">Surface Temp: {h.sst_celsius}°C (Gradient: {h.thermal_front_gradient})</p>
+                <p className="text-[9px] text-emerald-300 font-mono">ISRO INSAT-3D Split-Window Radiometry</p>
+              </div>
+            </Popup>
+          </Circle>
+        ))}
+
+        {/* Chlorophyll-a Plankton Bloom Layer */}
+        {activeLayers.chl && hotspots?.map((h) => (
+          <Circle
+            key={`chl-${h.id}`}
+            center={[h.lat + 0.02, h.lng - 0.02]}
+            radius={13000}
+            pathOptions={{
+              color: '#10b981',
+              fillColor: '#059669',
+              fillOpacity: 0.25,
+              weight: 2,
+              dashArray: '4, 4'
+            }}
+          >
+            <Popup>
+              <div className="p-1.5 text-xs text-emerald-200">
+                <p className="font-bold">🌿 Phytoplankton Bloom Filament</p>
+                <p className="text-[10px] text-slate-300">Chlorophyll-a: {h.chlorophyll_mg_m3} mg/m³</p>
+                <p className="text-[9px] text-cyan-300 font-mono">ISRO Oceansat-3 OCM Sensor</p>
+              </div>
+            </Popup>
+          </Circle>
+        ))}
+
+        {/* Cyclone / Rough Sea Hazard Buffer Zone */}
+        {activeLayers.hazard && (
+          <Circle
+            center={[center[0] - 0.25, center[1] - 0.35]}
+            radius={22000}
+            pathOptions={{
+              color: '#a855f7',
+              fillColor: '#7e22ce',
+              fillOpacity: 0.2,
+              weight: 2,
+              dashArray: '6, 6'
+            }}
+          >
+            <Popup>
+              <div className="p-1.5 text-xs text-purple-200">
+                <p className="font-bold">🌀 INCOIS High Swell & Hazard Zone</p>
+                <p className="text-[10px] text-slate-300">Wave Height: &gt;2.2m &bull; Swell Period: 12s</p>
+                <p className="text-[9px] text-rose-300 font-mono">Caution Advised for Small Crafts</p>
+              </div>
+            </Popup>
+          </Circle>
+        )}
+
         {/* AI Current-Assisted Optimal Route */}
         {aiRoutePoints.length > 0 && (
           <Polyline
@@ -273,7 +350,7 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
         ))}
 
         {/* Marine Protected Areas (Sanctuaries) */}
-        {boundaries?.protected_areas?.map((mpa) => (
+        {activeLayers.mpa && boundaries?.protected_areas?.map((mpa) => (
           <Circle
             key={mpa.id}
             center={[mpa.center_lat, mpa.center_lng]}
@@ -316,6 +393,45 @@ export default function MarineMap({ harbor, hotspots, selectedHotspot, onSelectH
         <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
         <span className="font-bold text-white truncate max-w-[100px] sm:max-w-none">{harbor?.name?.split('(')[0]?.trim() || 'Coast'}:</span>
         <span className="text-emerald-400 font-mono font-black truncate">{harbor?.coast || 'Indian EEZ'}</span>
+      </div>
+
+      {/* Top Left GIS Layer Controls Toolbar */}
+      <div className="absolute top-12 left-3 z-[1200] bg-[#020b17]/95 backdrop-blur-xl border border-white/25 p-1 rounded-2xl flex items-center gap-1 text-[9px] sm:text-[10px] shadow-2xl pointer-events-auto">
+        <button
+          onClick={() => setActiveLayers(prev => ({ ...prev, pfz: !prev.pfz }))}
+          className={`px-2 py-1 rounded-xl transition flex items-center gap-1 font-bold ${activeLayers.pfz ? 'bg-emerald-500 text-black font-black shadow' : 'text-slate-400 hover:text-white'}`}
+          title="Toggle PFZ Hotspots"
+        >
+          <span>🐟</span> <span className="hidden sm:inline">PFZ</span>
+        </button>
+        <button
+          onClick={() => setActiveLayers(prev => ({ ...prev, sst: !prev.sst }))}
+          className={`px-2 py-1 rounded-xl transition flex items-center gap-1 font-bold ${activeLayers.sst ? 'bg-amber-500 text-black font-black shadow' : 'text-slate-400 hover:text-white'}`}
+          title="Toggle SST Thermal Fronts"
+        >
+          <span>🌡️</span> <span className="hidden sm:inline">SST</span>
+        </button>
+        <button
+          onClick={() => setActiveLayers(prev => ({ ...prev, chl: !prev.chl }))}
+          className={`px-2 py-1 rounded-xl transition flex items-center gap-1 font-bold ${activeLayers.chl ? 'bg-teal-500 text-black font-black shadow' : 'text-slate-400 hover:text-white'}`}
+          title="Toggle Chlorophyll-a Plankton Density"
+        >
+          <span>🌿</span> <span className="hidden sm:inline">Chl-a</span>
+        </button>
+        <button
+          onClick={() => setActiveLayers(prev => ({ ...prev, mpa: !prev.mpa }))}
+          className={`px-2 py-1 rounded-xl transition flex items-center gap-1 font-bold ${activeLayers.mpa ? 'bg-rose-500 text-white font-black shadow' : 'text-slate-400 hover:text-white'}`}
+          title="Toggle Marine Protected Areas"
+        >
+          <span>🐠</span> <span className="hidden sm:inline">MPA</span>
+        </button>
+        <button
+          onClick={() => setActiveLayers(prev => ({ ...prev, hazard: !prev.hazard }))}
+          className={`px-2 py-1 rounded-xl transition flex items-center gap-1 font-bold ${activeLayers.hazard ? 'bg-purple-500 text-white font-black shadow' : 'text-slate-400 hover:text-white'}`}
+          title="Toggle Cyclone & Swell Hazard Zone"
+        >
+          <span>🌀</span> <span className="hidden sm:inline">Hazard</span>
+        </button>
       </div>
 
       {/* Top Right Tactical Legend (Desktop Only) */}

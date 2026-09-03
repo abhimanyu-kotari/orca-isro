@@ -12,7 +12,9 @@ export default function Navbar({
   onOpenVesselModal,
   onStartTour,
   harbors, 
-  isOffline 
+  isOffline,
+  selectedPersona = 'fisherman',
+  onPersonaChange
 }) {
   const [isHarborOpen, setIsHarborOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
@@ -255,6 +257,31 @@ export default function Navbar({
 
           </div>
 
+          {/* Stakeholder Persona Toggle Mobile/Tablet */}
+          <div className="flex items-center justify-between p-1 rounded-xl bg-black/60 border border-white/15 text-[10px] font-bold">
+            <button
+              onClick={() => onPersonaChange?.('fisherman')}
+              className={`flex-1 py-1 px-1 rounded-lg transition flex items-center justify-center gap-1 ${selectedPersona === 'fisherman' ? 'bg-emerald-500 text-black font-black shadow-md' : 'text-slate-300'}`}
+            >
+              <span>🎣</span>
+              <span className="truncate">{t.personaFisherman}</span>
+            </button>
+            <button
+              onClick={() => onPersonaChange?.('researcher')}
+              className={`flex-1 py-1 px-1 rounded-lg transition flex items-center justify-center gap-1 ${selectedPersona === 'researcher' ? 'bg-cyan-500 text-black font-black shadow-md' : 'text-slate-300'}`}
+            >
+              <span>🔬</span>
+              <span className="truncate">{t.personaResearcher}</span>
+            </button>
+            <button
+              onClick={() => onPersonaChange?.('authority')}
+              className={`flex-1 py-1 px-1 rounded-lg transition flex items-center justify-center gap-1 ${selectedPersona === 'authority' ? 'bg-amber-500 text-black font-black shadow-md' : 'text-slate-300'}`}
+            >
+              <span>🚨</span>
+              <span className="truncate">{t.personaAuthority}</span>
+            </button>
+          </div>
+
           {/* Context Footer Strip on Compact/Tablet */}
           <div className="flex items-center justify-between text-[10px] text-slate-300 font-mono pt-1.5 border-t border-white/15">
             <span className="text-emerald-400 font-bold truncate drop-shadow">⚓ {currentHarbor.name.split('(')[0]} &bull; {currentHarbor.coast}</span>
@@ -291,6 +318,34 @@ export default function Navbar({
                   <span className="truncate">{t.brandSub}</span>
                 </p>
               </div>
+            </div>
+
+            {/* Stakeholder Persona Switcher Desktop */}
+            <div className="flex items-center p-1 rounded-2xl bg-black/60 border border-white/15 text-xs font-bold shrink-0 shadow-inner">
+              <button
+                onClick={() => onPersonaChange?.('fisherman')}
+                className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 ${selectedPersona === 'fisherman' ? 'bg-emerald-500 text-black font-black shadow-[0_0_15px_rgba(0,245,160,0.5)]' : 'text-slate-300 hover:text-white'}`}
+                title="Fisherman Operational Mode"
+              >
+                <span>🎣</span>
+                <span>{t.personaFisherman}</span>
+              </button>
+              <button
+                onClick={() => onPersonaChange?.('researcher')}
+                className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 ${selectedPersona === 'researcher' ? 'bg-cyan-500 text-black font-black shadow-[0_0_15px_rgba(6,182,212,0.5)]' : 'text-slate-300 hover:text-white'}`}
+                title="Marine Researcher Analytics Mode"
+              >
+                <span>🔬</span>
+                <span>{t.personaResearcher}</span>
+              </button>
+              <button
+                onClick={() => onPersonaChange?.('authority')}
+                className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 ${selectedPersona === 'authority' ? 'bg-amber-500 text-black font-black shadow-[0_0_15px_rgba(245,158,11,0.5)]' : 'text-slate-300 hover:text-white'}`}
+                title="Coastal & Disaster Authority Mode"
+              >
+                <span>🚨</span>
+                <span>{t.personaAuthority}</span>
+              </button>
             </div>
 
             {/* Desktop Controls Row */}

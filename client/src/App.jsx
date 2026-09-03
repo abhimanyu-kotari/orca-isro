@@ -17,6 +17,7 @@ import {
   computeVoyageRoute,
   checkGeofenceProximity,
   generateWeather,
+  generateResearcherAnalytics,
   processClientChat
 } from './services/marineEngine';
 
@@ -27,6 +28,7 @@ function App() {
   const [selectedHarbor, setSelectedHarbor] = useState('malpe');
   const [selectedLang, setSelectedLang] = useState('en');
   const [selectedVessel, setSelectedVessel] = useState('trawler'); // 'trawler' | 'fibre' | 'canoe'
+  const [selectedPersona, setSelectedPersona] = useState('fisherman'); // 'fisherman' | 'researcher' | 'authority'
   const [isVesselModalOpen, setIsVesselModalOpen] = useState(false);
   const [isTourOpen, setIsTourOpen] = useState(false);
   const [activeMobileTab, setActiveMobileTab] = useState('map'); // 'map' | 'chat' | 'weather' | 'pass'
@@ -43,8 +45,8 @@ function App() {
   const [messages, setMessages] = useState([
     {
       sender: 'agent',
-      text: '🐋 **Welcome to ORCA Marine Intelligence Co-Pilot (ISRO PS-26176)**!\n\nI am your collaborative Agentic AI assistant. I reason over real-time satellite Earth Observation data (SST, Chlorophyll-a, ocean currents, and weather forecasts) to deliver evidence-backed fishing hotspots and fuel-optimal routing.\n\nAsk me anything in English or your mother tongue (ಕನ್ನಡ, ತುಳು, தமிழ், తెలుగు, हिन्दी, മലയാളം)!',
-      voiceScript: 'Welcome to Project ORCA. Your collaborative Marine Intelligence Co-Pilot is online and ready for voyage guidance.'
+      text: '🐋 **Welcome to Project ORCA — Marine Ecosystem Reasoning & Collaborative Agents (ISRO PS-26176)**!\n\nI am your collaborative Agentic AI assistant. I autonomously synthesize ISRO satellite Earth Observation data (Oceansat-3 Chlorophyll-a, INSAT-3D/3DR SST, and INCOIS Ocean State Forecasts) with multi-agent reasoning.\n\nToggle between **🎣 Fisherman**, **🔬 Marine Researcher**, and **🚨 Coastal Authority** modes at any time, or query me in English, ಕನ್ನಡ, தமிழ், తెలుగు, हिन्दी, or മലയാളം!',
+      voiceScript: 'Welcome to Project ORCA. Your collaborative Marine Intelligence Co-Pilot is online and calibrated for your vessel.'
     }
   ]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -217,7 +219,9 @@ function App() {
           sender: 'agent',
           text: result.response_text,
           voiceScript: result.voice_script,
-          voiceScriptPhonetic: result.voice_script_phonetic
+          voiceScriptPhonetic: result.voice_script_phonetic,
+          agentic_steps: result.agentic_steps,
+          evidence: result.evidence
         }
       ]);
       setCollaboratingAgents(result.collaborating_agents);
@@ -228,6 +232,7 @@ function App() {
 
   const safeHarbors = (harbors && typeof harbors === 'object' && Object.keys(harbors).length > 0) ? harbors : HARBORS;
   const currentHarborObj = safeHarbors[selectedHarbor] || safeHarbors.malpe || HARBORS.malpe;
+  const researcherData = generateResearcherAnalytics(selectedHarbor);
 
   return (
     <div className="min-h-screen ocean-ambient-bg flex flex-col justify-between pb-24 lg:pb-4 py-2 sm:py-3">
@@ -243,11 +248,84 @@ function App() {
         onStartTour={() => setIsTourOpen(true)}
         harbors={safeHarbors}
         isOffline={isOffline}
+        selectedPersona={selectedPersona}
+        onPersonaChange={setSelectedPersona}
       />
 
       {/* Main Single-DOM Layout */}
       <main className="max-w-7xl mx-auto px-2.5 sm:px-6 w-full space-y-4 sm:space-y-5 my-3 sm:my-4 flex-1">
         
+        {/* Stakeholder Persona Specialized Status Strip */}
+        {selectedPersona === 'researcher' && (
+          <div className="bg-gradient-to-r from-cyan-950/80 via-[#020b17]/90 to-blue-950/80 border border-cyan-400/40 rounded-2xl p-3 sm:p-4 text-xs shadow-xl animate-fadeIn">
+            <div className="flex items-center justify-between border-b border-cyan-500/20 pb-2 mb-2">
+              <span className="font-black text-cyan-300 flex items-center gap-2">
+                <span className="text-base">🔬</span> ISRO Satellite Oceanographic & Ecosystem Research Analytics ({currentHarborObj.name})
+              </span>
+              <span className="text-[10px] font-mono bg-cyan-500/20 text-cyan-200 px-2.5 py-0.5 rounded-full border border-cyan-400/40">
+                Oceansat-3 OCM & INSAT-3D
+              </span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-[11px]">
+              <div className="bg-white/[0.04] p-2 rounded-xl border border-white/10">
+                <span className="text-slate-400 block text-[9px]">SST-Chl Correlation</span>
+                <span className="text-white font-black text-sm">r = {researcherData.sst_chlorophyll_correlation}</span>
+                <span className="text-emerald-400 block text-[9px]">Inverse Upwelling Front</span>
+              </div>
+              <div className="bg-white/[0.04] p-2 rounded-xl border border-white/10">
+                <span className="text-slate-400 block text-[9px]">Thermocline Depth</span>
+                <span className="text-cyan-300 font-black text-sm">{researcherData.thermocline_depth_m} meters</span>
+                <span className="text-slate-300 block text-[9px]">{researcherData.thermocline_gradient}</span>
+              </div>
+              <div className="bg-white/[0.04] p-2 rounded-xl border border-white/10">
+                <span className="text-slate-400 block text-[9px]">Bakun Upwelling</span>
+                <span className="text-amber-300 font-black text-sm">{researcherData.upwelling_index_bakun.split(' ')[0]}</span>
+                <span className="text-emerald-300 block text-[9px]">Active Coastal Pump</span>
+              </div>
+              <div className="bg-white/[0.04] p-2 rounded-xl border border-white/10">
+                <span className="text-slate-400 block text-[9px]">Shelf Break Dist</span>
+                <span className="text-teal-300 font-black text-sm">{researcherData.shelf_break_distance_nm} NM</span>
+                <span className="text-slate-300 block text-[9px]">Bathymetric Contour</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {selectedPersona === 'authority' && (
+          <div className="bg-gradient-to-r from-amber-950/80 via-[#020b17]/90 to-rose-950/80 border border-amber-400/40 rounded-2xl p-3 sm:p-4 text-xs shadow-xl animate-fadeIn">
+            <div className="flex items-center justify-between border-b border-amber-500/20 pb-2 mb-2">
+              <span className="font-black text-amber-300 flex items-center gap-2">
+                <span className="text-base">🚨</span> Coastal Governance, Border (IMBL) & Hazard Enforcement Dashboard
+              </span>
+              <span className="text-[10px] font-mono bg-amber-500/20 text-amber-200 px-2.5 py-0.5 rounded-full border border-amber-400/40">
+                INCOIS / Indian Coast Guard EEZ
+              </span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-[11px]">
+              <div className="bg-white/[0.04] p-2 rounded-xl border border-white/10">
+                <span className="text-slate-400 block text-[9px]">Border (IMBL) Distance</span>
+                <span className="text-emerald-400 font-black text-sm">{geofence?.nearest_imbl_distance_km || 138} km</span>
+                <span className="text-slate-300 block text-[9px]">Status: {geofence?.status || 'SAFE'}</span>
+              </div>
+              <div className="bg-white/[0.04] p-2 rounded-xl border border-white/10">
+                <span className="text-slate-400 block text-[9px]">Active MPAs</span>
+                <span className="text-amber-300 font-black text-sm">{boundaries?.protected_areas?.length || 4} Sanctuaries</span>
+                <span className="text-rose-400 block text-[9px]">Trawling Prohibited</span>
+              </div>
+              <div className="bg-white/[0.04] p-2 rounded-xl border border-white/10">
+                <span className="text-slate-400 block text-[9px]">Lightning CAPE</span>
+                <span className="text-emerald-300 font-black text-sm">{weather?.lightning_radar?.cape_index_j_kg || 420} J/kg</span>
+                <span className="text-emerald-400 block text-[9px]">Safe (&lt;1000 J/kg)</span>
+              </div>
+              <div className="bg-white/[0.04] p-2 rounded-xl border border-white/10">
+                <span className="text-slate-400 block text-[9px]">Port Tidal Clearance</span>
+                <span className="text-cyan-300 font-black text-sm">+{weather?.tide?.water_level_m || 1.28}m</span>
+                <span className="text-slate-300 block text-[9px]">{weather?.tide?.current_phase || 'Flood Tide'}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Top 4 Telemetry Metric Capsules */}
         <div className={activeMobileTab === 'map' ? 'block' : 'hidden lg:block'}>
           <Telemetry
@@ -273,6 +351,7 @@ function App() {
               boundaries={boundaries}
               onOpenChat={() => setActiveMobileTab('chat')}
               selectedLang={selectedLang}
+              selectedPersona={selectedPersona}
             />
           </div>
 
@@ -285,6 +364,7 @@ function App() {
               collaboratingAgents={collaboratingAgents}
               activeVoiceScript={messages[messages.length - 1]?.voiceScript}
               selectedLang={selectedLang}
+              selectedPersona={selectedPersona}
             />
           </div>
 
@@ -299,6 +379,7 @@ function App() {
               weather={weather}
               hotspot={selectedHotspot}
               selectedLang={selectedLang}
+              selectedPersona={selectedPersona}
             />
           </div>
 

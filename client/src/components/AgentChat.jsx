@@ -1,21 +1,58 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Mic, MicOff, Volume2, VolumeX, Sparkles, Bot, Radio, Cpu, ChevronDown, ChevronUp } from 'lucide-react';
 
-export default function AgentChat({ onSendMessage, messages, isProcessing, collaboratingAgents, activeVoiceScript, selectedLang }) {
+export default function AgentChat({ onSendMessage, messages, isProcessing, collaboratingAgents, activeVoiceScript, selectedLang, selectedPersona = 'fisherman' }) {
   const [input, setInput] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [showAgentsTrace, setShowAgentsTrace] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Dynamic Suggested Prompts per Selected Language
-  const getSuggestedQueries = (lang) => {
+  // Dynamic Suggested Prompts per Selected Language & Stakeholder Persona
+  const getSuggestedQueries = (lang, persona) => {
+    // 1. Marine Researcher Persona Prompts
+    if (persona === 'researcher') {
+      if (lang === 'kn') {
+        return [
+          { label: '🔬 SST & ಕ್ಲೋರೊಫಿಲ್ ಸಂಬಂಧ', query: 'SST ಮತ್ತು ಕ್ಲೋರೊಫಿಲ್ ನಡುವಿನ ಸಂಬಂಧವನ್ನು ವಿಶ್ಲೇಷಿಸಿ.' },
+          { label: '📉 ಉತ್ಪಾದಕತೆ ಕುಸಿತದ ಕಾರಣ', query: 'ಕರಾವಳಿಯಲ್ಲಿ ಮೀನಿನ ಉತ್ಪಾದಕತೆ ಏಕೆ ಬದಲಾಗಿದೆ?' },
+          { label: '🌡️ ಥರ್ಮೋಕ್ಲೈನ್ ಆಳ', query: 'ಸಮುದ್ರದ ಥರ್ಮೋಕ್ಲೈನ್ ಪ್ರೊಫೈಲ್ ಮತ್ತು ಗ್ರೇಡಿಯೆಂಟ್ ಹೇಗಿದೆ?' },
+          { label: '🌊 ಬಕುನ್ ಅಪ್‌ವೆಲ್ಲಿಂಗ್ ಸೂಚ್ಯಂಕ', query: 'ಕರಾವಳಿ ಅಪ್‌ವೆಲ್ಲಿಂಗ್ ಮತ್ತು ಪೋಷಕಾಂಶಗಳ ಸ್ಥಿತಿ ಏನು?' }
+        ];
+      }
+      return [
+        { label: '🔬 SST vs Chl-a Correlation', query: 'Analyze the correlation between SST thermal fronts and chlorophyll-a concentration.' },
+        { label: '📉 Why has productivity declined?', query: 'Explain why pelagic fish productivity shifted or declined in nearshore zones.' },
+        { label: '🌡️ Thermocline Depth & Gradient', query: 'What is the current thermocline depth and vertical thermal gradient?' },
+        { label: '🌊 Coastal Upwelling Index', query: 'What is the Bakun coastal upwelling index status for this harbor sector?' }
+      ];
+    }
+
+    // 2. Coastal & Disaster Authority Persona Prompts
+    if (persona === 'authority') {
+      if (lang === 'kn') {
+        return [
+          { label: '🚨 IMBL ಗಡಿ ಅಂತರ & ಎಚ್ಚರಿಕೆ', query: 'ಅಂತಾರಾಷ್ಟ್ರೀಯ ಗಡಿಯ ಅಂತರವನ್ನು ಪರಿಶೀಲಿಸಿ.' },
+          { label: '🚫 ಸಂರಕ್ಷಿತ ವಲಯಗಳು (MPA)', query: 'ನಮ್ಮ ಸಮೀಪವಿರುವ ನಿಷೇಧಿತ ಅಥವಾ ಸಂರಕ್ಷಿತ ವಲಯಗಳು ಯಾವುವು?' },
+          { label: '⚡ ಮಿಂಚು & ಚಂಡಮಾರುತ ರಾಡಾರ್', query: 'ಕರಾವಳಿಯಲ್ಲಿ ಯಾವುದೇ ಮಿಂಚು ಅಥವಾ ಚಂಡಮಾರುತ ಎಚ್ಚರಿಕೆ ಇದೆಯೇ?' },
+          { label: '🌊 ಉಬ್ಬರವಿಳಿತ & ನೀರಿನ ಮಟ್ಟ', query: 'ಬಂದರಿನ ಪ್ರಸ್ತುತ ಉಬ್ಬರವಿಳಿತ ಮತ್ತು ನೀರಿನ ಮಟ್ಟವೇನು?' }
+        ];
+      }
+      return [
+        { label: '🚨 IMBL Border Clearance', query: 'Verify vessel distance to the International Maritime Boundary Line.' },
+        { label: '🚫 Protected Areas & MPAs', query: 'Identify all restricted Marine Protected Areas and coral sanctuaries to avoid.' },
+        { label: '⚡ Lightning & Cyclone Watch', query: 'Check atmospheric lightning CAPE radar and cyclone depression warnings.' },
+        { label: '🌊 Tidal Cycles & Port Draft', query: 'What are the current tide levels and next high/low tide timings for harbor navigation?' }
+      ];
+    }
+
+    // 3. Fisherman Operational Persona Prompts
     if (lang === 'te') {
       return [
         { label: '🐟 దగ్గరలోని చేపల జోన్ (PFZ)', query: 'ఈ రోజు అత్యధికంగా చేపలు ఎక్కడ లభిస్తాయి?' },
         { label: '🌊 సముద్ర వాతావరణం & అలలు', query: 'రేపు ఉదయం సముద్రంలోకి వెళ్లడం సురక్షితమేనా?' },
         { label: '🧭 తక్కువ డీజిల్ మార్గం', query: 'తక్కువ డీజిల్ వినియోగించే సురక్షిత మార్గం చూపించండి.' },
-        { label: '🛡️ అంతర్జాతీయ సరిహద్దు (IMBL)', query: 'అంతర్జాతీయ సముద్ర సరిహద్దు దూరం ఎంత?' }
+        { label: '⚡ మెరుపు & తుఫాను రాడార్', query: 'వాతావరణంలో మెరుపుల ప్రమాదం లేదా తుఫాను ఉందా?' }
       ];
     }
     if (lang === 'ml') {
@@ -23,7 +60,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
         { label: '🐟 അടുത്തുള്ള മത്സ്യ മേഖല (PFZ)', query: 'ഇന്ന് ഏറ്റവും കൂടുതൽ മീൻ എവിടെ ലഭിക്കും?' },
         { label: '🌊 കടൽ കാലാവസ്ഥയും തിരമാലയും', query: 'നാളെ രാവിലെ കടലിൽ പോകുന്നത് സുരക്ഷിതമാണോ?' },
         { label: '🧭 കുറഞ്ഞ ഡീസൽ റൂട്ട്', query: 'ഡീസൽ ലാഭിക്കുന്ന എഐ റൂട്ട് കാണിക്കുക.' },
-        { label: '🛡️ അന്താരാഷ്ട്ര അതിർത്തി (IMBL)', query: 'അന്താരാഷ്ട്ര സമുദ്ര അതിർത്തിയിലേക്കുള്ള ദൂരം പരിശോധിക്കുക.' }
+        { label: '⚡ മിന്നൽ സാധ്യത', query: 'കടലിൽ എന്തെങ്കിലും മിന്നലോ ചുഴലിക്കാറ്റോ സാധ്യതയുണ്ടോ?' }
       ];
     }
     if (lang === 'kn') {
@@ -31,7 +68,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
         { label: '🐟 ಹತ್ತಿರದ ಮೀನಿನ ವಲಯ (PFZ)', query: 'ಇಂದು ಸಮೃದ್ಧ ಮೀನುಗಾರಿಕೆ ವಲಯ ಎಲ್ಲಿದೆ?' },
         { label: '🌊 ಸಮುದ್ರ ಅಲೆ & ಹವಾಮಾನ', query: 'ನಾಳೆ ಬೆಳಿಗ್ಗೆ ಸಮುದ್ರಕ್ಕೆ ಇಳಿಯಲು ಸುರಕ್ಷಿತವೇ?' },
         { label: '🧭 ಕಡಿಮೆ ಇಂಧನದ ಹಾದಿ', query: 'ಕಡಿಮೆ ಡೀಸೆಲ್ ಖರ್ಚಿನ ಪ್ರವಾಹ-ಮಾರ್ಗವನ್ನು ಲೆಕ್ಕಹಾಕಿ.' },
-        { label: '🛡️ ಕಡಲ ಗಡಿ (IMBL) ಸ್ಥಿತಿ', query: 'ಅಂತಾರಾಷ್ಟ್ರೀಯ ಗಡಿಯ ಅಂತರವನ್ನು ಪರಿಶೀಲಿಸಿ.' }
+        { label: '⚡ ಮಿಂಚು & ಬಿರುಗಾಳಿ ರಾಡಾರ್', query: 'ಸಮುದ್ರದಲ್ಲಿ ಯಾವುದೇ ಮಿಂಚು ಅಥವಾ ಬಿರುಗಾಳಿ ಎಚ್ಚರಿಕೆ ಇದೆಯೇ?' }
       ];
     }
     if (lang === 'ta') {
@@ -39,7 +76,7 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
         { label: '🐟 அருகிலுள்ள மீன்பிடி மண்டலம் (PFZ)', query: 'இன்று அதிக மீன் உள்ள பகுதி எங்குள்ளது?' },
         { label: '🌊 கடல் அலை & வானிலை', query: 'நாளை காலை கடலுக்குச் செல்வது பாதுகாப்பானதா?' },
         { label: '🧭 குறைந்த டீசல் வழி', query: 'குறைந்த எரிபொருள் பயன்படுத்தும் AI வழியைக் கணக்கிடுங்கள்.' },
-        { label: '🛡️ சர்வதேச எல்லை (IMBL)', query: 'சர்வதேச கடல் எல்லைக்கான தூரத்தை சரிபார்க்கவும்.' }
+        { label: '⚡ மின்னல் ரேடார் எச்சரிக்கை', query: 'வானிலையில் மின்னல் அல்லது சூறாவளி ஆபத்து உள்ளதா?' }
       ];
     }
     if (lang === 'hi') {
@@ -47,18 +84,18 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
         { label: '🐟 निकटतम मछली क्षेत्र (PFZ)', query: 'आज सबसे अच्छी मछली पकड़ने का क्षेत्र कहाँ है?' },
         { label: '🌊 समुद्री मौसम और लहरें', query: 'क्या कल सुबह समुद्र में जाना सुरक्षित है?' },
         { label: '🧭 कम डीजल वाला मार्ग', query: 'कम डीजल वाला सबसे तेज मार्ग बताएं।' },
-        { label: '🛡️ अंतरराष्ट्रीय सीमा (IMBL)', query: 'अंतरराष्ट्रीय समुद्री सीमा की दूरी जांचें।' }
+        { label: '⚡ आकाशीय बिजली व चक्रवात', query: 'क्या समुद्र में आकाशीय बिजली या तूफान का खतरा है?' }
       ];
     }
     return [
       { label: '🐟 Nearest Fish Shoal (PFZ)', query: 'Where is the nearest Potential Fishing Zone today?' },
       { label: '🌊 Sea Waves & Weather', query: 'Is it safe to venture into the sea tomorrow morning?' },
       { label: '🧭 Low-Fuel Current Route', query: 'Calculate the lowest-fuel current-assisted route to the best Mackerel zone.' },
-      { label: '🛡️ IMBL Border Status', query: 'Check distance to international maritime boundary line.' }
+      { label: '⚡ Lightning & Cyclone Risk', query: 'Check atmospheric lightning CAPE radar and cyclone depression warnings.' }
     ];
   };
 
-  const suggestedQueries = getSuggestedQueries(selectedLang);
+  const suggestedQueries = getSuggestedQueries(selectedLang, selectedPersona);
 
   // Auto-scroll chat to bottom
   useEffect(() => {
@@ -277,6 +314,36 @@ export default function AgentChat({ onSendMessage, messages, isProcessing, colla
                 : 'bg-white/[0.05] text-slate-100 border border-white/[0.1] rounded-tl-none'
             }`}>
               <div className="whitespace-pre-wrap">{m.text}</div>
+
+              {/* Multi-Agent Reasoning Chain & Tool Execution Steps */}
+              {m.agentic_steps && m.agentic_steps.length > 0 && (
+                <div className="mt-3 pt-2.5 border-t border-white/10 space-y-1.5">
+                  <div className="flex items-center justify-between text-[10px] font-mono font-bold text-cyan-300">
+                    <span className="flex items-center gap-1.5">
+                      <Cpu className="w-3.5 h-3.5 text-cyan-400 animate-spin" style={{ animationDuration: '8s' }} />
+                      <span>Multi-Agent Reasoning & Tool Evidence</span>
+                    </span>
+                    <span className="text-[9px] bg-cyan-500/20 text-cyan-200 px-1.5 py-0.5 rounded border border-cyan-400/30">
+                      {m.agentic_steps.length} Subagents
+                    </span>
+                  </div>
+                  <div className="space-y-1.5 bg-black/50 border border-white/10 rounded-2xl p-2 font-mono shadow-inner">
+                    {m.agentic_steps.map((step, sIdx) => (
+                      <div key={sIdx} className="bg-white/[0.03] border border-white/[0.08] p-2 rounded-xl text-[10px] space-y-0.5">
+                        <div className="flex items-center justify-between font-bold">
+                          <span className="text-emerald-400 flex items-center gap-1">
+                            <span>{step.icon}</span> <span>{step.agent}</span>
+                          </span>
+                          <span className="text-[8px] uppercase tracking-wider text-slate-400 bg-white/10 px-1.5 py-0.5 rounded">
+                            {step.title}
+                          </span>
+                        </div>
+                        <p className="text-slate-300 text-[10px] leading-snug">{step.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               
               {/* Voice playback button for Agent responses */}
               {m.sender === 'agent' && (

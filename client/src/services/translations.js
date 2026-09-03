@@ -87,6 +87,33 @@ export const UI_TRANSLATIONS = {
     navWeather: "Weather",
     navPass: "Voyage Pass",
 
+    // Stakeholder Switcher
+    personaFisherman: "Fisherman",
+    personaResearcher: "Researcher",
+    personaAuthority: "Coastal Authority",
+
+    // Map GIS Layers
+    layerPFZ: "PFZ Hotspots",
+    layerSST: "SST Thermal Fronts",
+    layerChl: "Chlorophyll Bloom",
+    layerMPA: "Marine Protected (MPA)",
+    layerCyclone: "Cyclone Hazard Cone",
+
+    // Tides & Lightning
+    tidesTitle: "Tidal Cycles & Coastal Tides",
+    highTide: "Next High Tide",
+    lowTide: "Next Low Tide",
+    currentPhase: "Current Phase",
+    waterLevel: "Water Level",
+    lightningTitle: "Atmospheric Lightning & Cyclone Radar",
+    lightningRisk: "Lightning Risk",
+    cycloneAlert: "Cyclone Alert",
+    capeIndex: "CAPE Index",
+
+    // Agentic Chain of Thought
+    agenticTitle: "Multi-Agent Reasoning Chain",
+    agenticSubtitle: "Autonomous Task Decomposition & Tool Selection",
+
     // Footer
     footerText: "Project ORCA • Built for Smart India Hackathon (SIH 2026) • Sponsoring Ministry: ISRO (Dept. of Space)"
   },
@@ -175,6 +202,33 @@ export const UI_TRANSLATIONS = {
     navChat: "AI ಸಹಾಯಕ",
     navWeather: "ಹವಾಮಾನ",
     navPass: "ಯಾನ ಪಾಸ್",
+
+    // Stakeholder Switcher
+    personaFisherman: "ಮೀನುಗಾರ",
+    personaResearcher: "ಸಂಶೋಧಕ",
+    personaAuthority: "ಕರಾವಳಿ ಪ್ರಾಧಿಕಾರ",
+
+    // Map GIS Layers
+    layerPFZ: "ಮೀನಿನ ವಲಯ (PFZ)",
+    layerSST: "ಉಷ್ಣತಾ ವಲಯ (SST)",
+    layerChl: "ಕ್ಲೋರೊಫಿಲ್ ಸಾಂದ್ರತೆ",
+    layerMPA: "ಸಂರಕ್ಷಿತ ವಲಯ (MPA)",
+    layerCyclone: "ಚಂಡಮಾರುತ ಅಪಾಯ ವಲಯ",
+
+    // Tides & Lightning
+    tidesTitle: "ಉಬ್ಬರವಿಳಿತ & ನೀರಿನ ಮಟ್ಟ",
+    highTide: "ಮುಂದಿನ ಹೈ ಟೈಡ್",
+    lowTide: "ಮುಂದಿನ ಲೋ ಟೈಡ್",
+    currentPhase: "ಪ್ರಸ್ತುತ ಸ್ಥಿತಿ",
+    waterLevel: "ನೀರಿನ ಮಟ್ಟ",
+    lightningTitle: "ಮಿಂಚು & ಚಂಡಮಾರುತ ರಾಡಾರ್",
+    lightningRisk: "ಮಿಂಚಿನ ಅಪಾಯ",
+    cycloneAlert: "ಚಂಡಮಾರುತ ಎಚ್ಚರಿಕೆ",
+    capeIndex: "CAPE ಸೂಚ್ಯಂಕ",
+
+    // Agentic Chain of Thought
+    agenticTitle: "ಬಹು-ಏಜೆಂಟ್ ವಿಶ್ಲೇಷಣಾ ಸರಣಿ",
+    agenticSubtitle: "ಸ್ವಾಯತ್ತ ಕಾರ್ಯ ವಿಭಜನೆ & ಪರಿಕರಗಳ ಆಯ್ಕೆ",
 
     // Footer
     footerText: "ಪ್ರಾಜೆಕ್ಟ್ ಒರ್ಕಾ • ಸ್ಮಾರ್ಟ್ ಇಂಡಿಯಾ ಹ್ಯಾಕಥಾನ್ (SIH 2026) • ಪ್ರಾಯೋಜಕತ್ವ: ಇಸ್ರೋ (ಬಾಹ್ಯಾಕಾಶ ಇಲಾಖೆ)"
@@ -265,6 +319,33 @@ export const UI_TRANSLATIONS = {
     navWeather: "வானிலை",
     navPass: "பயண பாஸ்",
 
+    // Stakeholder Switcher
+    personaFisherman: "மீனவர்",
+    personaResearcher: "ஆராய்ச்சியாளர்",
+    personaAuthority: "கடலோர காவல்படை",
+
+    // Map GIS Layers
+    layerPFZ: "மீன்பிடி மண்டலம் (PFZ)",
+    layerSST: "வெப்பநிலை அடுக்கு (SST)",
+    layerChl: "குளோரோபில் செறிவு",
+    layerMPA: "பாதுகாக்கப்பட்ட பகுதி (MPA)",
+    layerCyclone: "சூறாவளி எச்சரிக்கை பகுதி",
+
+    // Tides & Lightning
+    tidesTitle: "அலை சுழற்சிகள் & நீர் மட்டம்",
+    highTide: "அடுத்த உயர் அலை",
+    lowTide: "அடுத்த குறைந்த அலை",
+    currentPhase: "தற்போதைய நிலை",
+    waterLevel: "நீர் மட்டம்",
+    lightningTitle: "மின்னல் & சூறாவளி ரேடார்",
+    lightningRisk: "மின்னல் ஆபத்து",
+    cycloneAlert: "சூறாவளி எச்சரிக்கை",
+    capeIndex: "CAPE குறியீடு",
+
+    // Agentic Chain of Thought
+    agenticTitle: "கூட்டு பல-முகவர் பகுப்பாய்வு",
+    agenticSubtitle: "தன்னியக்க பணிப் பகிர்வு & கருவிகள் தேர்வு",
+
     // Footer
     footerText: "ப்ராஜெக்ட் ஓர்கா • ஸ்மார்ட் இந்தியா ஹேக்கத்தான் (SIH 2026) • ஆதரவு: இஸ்ரோ (விண்வெளித் துறை)"
   },
@@ -353,6 +434,33 @@ export const UI_TRANSLATIONS = {
     navChat: "AI కో-పైలట్",
     navWeather: "వాతావరణం",
     navPass: "ప్రయాణ పాస్",
+
+    // Stakeholder Switcher
+    personaFisherman: "మత్స్యకారుడు",
+    personaResearcher: "పరిశోధకుడు",
+    personaAuthority: "కోస్ట్ గార్డ్ అధికారి",
+
+    // Map GIS Layers
+    layerPFZ: "చేపల జోన్ (PFZ)",
+    layerSST: "సముద్ర ఉష్ణోగ్రత (SST)",
+    layerChl: "క్లోరోఫిల్ సాంద్రత",
+    layerMPA: "రక్షిత ప్రాంతం (MPA)",
+    layerCyclone: "తుఫాను హెచ్చరిక జోన్",
+
+    // Tides & Lightning
+    tidesTitle: "ఆటుపోట్లు & నీటి మట్టం",
+    highTide: "తదుపరి హై టైడ్",
+    lowTide: "తదుపరి లో టైడ్",
+    currentPhase: "ప్రస్తుత స్థితి",
+    waterLevel: "నీటి మట్టం",
+    lightningTitle: "మెరుపు & తుఫాను రాడార్",
+    lightningRisk: "మెరుపుల ప్రమాదం",
+    cycloneAlert: "తుఫాను హెచ్చరిక",
+    capeIndex: "CAPE సూచిక",
+
+    // Agentic Chain of Thought
+    agenticTitle: "మల్టీ-ఏజెంట్ రీజనింగ్ చైన్",
+    agenticSubtitle: "టాస్క్ విభజన & టూల్ ఎంపిక",
 
     // Footer
     footerText: "ప్రాజెక్ట్ ఓర్కా • స్మార్ట్ ఇండియా హ్యాకథాన్ (SIH 2026) • భాగస్వామ్యం: ఇస్రో (అంతరిక్ష విభాగం)"
@@ -443,6 +551,33 @@ export const UI_TRANSLATIONS = {
     navWeather: "मौसम",
     navPass: "यात्रा पास",
 
+    // Stakeholder Switcher
+    personaFisherman: "मछुआरा",
+    personaResearcher: "शोधकर्ता",
+    personaAuthority: "तटरक्षक प्राधिकरण",
+
+    // Map GIS Layers
+    layerPFZ: "मछली क्षेत्र (PFZ)",
+    layerSST: "समुद्री तापमान (SST)",
+    layerChl: "क्लोरोफिल सांद्रता",
+    layerMPA: "संरक्षित क्षेत्र (MPA)",
+    layerCyclone: "चक्रवात चेतावनी क्षेत्र",
+
+    // Tides & Lightning
+    tidesTitle: "ज्वार-भाटा चक्र एवं जल स्तर",
+    highTide: "अगला उच्च ज्वार",
+    lowTide: "अगला निम्न ज्वार",
+    currentPhase: "वर्तमान स्थिति",
+    waterLevel: "जल स्तर",
+    lightningTitle: "तड़ित एवं चक्रवात रडार",
+    lightningRisk: "आसमानी बिजली खतरा",
+    cycloneAlert: "चक्रवात चेतावनी",
+    capeIndex: "CAPE सूचकांक",
+
+    // Agentic Chain of Thought
+    agenticTitle: "मल्टी-एजेंट रीज़निंग श्रृंखला",
+    agenticSubtitle: "स्वायत्त कार्य विभाजन एवं उपकरण चयन",
+
     // Footer
     footerText: "प्रोजेक्ट ओर्का • स्मार्ट इंडिया हैकथॉन (SIH 2026) • प्रायोजक: इसरो (अंतरिक्ष विभाग)"
   },
@@ -531,6 +666,33 @@ export const UI_TRANSLATIONS = {
     navChat: "AI കോ-പൈലറ്റ്",
     navWeather: "കാലാവസ്ഥ",
     navPass: "യാത്രാ പാസ്",
+
+    // Stakeholder Switcher
+    personaFisherman: "മത്സ്യത്തൊഴിലാളി",
+    personaResearcher: "ഗവേഷകൻ",
+    personaAuthority: "കോസ്റ്റ് ഗാർഡ് അതോറിറ്റി",
+
+    // Map GIS Layers
+    layerPFZ: "മത്സ്യ മേഖല (PFZ)",
+    layerSST: "സമുദ്ര താപനില (SST)",
+    layerChl: "ക്ലോറോഫിൽ സാന്ദ്രത",
+    layerMPA: "സംരക്ഷിത പ്രദേശം (MPA)",
+    layerCyclone: "ചുഴലിക്കാറ്റ് മുന്നറിയിപ്പ്",
+
+    // Tides & Lightning
+    tidesTitle: "വേലിയേറ്റ-വേലിയിറക്ക ചക്രം",
+    highTide: "അടുത്ത വേലിയേറ്റം",
+    lowTide: "അടുത്ത വേലിയിറക്കം",
+    currentPhase: "നിലവിലെ അവസ്ഥ",
+    waterLevel: "ജലനിരപ്പ്",
+    lightningTitle: "മിന്നലും ചുഴലിക്കാറ്റും റഡാർ",
+    lightningRisk: "മിന്നൽ സാധ്യത",
+    cycloneAlert: "ചുഴലിക്കാറ്റ് മുന്നറിയിപ്പ്",
+    capeIndex: "CAPE സൂചിക",
+
+    // Agentic Chain of Thought
+    agenticTitle: "മൾട്ടി-ഏജന്റ് വിശകലന ശൃംഖല",
+    agenticSubtitle: "സ്വയംപ്രേരിത ചുമതല വിഭജനം & ടൂൾ തിരഞ്ഞെടുപ്പ്",
 
     // Footer
     footerText: "പ്രൊജക്റ്റ് ഓർക്ക • സ്മാർട്ട് ഇന്ത്യ ഹാക്കത്തോൺ (SIH 2026) • സ്പോൺസർ: ഐഎസ്ആർഒ (ബഹിരാകാശ വകുപ്പ്)"
